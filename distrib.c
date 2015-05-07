@@ -2,7 +2,7 @@
 #include "distrib.h" 
 #include <stdlib.h>
 
-int Sample(const Distrib& Chi) { 
+int Sample(const Distrib Chi) { 
   if (Chi.max) {///ASK PETER
     double r = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
     for (int i = 0; i < Chi.max; ++i) 

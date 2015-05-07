@@ -10,7 +10,7 @@ typedef struct {
   const float* table; // CDF of Gaussian of standard deviation std_dev centered around offset
 } Distrib;
 
-int Sample(const Distrib& Chi); /* sample integer with gaussian distribution */ 
+int Sample(const Distrib Chi); /* sample integer with gaussian distribution */ 
 
 // Distribution of std dev 1.2
 const float Chi1_Table[23] = {
