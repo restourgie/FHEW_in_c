@@ -1,5 +1,6 @@
 #include "../LWE.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
 #include "../FHEW.h"
 
@@ -10,7 +11,7 @@
 *                                                                        *
 *************************************************************************/
 
-void SaveSecretKey(const LWE::SecretKey* LWEsk, char* filepath) {
+void SaveSecretKey(const SecretKey* LWEsk, char* filepath) {
   FILE * f;
   f = fopen(filepath, "wb"); // wb -write binary
   if (f == NULL) {
@@ -18,20 +19,20 @@ void SaveSecretKey(const LWE::SecretKey* LWEsk, char* filepath) {
     exit(EXIT_FAILURE);
   }
   printf("Writing Secret key to %s .\n", filepath);
-  fwrite(LWEsk, sizeof(LWE::SecretKey), 1, f);
+  fwrite(LWEsk, sizeof(SecretKey), 1, f);
   fclose(f);
 }
 
-LWE::SecretKey* LoadSecretKey(char* filepath) {
+SecretKey* LoadSecretKey(char* filepath) {
   FILE * f;
   f = fopen(filepath, "rb"); // wb -write binary
   if (f == NULL) {
     printf("Failed to open %s in Read-Binary mode.\n", filepath);
     exit(EXIT_FAILURE);
   }
-  LWE::SecretKey* LWEsk = (LWE::SecretKey*) malloc(sizeof(LWE::SecretKey));  
+  SecretKey* LWEsk = (SecretKey*) malloc(sizeof(SecretKey));  
   printf("Reading Secret key From %s .\n", filepath);
-  assert(fread(LWEsk, sizeof(LWE::SecretKey), 1, f));
+  assert(fread(LWEsk, sizeof(SecretKey), 1, f));
   printf("Secret Key read.\n");
   fclose(f);
   return LWEsk;
@@ -44,7 +45,7 @@ LWE::SecretKey* LoadSecretKey(char* filepath) {
 *                                                                        *
 *************************************************************************/
 
-void SaveEvalKey(const FHEW::EvalKey *EK, char* filepath) {
+void SaveEvalKey(EvalKey *EK, char* filepath) {
   FILE * f;
   f = fopen(filepath, "wb"); // wb -write binary
   if (f == NULL) {
@@ -52,12 +53,12 @@ void SaveEvalKey(const FHEW::EvalKey *EK, char* filepath) {
     exit(EXIT_FAILURE);
   }
   printf("Writing Evaluation key to %s .\n", filepath);
-  FHEW::fwrite_ek(*EK, f);
+  fwrite_ek(*EK, f);
   fclose(f);
 }
 
-FHEW::EvalKey* LoadEvalKey(char* filepath) {
-  FHEW::EvalKey* EK;
+EvalKey* LoadEvalKey(char* filepath) {
+  EvalKey* EK;
   FILE * f;
   f = fopen(filepath, "rb"); // rb -read binary
   if (f == NULL){
@@ -65,7 +66,7 @@ FHEW::EvalKey* LoadEvalKey(char* filepath) {
     exit(EXIT_FAILURE);
   }
   printf("Reading Evaluation key from %s.\n", filepath);
-  EK = FHEW::fread_ek(f);
+  EK = fread_ek(f);
   printf("KSKey Read : %d \t %d \t %d .\n", N, KS_base, KS_exp);
   fclose(f);
   return EK;
@@ -78,7 +79,7 @@ FHEW::EvalKey* LoadEvalKey(char* filepath) {
 *************************************************************************/
 
 
-void SaveCipherText(const LWE::CipherText* ct, char* filepath){
+void SaveCipherText(const CipherText* ct, char* filepath){
    FILE * f;
   f = fopen(filepath, "wb"); // wb -write binary
   if (f == NULL){
@@ -86,11 +87,11 @@ void SaveCipherText(const LWE::CipherText* ct, char* filepath){
     exit(EXIT_FAILURE);
   }
   printf("Writing CipherText to %s .\n", filepath);
-  assert(fwrite(ct, sizeof(LWE::CipherText), 1, f));
+  assert(fwrite(ct, sizeof(CipherText), 1, f));
   fclose(f);
 }
 
-LWE::CipherText* LoadCipherText(char* filepath) {
+CipherText* LoadCipherText(char* filepath) {
   FILE * f;
   f = fopen(filepath, "rb"); // wb -write binary
   if (f == NULL) {
@@ -98,8 +99,8 @@ LWE::CipherText* LoadCipherText(char* filepath) {
     exit(EXIT_FAILURE);
   }
   printf("Loading CipherText from %s.\n", filepath);
-  LWE::CipherText* ct = new LWE::CipherText;
-  assert(fread(ct, sizeof(LWE::CipherText), 1, f));
+  CipherText* ct = new CipherText;
+  assert(fread(ct, sizeof(CipherText), 1, f));
   fclose(f);
   return ct;
 }

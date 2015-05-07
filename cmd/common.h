@@ -5,19 +5,16 @@
 #include "../FHEW.h"
 
 
-using namespace std;
+void SaveSecretKey(SecretKey* ct, char* filepath);
+SecretKey* LoadSecretKey(char* filepath);
 
 
-void SaveSecretKey(const LWE::SecretKey* ct, char* filepath);
-LWE::SecretKey* LoadSecretKey(char* filepath);
+void SaveEvalKey(const EvalKey *EK, char* filepath);
+EvalKey* LoadEvalKey(char* filepath);
 
 
-void SaveEvalKey(const FHEW::EvalKey *EK, char* filepath);
-FHEW::EvalKey* LoadEvalKey(char* filepath);
-
-
-void SaveCipherText(const LWE::CipherText* ct, char* filepath);
-LWE::CipherText* LoadCipherText(char* filepath);
+void SaveCipherText(const CipherText* ct, char* filepath);
+CipherText* LoadCipherText(char* filepath);
 
 
 #endif

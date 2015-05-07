@@ -18,7 +18,7 @@
   //TODOOOOOOOOOOOOOOOOO
   // void HomNAND(CipherText* res, const EvalKey& EK, const CipherText& ct1, const CipherText& ct2);
 
-  // void fwrite_ek(const EvalKey& EK, FILE* f);
+  //void fwrite_ek(const EvalKey& EK, FILE* f);
   // EvalKey* fread_ek(FILE* f);
 
 #endif

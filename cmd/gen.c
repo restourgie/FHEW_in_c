@@ -4,8 +4,8 @@
 #include "common.h"
 #include <stdlib.h>
 
-FHEW::EvalKey EK;
-LWE::SecretKey LWEsk;
+EvalKey EK;
+SecretKey LWEsk;
 
 void help(char* cmd){
 	printf("\nusage: %s  SecretKeyFileName EvalKeyFileName  \n\n Generate a secret key sk and evaluation key ek, and store them in two separate files.\n\n",cmd);
