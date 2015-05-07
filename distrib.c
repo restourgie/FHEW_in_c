@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 int Sample(const Distrib& Chi) { 
-  if (Chi.max) {
+  if (Chi.max) {///ASK PETER
     double r = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
     for (int i = 0; i < Chi.max; ++i) 
       if (r<= Chi.table[i]) 
@@ -13,7 +13,8 @@ int Sample(const Distrib& Chi) {
   }
 
   double r, s = Chi.std_dev;
-  if (s < 500){  
+  if (s < 500) //ONLY CHI3????
+  {  
     int x, maxx = ceil(s*8);
     while(true) {
       x = rand() % (2*maxx + 1)  - maxx;
@@ -24,7 +25,7 @@ int Sample(const Distrib& Chi) {
 
   // For some reason unknown to us, the previous implementation provides a bad distribution for large s...
   // We switch from "discrete gaussian" to rounded gaussian when s gets larger
-
+  //THIS IS CHI2?? WHY NOT 3 DIFFERENT FUNCTIONS???
   double x;
 
   while(true) 

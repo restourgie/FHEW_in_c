@@ -81,11 +81,15 @@ void FFTforward(Ring_FFT res, const Ring_ModQ val) {
     } 
     CalcFFT(data,-1);
     for(int k=0; k < N2; ++k){
-      res[k][0] = out[2*k+1][0];
+      res[k][0] = out[2*k+1][0];pet
       res[k][1] = out[2*k+1][1];
     }
 }
 
 void FFTbackward(Ring_ModQ res, const Ring_FFT val){
+  complex_double data[N];
+  for(int k = 0;k < N2; ++k){
+    data[2*k+1] = val[k]/N; //NOT DONE YET
+  }
 
 }

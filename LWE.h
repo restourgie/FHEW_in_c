@@ -26,19 +26,19 @@ namespace LWE {
   
   void KeyGen(SecretKey sk);
   void KeyGenN(SecretKeyN sk);
-  void Encrypt(CipherText* ct, const SecretKey sk, int m);
-  int Decrypt(const SecretKey sk, const CipherText& ct);
+  // void Encrypt(CipherText* ct, const SecretKey sk, int m);
+  // int Decrypt(const SecretKey sk, const CipherText& ct);
 
 
-  typedef CipherTextQ* SwitchingKey[N][KS_base][KS_exp];
+  typedef CipherTextQ* SwitchingKey[N][KS_base][KS_exp]; //SwitchingKey => CipherTextQ[1024][25][7]
   // Generate key material (SwitchingKey) required by KeySwitch to transform 
   // LWE encryptions under old_sk into LWE encryptions under new_sk
   void SwitchingKeyGen(SwitchingKey res, const SecretKey new_sk, const SecretKeyN old_sk);
-  void KeySwitch(CipherTextQ* res, const SwitchingKey K, const CipherTextQN& ct);
+  // void KeySwitch(CipherTextQ* res, const SwitchingKey K, const CipherTextQN& ct);
 
   // Changes an LWE ciphertext modulo Q into an LWE ciphertext modulo q
-  void ModSwitch(CipherText* ct, const CipherTextQ& c); 
-  int round_qQ(ZmodQ v);
+  // void ModSwitch(CipherText* ct, const CipherTextQ& c); 
+  // int round_qQ(ZmodQ v);
 
 
 // For debbugging purpose you can use the following 

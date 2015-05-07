@@ -17,11 +17,52 @@ void setup(){
 
 
 void FHEWencrypt(ct_FFT ct, Ring_FFT sk_FFT, int m) {
+    Ring_FFT ai;
+    ct_ModQ res;
+    int mm = (((m % q) + q) % q) * (2*N/q);             // Reduce mod q (dealing with negative number as well)
+    int sign = 1;
+    
+    if (mm >= N) { 
+    	mm -= N; 
+    	sign = -1; 
+    }
+    
+    for (int i = 0; i < K2; ++i) 
+    {
+      for (int k = 0; k < N; ++k) res[i][0][k] = rand(); // % Q
+      	FFTforward(ai, res[i][0]);
+      for (int k = 0; k < N2; ++k) 
+        ai[k] = ((double complex) ai[k]) * ((double complex) sk_FFT[k]);
+      FFTbackward(res[i][1], ai);
+      for (int k = 0; k < N; ++k) 
+      	res[i][1][k] += Sample(Chi1);    // Add error [a,as+e]
+    }
+    for (int i = 0; i < K; ++i) 
+    {
+      res[2*i  ][0][mm] += sign*vgprime[i]; // Add G Multiple
+      res[2*i+1][1][mm] += sign*vgprime[i]; // [a,as+e] + X^m *G
+    }
+    for (int i = 0; i < K2; ++i)
+      for (int j = 0; j < 2; ++j)
+		FFTforward(ct[i][j], res[i][j]);
 
 }
 
 
-void KeyGen(EvalKey* EK, const LWE::SecretKey LWEsk) {
+void KeyGen(EvalKey* EK, const SecretKey LWEsk) {
+	SecretKeyN FHEWsk;
+	KeyGenN(FHEWsk);
+	SwitchingKeyGen(EK -> KSkey, LWEsk, FHEWsk);
+
+	Ring_FFT FHEWskFFT;
+	FFTforward(FHEWskFFT,FHEWsk);
+	for (int i = 0; i < n; ++i)
+      for (int j = 1; j < BS_base; ++j)
+        for (int k = 0; k < BS_exp; ++k) 
+        {
+          EK->BSkey[i][j][k] = (ct_FFT*) fftw_malloc(sizeof(ct_FFT));//IS THIS NEEDED?
+          FHEWencrypt( (*EK->BSkey[i][j][k]), FHEWskFFT, LWEsk[i] * j * BS_table[k] );
+        }
 
 }
 
