@@ -99,7 +99,7 @@ CipherText* LoadCipherText(char* filepath) {
     exit(EXIT_FAILURE);
   }
   printf("Loading CipherText from %s.\n", filepath);
-  CipherText* ct = new CipherText;
+  CipherText *ct = malloc(sizeof *ct);
   assert(fread(ct, sizeof(CipherText), 1, f));
   fclose(f);
   return ct;

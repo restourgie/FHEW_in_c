@@ -1,6 +1,7 @@
 #include "FHEW.h"
 #include "FFT.h"
 #include <assert.h>
+#include <stdio.h>
 
 typedef Ring_ModQ ct_ModQ[K2][2];   // Ciphertext in coefficient form
 typedef Ring_ModQ dct_ModQ[K2][K2]; // Decomposed Ciphertext in coeff form
@@ -9,7 +10,7 @@ typedef Ring_FFT  dct_FFT[K2][K2];  // Decomposed Ciphertext in FFT form
 Ring_FFT t_TestMSB;
 
 void setup(){
-	Ring_modQ tmsb;
+	Ring_ModQ tmsb;
 	for (int i = 1; i < N; ++i)
 		tmsb[i]=1;
 	FFTforward(t_TestMSB,tmsb);
@@ -66,7 +67,7 @@ void KeyGen(EvalKey* EK, const SecretKey LWEsk) {
 
 }
 
-void fwrite_ek(const EvalKey& EK, FILE* f) {
+void fwrite_ek(EvalKey EK, FILE* f) {
 	// Write bootstrapping key
 	for (int i = 0; i < n; ++i)      
 	  for (int j = 1; j < BS_base; ++j)

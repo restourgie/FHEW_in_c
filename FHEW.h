@@ -3,6 +3,7 @@
 
 #include "params.h"
 #include "LWE.h"
+#include <stdio.h>
 
 
   typedef Ring_FFT  ct_FFT[K2][2];  // Ciphertext in FFT form ct_FFT[K2][2] => Ring_FFT[6][2] => complex_double[6][2][513] => double[6][2][513][2]
@@ -18,7 +19,7 @@
   //TODOOOOOOOOOOOOOOOOO
   // void HomNAND(CipherText* res, const EvalKey& EK, const CipherText& ct1, const CipherText& ct2);
 
-  //void fwrite_ek(const EvalKey& EK, FILE* f);
-  // EvalKey* fread_ek(FILE* f);
+  void fwrite_ek(EvalKey EK, FILE* f);
+  EvalKey* fread_ek(FILE* f);
 
 #endif
