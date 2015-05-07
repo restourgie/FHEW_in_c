@@ -4,7 +4,6 @@
 #include "params.h"
 #include "distrib.h"
 
-namespace LWE {
   
   typedef struct { // n-dimensional LWE ciphertext modulo q
     int a[n]; // array of n integers modulo q 
@@ -24,7 +23,7 @@ namespace LWE {
   typedef int SecretKey[n]; // n-dimensional LWE secret key 
   typedef int SecretKeyN[N]; // N-dimensional LWE secret key 
   
-  void KeyGen(SecretKey sk);
+  void LWEKeyGen(SecretKey sk);
   void KeyGenN(SecretKeyN sk);
   // void Encrypt(CipherText* ct, const SecretKey sk, int m);
   // int Decrypt(const SecretKey sk, const CipherText& ct);
@@ -44,8 +43,6 @@ namespace LWE {
 // For debbugging purpose you can use the following 
 //  void DecryptDetail(const SecretKey sk, const CipherText& ct); 
 
-
-}
 
 
 

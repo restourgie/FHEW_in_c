@@ -21,9 +21,9 @@ int main (int argc, char *argv[])
 	char* sk_fn = argv[1]; 
   	char* ek_fn = argv[2];
 
-  FHEW::Setup();
-  LWE::KeyGen(LWEsk);
-  FHEW::KeyGen(&EK, LWEsk);
+  Setup();
+  LWEKeyGen(LWEsk);
+  FHEWKeyGen(&EK, LWEsk);
   SaveEvalKey(&EK,ek_fn);
   SaveSecretKey(&LWEsk,sk_fn);
 }

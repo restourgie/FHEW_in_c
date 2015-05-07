@@ -76,7 +76,7 @@ void fwrite_ek(const EvalKey& EK, FILE* f) {
 	for (int i = 0; i < N; ++i)
 	  for (int j = 0; j < KS_base; ++j)
 	    for (int k = 0; k < KS_exp; ++k)
-	        assert(fwrite(EK.KSkey[i][j][k], sizeof(LWE::CipherTextQ), 1, f));
+	        assert(fwrite(EK.KSkey[i][j][k], sizeof(CipherTextQ), 1, f));
 }
 
 EvalKey* fread_ek(FILE* f) {
@@ -95,27 +95,27 @@ EvalKey* fread_ek(FILE* f) {
 	  for (int j = 0; j < KS_base; ++j)
 	    for (int k = 0; k < KS_exp; ++k) 
 	    {
-		  EK->KSkey[i][j][k] = new LWE::CipherTextQ;
-		  assert(fread(EK->KSkey[i][j][k], sizeof(LWE::CipherTextQ), 1, f));
+		  EK->KSkey[i][j][k] = new CipherTextQ;
+		  assert(fread(EK->KSkey[i][j][k], sizeof(CipherTextQ), 1, f));
 		}
 	return EK;
 }
 
+//TODOOOOOOOOOOOOOOOOOOO
+// void AddToACC(ct_FFT ACC, ct_FFT C) {
 
-void AddToACC(ct_FFT ACC, ct_FFT C) {
+// }
 
-}
+// void InitializeACC(ct_FFT ACC, int m) {
 
-void InitializeACC(ct_FFT ACC, int m) {
-
-}
+// }
 
 
-LWE::CipherTextQN* MemberTest(Ring_FFT t, ct_FFT C) {
+// CipherTextQN* MemberTest(Ring_FFT t, ct_FFT C) {
 
-}
+// }
 
-void HomNAND(LWE::CipherText* res, const EvalKey& EK, const LWE::CipherText& ct1, const LWE::CipherText& ct2) {
+// void HomNAND(CipherText* res, const EvalKey& EK, const CipherText& ct1, const CipherText& ct2) {
 
-}
+// }
 

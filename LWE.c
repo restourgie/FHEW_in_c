@@ -4,8 +4,8 @@
 #include <stdlib.h>
 
 
-void KeyGen(LWE::SecretKey sk) {
-	KeyGenRestart:
+void LWEKeyGen(SecretKey sk) {
+	KeyGenRestart:;
     int s=0, ss=0;
     for (int i = 0; i < n; ++i) {
 
@@ -17,7 +17,7 @@ void KeyGen(LWE::SecretKey sk) {
       if (abs(ss - n/2)>5) goto KeyGenRestart;
 }
 
-void KeyGenN(LWE::SecretKeyN sk) {
+void KeyGenN(SecretKeyN sk) {
 	for(int i =0;i < N; ++i)
 		sk[i] = Sample(Chi1); //WHY ARE THERE NO CHECKS HERE?? IT IS THE SAME
 }
@@ -44,12 +44,12 @@ void KeyGenN(LWE::SecretKeyN sk) {
 // }
 
 //GENERATE SwitchingKey //SwitchingKey => CipherTextQ[1024][25][7] //CipherTextQ = {ZmodQ a[n]; ZmodQ b;} => ZmodQ = int32_t and n = 500 
-void SwitchingKeyGen(LWE::SwitchingKey res,const LWE::SecretKey new_sk,const LWE::SecretKeyN old_sk) {
+void SwitchingKeyGen(SwitchingKey res,const SecretKey new_sk,const SecretKeyN old_sk) {
 	for (int i = 0; i < N; ++i) 
       for (int j = 0; j < KS_base; ++j)
 		for (int k = 0; k < KS_exp; ++k) 
 		{
-	  		LWE::CipherTextQ *ct = malloc(sizeof *ct);    
+	  		CipherTextQ *ct = malloc(sizeof *ct);    
 	  		ct->b = -old_sk[i]*j*KS_table[k] + Sample(Chi2);
 	  		for (int l = 0; l < n; ++l) 
 	  		{
