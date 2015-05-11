@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-FHEW::EvalKey* EK;
+EvalKey* EK;
 
 
 void help(char* cmd) {
@@ -20,16 +20,16 @@ int main(int argc, char *argv[]) {
   char* ict2_fn = argv[3]; 
   char* oct_fn = argv[4]; 
 
-  FHEW::Setup();
+  Setup();
 
 
   EK = LoadEvalKey(ek_fn);
 
-  LWE::CipherText *ct1,*ct2,*ct3;
+  CipherText *ct1,*ct2,*ct3;
 
   ct1 = LoadCipherText(ict1_fn);
   ct2 = LoadCipherText(ict2_fn);
-  CipherText ct3;
+
 
   HomNAND(ct3, *EK,*ct1,*ct2);
 

@@ -33,10 +33,10 @@
   // Generate key material (SwitchingKey) required by KeySwitch to transform 
   // LWE encryptions under old_sk into LWE encryptions under new_sk
   void SwitchingKeyGen(SwitchingKey res, const SecretKey new_sk, const SecretKeyN old_sk);
-  // void KeySwitch(CipherTextQ* res, const SwitchingKey K, const CipherTextQN& ct);
+  void KeySwitch(CipherTextQ* res, const SwitchingKey Key, const CipherTextQN ct);
 
   // Changes an LWE ciphertext modulo Q into an LWE ciphertext modulo q
-  // void ModSwitch(CipherText* ct, const CipherTextQ& c); 
+  void ModSwitch(CipherText* ct, const CipherTextQ c); 
   // int round_qQ(ZmodQ v);
 
 

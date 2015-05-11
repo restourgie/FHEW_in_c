@@ -46,9 +46,11 @@ void Encrypt(CipherText* ct, const SecretKey sk, int m) {
   
 // }
   
-// void ModSwitch(CipherText* ct, const CipherTextQ& c) {
-
-// }
+void ModSwitch(CipherText* ct, const CipherTextQ c) {
+  for (int i = 0; i < n; ++i) 
+    ct->a[i] = round_qQ(c.a[i]);  
+  ct->b = round_qQ(c.b);
+}
 
 //GENERATE SwitchingKey //SwitchingKey => CipherTextQ[1024][25][7] //CipherTextQ = {ZmodQ a[n]; ZmodQ b;} => ZmodQ = int32_t and n = 500 
 void SwitchingKeyGen(SwitchingKey res,const SecretKey new_sk,const SecretKeyN old_sk) {
@@ -67,7 +69,8 @@ void SwitchingKeyGen(SwitchingKey res,const SecretKey new_sk,const SecretKeyN ol
 		}
 }
   
-void KeySwitch(CipherTextQ* res, const SwitchingKey K, const CipherTextQN& ct) {
+void KeySwitch(CipherTextQ* res, const SwitchingKey Key, const CipherTextQN ct) {
+  //SwitchingKey => CipherTextQ[1024][25][7]
   for (int k = 0; k < n; ++k) 
     res->a[k] = 0;
     
@@ -79,8 +82,9 @@ void KeySwitch(CipherTextQ* res, const SwitchingKey K, const CipherTextQN& ct) {
     {
       uZmodQ a0 = a % KS_base;
       for (int k = 0; k < n; ++k)
-        res->a[k] -= (K[i][a0][j])->a[k];
-      res->b -= (K[i][a0][j])->b;
+        res->a[k] -= (Key[i][a0][j])->a[k];
+      
+      res->b -= (Key[i][a0][j])->b;
     }
   } 
 }

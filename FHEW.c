@@ -61,7 +61,7 @@ void KeyGen(EvalKey* EK, const SecretKey LWEsk) {
       for (int j = 1; j < BS_base; ++j)
         for (int k = 0; k < BS_exp; ++k) 
         {
-          EK->BSkey[i][j][k] = (ct_FFT*) fftw_malloc(sizeof(ct_FFT));//IS THIS NEEDED?
+          // EK->BSkey[i][j][k] = (ct_FFT*) fftw_malloc(sizeof(ct_FFT));//IS THIS NEEDED?
           FHEWencrypt( (*EK->BSkey[i][j][k]), FHEWskFFT, LWEsk[i] * j * BS_table[k] );
         }
 
@@ -96,7 +96,7 @@ EvalKey* fread_ek(FILE* f) {
 	  for (int j = 0; j < KS_base; ++j)
 	    for (int k = 0; k < KS_exp; ++k) 
 	    {
-		  EK->KSkey[i][j][k] = new CipherTextQ;
+		  // EK->KSkey[i][j][k] = new CipherTextQ;//??????????????????????????????????????????????????????????????
 		  assert(fread(EK->KSkey[i][j][k], sizeof(CipherTextQ), 1, f));
 		}
 	return EK;
@@ -197,7 +197,7 @@ CipherTextQN* MemberTest(Ring_FFT t, ct_FFT C) {
 
 }
 
-void HomNAND(CipherText* res, const EvalKey& EK, const CipherText& ct1, const CipherText& ct2) {
+void HomNAND(CipherText* res, const EvalKey EK, const CipherText ct1, const CipherText ct2) {
 	CipherText e12;
     for (int i = 0; i < n; ++i)
       e12.a[i] = (2*q - (ct1.a[i] + ct2.a[i])) % q;
@@ -217,8 +217,8 @@ void HomNAND(CipherText* res, const EvalKey& EK, const CipherText& ct1, const Ci
     }
     CipherTextQN *eQN = MemberTest(t_TestMSB, ACC);
     CipherTextQ eQ;
-    LWE::KeySwitch(&eQ, EK.KSkey, *eQN);
-    LWE::ModSwitch(res, eQ);
+    KeySwitch(&eQ, EK.KSkey, *eQN);
+    ModSwitch(res, eQ);
 
 }
 
