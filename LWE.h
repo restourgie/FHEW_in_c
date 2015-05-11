@@ -25,7 +25,7 @@
   
   void LWEKeyGen(SecretKey sk);
   void KeyGenN(SecretKeyN sk);
-  // void Encrypt(CipherText* ct, const SecretKey sk, int m);
+  void Encrypt(CipherText* ct, const SecretKey sk, int m);
   // int Decrypt(const SecretKey sk, const CipherText& ct);
 
 

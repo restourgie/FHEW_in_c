@@ -22,9 +22,16 @@ void KeyGenN(SecretKeyN sk) {
 		sk[i] = Sample(Chi1); //WHY ARE THERE NO CHECKS HERE?? IT IS THE SAME
 }
 
-// void Encrypt(CipherText* ct, const SecretKey sk, int m) {
-
-// }
+void Encrypt(CipherText* ct, const SecretKey sk, int m) {
+    ct->b = (m % 4) * q / 4;//can you just do m * q / 4 because m is 0 or 1 this is always the same mod 4
+    ct->b += Sample(Chi3);
+    
+    for (int i = 0; i < n; ++i)	
+    {
+      ct->a[i] = rand() % q;
+      ct->b = (ct->b + ct->a[i] * sk[i]) % q;
+    }
+}
 
 // int Decrypt(const SecretKey sk, const CipherText& ct) {
  
@@ -60,8 +67,23 @@ void SwitchingKeyGen(SwitchingKey res,const SecretKey new_sk,const SecretKeyN ol
 		}
 }
   
-// void KeySwitch(CipherTextQ* res, const SwitchingKey K, const CipherTextQN& ct) {
-
-// }
+void KeySwitch(CipherTextQ* res, const SwitchingKey K, const CipherTextQN& ct) {
+  for (int k = 0; k < n; ++k) 
+    res->a[k] = 0;
+    
+  res->b = ct.b;
+  for (int i = 0; i < N; ++i) 
+  {
+    uZmodQ a = -ct.a[i];
+    for (int j = 0; j < KS_exp; ++j, a /= KS_base) 
+    {
+      uZmodQ a0 = a % KS_base;
+      for (int k = 0; k < n; ++k)
+        res->a[k] -= (K[i][a0][j])->a[k];
+      res->b -= (K[i][a0][j])->b;
+    }
+  } 
+}
   
+
 

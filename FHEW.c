@@ -3,9 +3,9 @@
 #include <assert.h>
 #include <stdio.h>
 
-typedef Ring_ModQ ct_ModQ[K2][2];   // Ciphertext in coefficient form
-typedef Ring_ModQ dct_ModQ[K2][K2]; // Decomposed Ciphertext in coeff form
-typedef Ring_FFT  dct_FFT[K2][K2];  // Decomposed Ciphertext in FFT form
+typedef Ring_ModQ ct_ModQ[K2][2];   // Ciphertext in coefficient form. ct_ModQ => Ring_ModQ[6][2] => Ring_ModQ[6][2] =>  ZmodQ[6][2][1024] => int32_t[6][2][1024]
+typedef Ring_ModQ dct_ModQ[K2][K2]; // Decomposed Ciphertext in coeff form. dct_ModQ => Ring_ModQ[6][6] => ZmodQ[6][6][1024] => int32_t[6][6][1024]
+typedef Ring_FFT  dct_FFT[K2][K2];  // Decomposed Ciphertext in FFT form. dct_FFT => Ring_FFT[6][6] => complex_double[6][6][513] => double[6][6][513][2]
 
 Ring_FFT t_TestMSB;
 
@@ -102,21 +102,123 @@ EvalKey* fread_ek(FILE* f) {
 	return EK;
 }
 
-//TODOOOOOOOOOOOOOOOOOOO
-// void AddToACC(ct_FFT ACC, ct_FFT C) {
 
-// }
+void AddToACC(ct_FFT ACC, ct_FFT C) {
+	ct_ModQ ct;		//int32_t[6][2][1024]
+    dct_ModQ dct;	//int32_t[6][6][1024]
+    dct_FFT dctFFT;	//double[6][6][513][2]
+    // Decompose_ct(dctFFT, ACC);
+    for (int i = 0; i < K2; ++i)
+      for (int j = 0; j < 2; ++j)
+		FFTbackward(ct[i][j], ACC[i][j]);
+    for (int i = 0; i < K2; ++i)
+      for (int j = 0; j < 2; ++j)
+		for (int k = 0; k < N; ++k) 
+		{
+	  		ZmodQ t = ct[i][j][k] * v_inverse;
+	  		for (int l = 0; l < K; ++l) 
+	  		{
+	    		ZmodQ r = (t << g_bits_32[l]) >> g_bits_32[l];
+		     // if ((l==2) && (k ==0 ))
+		     //  cout << r << ",";
+			    t = (t-r) >> g_bits[l];
+			    dct[i][j+2*l][k] = r;
+	  		}
+		}
+    
+    for (int i = 0; i < K2; ++i)
+      for (int j = 0; j < K2; ++j)
+		FFTforward(dctFFT[i][j], dct[i][j]);
+    // Mult_dct_ct(ACC, dct, C);
+    for (int i = 0; i < K2; ++i)     
+      for (int j = 0; j < 2; ++j)
+		for (int k = 0; k < N2; ++k) 
+		{
+	  		ACC[i][j][k][0] = 0.0;
+	  		ACC[i][j][k][1] = 0.0;
+	  		for (int l = 0; l < K2; ++l)
+	  			//(x + yi)(u + vi) = (xu - yv) + (xv + yu)i
+	  			//HERE WE ADD ACC TO THE COMPLEX MULTIPLICATION OF dctFFT[i][l][k] and C[l][j][k]
+	  			ACC[i][j][k][0] += (dctFFT[i][l][k][0] * C[l][j][k][0] - dctFFT[i][l][k][1] * C[l][j][k][1]);
+	  			ACC[i][j][k][1] += (dctFFT[i][l][k][0] * C[l][j][k][1] + dctFFT[i][l][k][1] * C[l][j][k][0]);
+	    		// ACC[i][j][k] += ((double complex) dctFFT[i][l][k]) * ((double complex) C[l][j][k]);
+		}
 
-// void InitializeACC(ct_FFT ACC, int m) {
+}
 
-// }
+void InitializeACC(ct_FFT ACC, int m) {
+	ct_ModQ res;										//int32_t[6][2][1024]
+    int mm = (((m % q) + q) % q) * (2*N/q);             // Reduce mod q (dealing with negative number as well)
+    int sign = 1;
+    if (mm >= N) { 
+    	mm -= N; 
+    	sign = -1; 
+    }
+    
+    for (int i = 0; i < K2; ++i)
+      for (int j = 0; j < 2; ++j)
+		for (int k = 0; k < N; ++k)
+	  		res[i][j][k]=0;
+    for (int i = 0; i < K; ++i) 
+    {
+      res[2*i  ][0][mm] += sign*vgprime[i]; // Add G Multiple
+      res[2*i+1][1][mm] += sign*vgprime[i]; // [a,as+e] + X^m *G
+    }
+    for (int i = 0; i < K2; ++i)
+      for (int j = 0; j < 2; ++j)
+		FFTforward(ACC[i][j], res[i][j]);
+
+}
 
 
-// CipherTextQN* MemberTest(Ring_FFT t, ct_FFT C) {
+CipherTextQN* MemberTest(Ring_FFT t, ct_FFT C) {
+    Ring_FFT temp;
+    Ring_ModQ temp_ModQ;
+    
+    CipherTextQN* ct;
+    for (int i = 0; i < N2; ++i){
+      	//(x + yi)(u + vi) = (xu - yv) + (xv + yu)i
+	  	//temp will be THE COMPLEX MULTIPLICATION OF C[i][l][k] and t[l][j][k]
+      	temp[i][0] = (C[1][0][i][0] * t[i][0] - C[1][0][i][1] * t[i][1]);
+      	temp[i][1] = (-1*(C[1][0][i][0] * t[i][1] + C[1][0][i][1] * t[i][0]));
+      	// temp[i] = conj(((double complex) C[1][0][i]) * ((double complex)t[i]));  // Compute t*a
+    }
+    FFTbackward(temp_ModQ, temp);
+    for (int i = 0; i < N; ++i) ct->a[i] = temp_ModQ[i];
+    	for (int i = 0; i < N2; ++i){
+    		//temp will be THE COMPLEX MULTIPLICATION OF C[i][l][k] and t[l][j][k]
+      		temp[i][0] = (C[1][1][i][0] * t[i][0] - C[1][1][i][1] * t[i][1]);
+      		temp[i][1] = (C[1][1][i][0] * t[i][1] + C[1][1][i][1] * t[i][0]);
+      		// temp[i] = ((double complex) C[1][1][i]) * ((double complex) t[i]);
+    	}
+    FFTbackward(temp_ModQ, temp);
+    ct->b = v+temp_ModQ[0];	
+    return ct; 
 
-// }
+}
 
-// void HomNAND(CipherText* res, const EvalKey& EK, const CipherText& ct1, const CipherText& ct2) {
+void HomNAND(CipherText* res, const EvalKey& EK, const CipherText& ct1, const CipherText& ct2) {
+	CipherText e12;
+    for (int i = 0; i < n; ++i)
+      e12.a[i] = (2*q - (ct1.a[i] + ct2.a[i])) % q;
+    e12.b  =  (13 * q / 8) - (ct1.b + ct2.b) % q;
 
-// }
+    ct_FFT ACC;
+    InitializeACC(ACC, (e12.b + q/4) % q);
+    for (int i = 0; i < n; ++i) 
+    {
+      int a = (q - e12.a[i] % q) % q;
+      for (int k = 0; k < BS_exp; ++k, 	a /= BS_base) 
+      {
+		int a0 = a % BS_base;
+		if(a0) 
+			AddToACC(ACC, *(EK.BSkey[i][a0][k]) );	
+      }
+    }
+    CipherTextQN *eQN = MemberTest(t_TestMSB, ACC);
+    CipherTextQ eQ;
+    LWE::KeySwitch(&eQ, EK.KSkey, *eQN);
+    LWE::ModSwitch(res, eQ);
+
+}
 

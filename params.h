@@ -18,6 +18,7 @@ const int q2 = 256;
 
 typedef int32_t ZmodQ;
 typedef uint32_t uZmodQ;
+
 const ZmodQ v = (1 << 29) +1;       // Q/8 +1
 const ZmodQ v_inverse = 3758096385; // 1/v mod Q
 

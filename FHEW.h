@@ -16,8 +16,8 @@
 
   void Setup();
   void FHEWKeyGen(EvalKey* EK, const SecretKey LWEsk);
-  //TODOOOOOOOOOOOOOOOOO
-  // void HomNAND(CipherText* res, const EvalKey& EK, const CipherText& ct1, const CipherText& ct2);
+
+  void HomNAND(CipherText* res, const EvalKey& EK, const CipherText& ct1, const CipherText& ct2);
 
   void fwrite_ek(EvalKey EK, FILE* f);
   EvalKey* fread_ek(FILE* f);
