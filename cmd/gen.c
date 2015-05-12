@@ -4,9 +4,6 @@
 #include "common.h"
 #include <stdlib.h>
 
-EvalKey EK;
-SecretKey LWEsk;
-
 void help(char* cmd){
 	printf("\nusage: %s  SecretKeyFileName EvalKeyFileName  \n\n Generate a secret key sk and evaluation key ek, and store them in two separate files.\n\n",cmd);
 	exit(0);
@@ -19,11 +16,16 @@ int main (int argc, char *argv[])
 		help(argv[0]);
 
 	char* sk_fn = argv[1]; 
-  	char* ek_fn = argv[2];
+  char* ek_fn = argv[2];
+
+  EvalKey *EK;
+  SecretKey *LWEsk;
 
   Setup();
-  LWEKeyGen(LWEsk);
-  FHEWKeyGen(&EK, LWEsk);
-  SaveEvalKey(&EK,ek_fn);
-  SaveSecretKey(&LWEsk,sk_fn);
+  LWEsk = LWEKeyGen();
+  EK = FHEWKeyGen(LWEsk);
+  SaveEvalKey(EK,ek_fn);
+  SaveSecretKey(LWEsk,sk_fn);
+  free(LWEsk);
+  free(EK);
 }

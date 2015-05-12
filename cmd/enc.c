@@ -24,12 +24,12 @@ int main(int argc, char *argv[]) {
   exit(0);
   }
 
-  SecretKey* SK = LoadSecretKey(sk_fn);
+  SecretKey *SK = LoadSecretKey(sk_fn);
 
   CipherText ct;
   Encrypt(&ct, *SK, message);  
   SaveCipherText(&ct,ct_fn);
- 
+  free(SK);
 }
 
 

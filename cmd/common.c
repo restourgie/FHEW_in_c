@@ -30,14 +30,13 @@ SecretKey* LoadSecretKey(char* filepath) {
     printf("Failed to open %s in Read-Binary mode.\n", filepath);
     exit(EXIT_FAILURE);
   }
-  SecretKey* LWEsk = (SecretKey*) malloc(sizeof(SecretKey));  
+  SecretKey *LWEsk = malloc(sizeof(SecretKey));  
   printf("Reading Secret key From %s .\n", filepath);
   assert(fread(LWEsk, sizeof(SecretKey), 1, f));
   printf("Secret Key read.\n");
   fclose(f);
   return LWEsk;
- 
-}
+ }
 
 /*************************************************************************
 *                                                                        *
@@ -53,12 +52,23 @@ void SaveEvalKey(EvalKey *EK, char* filepath) {
     exit(EXIT_FAILURE);
   }
   printf("Writing Evaluation key to %s .\n", filepath);
-  fwrite_ek(*EK, f);
+  
+   // Write bootstrapping key
+  for (int i = 0; i < n; ++i)      
+    for (int j = 1; j < BS_base; ++j)
+      for (int k = 0; k < BS_exp; ++k) 
+        assert(fwrite(&(EK->BSkey[i][j][k]), sizeof(ct_FFT), 1, f));
+  // Write switching key
+  for (int i = 0; i < N; ++i)
+    for (int j = 0; j < KS_base; ++j)
+      for (int k = 0; k < KS_exp; ++k)
+          assert(fwrite(&(EK->KSkey[i][j][k]), sizeof(CipherTextQ), 1, f));
+
   fclose(f);
 }
 
 EvalKey* LoadEvalKey(char* filepath) {
-  EvalKey* EK;
+  EvalKey *EK = malloc(sizeof(EvalKey));
   FILE * f;
   f = fopen(filepath, "rb"); // rb -read binary
   if (f == NULL){
@@ -66,8 +76,27 @@ EvalKey* LoadEvalKey(char* filepath) {
     exit(EXIT_FAILURE);
   }
   printf("Reading Evaluation key from %s.\n", filepath);
-  EK = fread_ek(f);
+
+  // Read bootstrapping key
+  for (int i = 0; i < n; ++i)
+    for (int j = 1; j < BS_base; ++j)
+      for (int k = 0; k < BS_exp; ++k) 
+      {
+        //EK->BSkey[i][j][k] = (ct_FFT*) fftw_malloc(sizeof(ct_FFT));
+        assert(fread(&(EK->BSkey[i][j][k]), sizeof(ct_FFT), 1, f));
+      }
+  printf("BSKey Read. \n");
+  
+  // Read switching key
+  for (int i = 0; i < N; ++i)
+    for (int j = 0; j < KS_base; ++j)
+      for (int k = 0; k < KS_exp; ++k) 
+      {
+        // EK->KSkey[i][j][k] = new CipherTextQ;//??????????????????????????????????????????????????????????????
+        assert(fread(&(EK->KSkey[i][j][k]), sizeof(CipherTextQ), 1, f));
+      }
   printf("KSKey Read : %d \t %d \t %d .\n", N, KS_base, KS_exp);
+  
   fclose(f);
   return EK;
 }
@@ -80,7 +109,7 @@ EvalKey* LoadEvalKey(char* filepath) {
 
 
 void SaveCipherText(const CipherText* ct, char* filepath){
-   FILE * f;
+ FILE * f;
   f = fopen(filepath, "wb"); // wb -write binary
   if (f == NULL){
     printf("Failed to open %s in Write-Binary mode .\n", filepath);
@@ -99,7 +128,7 @@ CipherText* LoadCipherText(char* filepath) {
     exit(EXIT_FAILURE);
   }
   printf("Loading CipherText from %s.\n", filepath);
-  CipherText *ct = malloc(sizeof *ct);
+  CipherText *ct = malloc(sizeof(CipherText));
   assert(fread(ct, sizeof(CipherText), 1, f));
   fclose(f);
   return ct;

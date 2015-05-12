@@ -1,10 +1,11 @@
 #include <math.h>
 #include "distrib.h" 
 #include <stdlib.h>
+#include <stdio.h>
 
 int Sample(const Distrib Chi) { 
   if (Chi.max) {///ASK PETER
-    double r = static_cast <double> (rand()) / static_cast <double> (RAND_MAX);
+    double r = (rand()) / (RAND_MAX);
     for (int i = 0; i < Chi.max; ++i) 
       if (r<= Chi.table[i]) 
         return i - Chi.offset;
@@ -16,9 +17,9 @@ int Sample(const Distrib Chi) {
   if (s < 500) //ONLY CHI3????
   {  
     int x, maxx = ceil(s*8);
-    while(true) {
+    while(1) {
       x = rand() % (2*maxx + 1)  - maxx;
-      r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+      r = (rand()) / (RAND_MAX);
       if (r < exp(- x*x / (2*s*s))) return x;
     }
   }
@@ -28,11 +29,11 @@ int Sample(const Distrib Chi) {
   //THIS IS CHI2?? WHY NOT 3 DIFFERENT FUNCTIONS???
   double x;
 
-  while(true) 
+  while(1) 
   {
-    x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    x = (rand()) / (RAND_MAX);
     x = 16 *x -8;
-    r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    r = (rand()) / (RAND_MAX);
     if (r < exp(- x*x / 2 )) 
       return floor(.5 + x*s) ;
   }

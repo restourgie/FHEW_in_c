@@ -3,24 +3,61 @@
 #include "stdbool.h"
 #include <stdlib.h>
 
+/*************************************************************************
+*                                                                        *
+*                           KEYGENERATION                                *
+*                                                                        *
+*************************************************************************/
 
-void LWEKeyGen(SecretKey sk) {
-	KeyGenRestart:;
-    int s=0, ss=0;
-    for (int i = 0; i < n; ++i) {
+SecretKey* LWEKeyGen() {
+	SecretKey LWEsk* = malloc(sizeof(SecretKey));
+  KeyGenRestart:;
+  int s=0, ss=0;
+  for (int i = 0; i < n; ++i) {
 
-          sk[i] = Sample(Chi_Binary);
-          s+= sk[i];
-          ss+= abs(sk[i]);
-        }
-      if (abs(s)>5) goto KeyGenRestart;
-      if (abs(ss - n/2)>5) goto KeyGenRestart;
+    sk[i] = Sample(Chi_Binary);
+    s+= sk[i];
+    ss+= abs(sk[i]);
+  }
+  if (abs(s)>5) 
+    goto KeyGenRestart;
+  if (abs(ss - n/2)>5) 
+    goto KeyGenRestart;
+
+  return LWEsk;
 }
 
-void KeyGenN(SecretKeyN sk) {
+SecretKeyN* KeyGenN() {
+  SecretKeyN FHEWsk* = malloc(sizeof(SecretKeyN));
 	for(int i =0;i < N; ++i)
 		sk[i] = Sample(Chi1); //WHY ARE THERE NO CHECKS HERE?? IT IS THE SAME
+  return FHEWsk;
 }
+
+//GENERATE SwitchingKey //SwitchingKey => CipherTextQ[1024][25][7] //CipherTextQ = {ZmodQ a[n]; ZmodQ b;} => ZmodQ = int32_t and n = 500 
+SwitchingKeyGen(SwitchingKey* res,SecretKey *new_sk,SecretKeyN *old_sk) {
+  
+  for (int i = 0; i < N; ++i) 
+    for (int j = 0; j < KS_base; ++j)
+      for (int k = 0; k < KS_exp; ++k) 
+      {
+          CipherTextQ ct;    
+          ct.b = -*old_sk[i]*j*KS_table[k] + Sample(Chi2);
+          for (int l = 0; l < n; ++l) 
+          {
+            ct.a[l] = rand();
+            ct.b += ct.a[l] * *new_sk[l];
+          }
+          *res[i][j][k] = ct;
+      }
+  return res;
+}
+
+/*************************************************************************
+*                                                                        *
+*                           DECRYPT ENCRYPT                              *
+*                                                                        *
+*************************************************************************/
 
 void Encrypt(CipherText* ct, const SecretKey sk, int m) {
     ct->b = (m % 4) * q / 4;//can you just do m * q / 4 because m is 0 or 1 this is always the same mod 4
@@ -33,40 +70,31 @@ void Encrypt(CipherText* ct, const SecretKey sk, int m) {
     }
 }
 
-// int Decrypt(const SecretKey sk, const CipherText& ct) {
- 
-// }
+int Decrypt(const SecretKey sk, const CipherText& ct) {
+    int r = ct.b;
+    for (int i = 0; i < n; ++i) r -= ct.a[i] * sk[i];
+    r = ((r % q) + q + q/8) % q;
+    return4 *r/q;    
+}
 
 // void DecryptDetail(const SecretKey sk, const CipherText& ct) {
 
 // }
 
+/*************************************************************************
+*                                                                        *
+*                           OTHER STUFF                                  *
+*                                                                        *
+*************************************************************************/
     
-// int round_qQ(ZmodQ v) {
-  
-// }
-  
-void ModSwitch(CipherText* ct, const CipherTextQ c) {
-  for (int i = 0; i < n; ++i) 
-    ct->a[i] = round_qQ(c.a[i]);  
-  ct->b = round_qQ(c.b);
+int round_qQ(ZmodQ v) {
+   return floor(.5 + (double) v * (double) q / (double) Q) + q % q;
 }
-
-//GENERATE SwitchingKey //SwitchingKey => CipherTextQ[1024][25][7] //CipherTextQ = {ZmodQ a[n]; ZmodQ b;} => ZmodQ = int32_t and n = 500 
-void SwitchingKeyGen(SwitchingKey res,const SecretKey new_sk,const SecretKeyN old_sk) {
-	for (int i = 0; i < N; ++i) 
-      for (int j = 0; j < KS_base; ++j)
-		for (int k = 0; k < KS_exp; ++k) 
-		{
-	  		CipherTextQ *ct = malloc(sizeof *ct);    
-	  		ct->b = -old_sk[i]*j*KS_table[k] + Sample(Chi2);
-	  		for (int l = 0; l < n; ++l) 
-	  		{
-	    		ct->a[l] = rand();
-	    		ct->b += ct->a[l] * new_sk[l];
-	  		}
-	  		res[i][j][k] = ct;
-		}
+  
+void ModSwitch(CipherText ct, const CipherTextQ c) {
+  for (int i = 0; i < n; ++i) 
+    ct.a[i] = round_qQ(c.a[i]);  
+  ct.b = round_qQ(c.b);
 }
   
 void KeySwitch(CipherTextQ* res, const SwitchingKey Key, const CipherTextQN ct) {

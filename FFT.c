@@ -73,7 +73,7 @@ void CalcFFT(complex_double data[], int sign){
 }
 
   
-void FFTforward(Ring_FFT res, const Ring_ModQ val) {
+void FFTforward(Ring_FFT res, Ring_ModQ val) {
     complex_double data[N];
     for(int k=0;i<N;++k){
       data[k][0] = val[k];
@@ -81,7 +81,7 @@ void FFTforward(Ring_FFT res, const Ring_ModQ val) {
     } 
     CalcFFT(data,-1);
     for(int k=0; k < N2; ++k){
-      res[k][0] = out[2*k+1][0];pet
+      res[k][0] = out[2*k+1][0];
       res[k][1] = out[2*k+1][1];
     }
 }

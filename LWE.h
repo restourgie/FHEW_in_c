@@ -22,17 +22,18 @@
   
   typedef int SecretKey[n]; // n-dimensional LWE secret key 
   typedef int SecretKeyN[N]; // N-dimensional LWE secret key 
+  typedef CipherTextQ SwitchingKey[N][KS_base][KS_exp]; //SwitchingKey => CipherTextQ[1024][25][7]
   
-  void LWEKeyGen(SecretKey sk);
-  void KeyGenN(SecretKeyN sk);
-  void Encrypt(CipherText* ct, const SecretKey sk, int m);
-  // int Decrypt(const SecretKey sk, const CipherText& ct);
-
-
-  typedef CipherTextQ* SwitchingKey[N][KS_base][KS_exp]; //SwitchingKey => CipherTextQ[1024][25][7]
+  SecretKey* LWEKeyGen();
+  SecretKeyN* KeyGenN();
   // Generate key material (SwitchingKey) required by KeySwitch to transform 
   // LWE encryptions under old_sk into LWE encryptions under new_sk
-  void SwitchingKeyGen(SwitchingKey res, const SecretKey new_sk, const SecretKeyN old_sk);
+  void SwitchingKeyGen(SwitchingKey* res,SecretKey *new_sk, SecretKeyN *old_sk);
+
+  void Encrypt(CipherText* ct, const SecretKey sk, int m);
+  int Decrypt(const SecretKey sk, const CipherText ct);
+  
+ 
   void KeySwitch(CipherTextQ* res, const SwitchingKey Key, const CipherTextQN ct);
 
   // Changes an LWE ciphertext modulo Q into an LWE ciphertext modulo q

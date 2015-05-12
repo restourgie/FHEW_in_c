@@ -1,11 +1,8 @@
-#include <iostream>
-#include <cstdlib>
 #include "../FHEW.h"
 #include "../LWE.h"
 #include "common.h"
-#include <cassert>
-
-using namespace std;
+#include <stdlib.h>
+#include <stdio.h>
 
 
 void help(char* cmd) {
@@ -15,6 +12,15 @@ void help(char* cmd) {
 
 
 int main(int argc, char *argv[]) {
+	  if (argc != 3) help(argv[0]);
+  char* sk_fn = argv[1]; 
+  char* ct_fn = argv[2]; 
+
+  Setup();
 
 
+  SecretKey* SK = LoadSecretKey(sk_fn);
+  CipherText* ct = LoadCipherText(ct_fn);
+  int m = Decrypt(*SK,*ct);
+  printf("%d\n",m);
 }

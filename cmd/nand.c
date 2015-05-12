@@ -25,13 +25,13 @@ int main(int argc, char *argv[]) {
 
   EK = LoadEvalKey(ek_fn);
 
-  CipherText *ct1,*ct2,*ct3;
+  CipherText ct1,ct2,ct3;
 
   ct1 = LoadCipherText(ict1_fn);
   ct2 = LoadCipherText(ict2_fn);
 
 
-  HomNAND(ct3, *EK,*ct1,*ct2);
+  ct3 = HomNAND(ct3, *EK,*ct1,*ct2);
 
   SaveCipherText(ct3,oct_fn);
 
