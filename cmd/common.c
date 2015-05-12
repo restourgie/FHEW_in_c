@@ -11,7 +11,7 @@
 *                                                                        *
 *************************************************************************/
 
-void SaveSecretKey(const SecretKey* LWEsk, char* filepath) {
+void SaveSecretKey(SecretKey* LWEsk, char* filepath) {
   FILE * f;
   f = fopen(filepath, "wb"); // wb -write binary
   if (f == NULL) {
@@ -108,7 +108,7 @@ EvalKey* LoadEvalKey(char* filepath) {
 *************************************************************************/
 
 
-void SaveCipherText(const CipherText* ct, char* filepath){
+void SaveCipherText(CipherText* ct, char* filepath){
  FILE * f;
   f = fopen(filepath, "wb"); // wb -write binary
   if (f == NULL){

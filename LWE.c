@@ -59,7 +59,7 @@ SwitchingKeyGen(SwitchingKey* res,SecretKey *new_sk,SecretKeyN *old_sk) {
 *                                                                        *
 *************************************************************************/
 
-void Encrypt(CipherText* ct, const SecretKey sk, int m) {
+void Encrypt(CipherText* ct, SecretKey* sk, int m) {
     ct->b = (m % 4) * q / 4;//can you just do m * q / 4 because m is 0 or 1 this is always the same mod 4
     ct->b += Sample(Chi3);
     
@@ -70,11 +70,12 @@ void Encrypt(CipherText* ct, const SecretKey sk, int m) {
     }
 }
 
-int Decrypt(const SecretKey sk, const CipherText& ct) {
-    int r = ct.b;
-    for (int i = 0; i < n; ++i) r -= ct.a[i] * sk[i];
+int Decrypt(SecretKey* sk, CipherText* ct) {
+    int r = ct->b;
+    for (int i = 0; i < n; ++i) 
+      r -= ct->a[i] * *sk[i];
     r = ((r % q) + q + q/8) % q;
-    return4 *r/q;    
+    return 4 *r/q;    
 }
 
 // void DecryptDetail(const SecretKey sk, const CipherText& ct) {
@@ -91,13 +92,13 @@ int round_qQ(ZmodQ v) {
    return floor(.5 + (double) v * (double) q / (double) Q) + q % q;
 }
   
-void ModSwitch(CipherText ct, const CipherTextQ c) {
+void ModSwitch(CipherText* ct, CipherTextQ* c) {
   for (int i = 0; i < n; ++i) 
-    ct.a[i] = round_qQ(c.a[i]);  
-  ct.b = round_qQ(c.b);
+    ct->a[i] = round_qQ(c->a[i]);  
+  ct->b = round_qQ(c->b);
 }
   
-void KeySwitch(CipherTextQ* res, const SwitchingKey Key, const CipherTextQN ct) {
+void KeySwitch(CipherTextQ* res, SwitchingKey* Key, CipherTextQN* ct) {
   //SwitchingKey => CipherTextQ[1024][25][7]
   for (int k = 0; k < n; ++k) 
     res->a[k] = 0;

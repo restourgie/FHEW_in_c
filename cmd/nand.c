@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-EvalKey* EK;
-
 
 void help(char* cmd) {
   printf("\nusage: %s  EvalKeyFileName InCTFileName1 InCTFileName2 OutCTFileName  \n\n  Perform Homomorphic NAND computation.\n\n",cmd);
@@ -22,17 +20,22 @@ int main(int argc, char *argv[]) {
 
   Setup();
 
+  EvalKey* EK;
 
   EK = LoadEvalKey(ek_fn);
 
-  CipherText ct1,ct2,ct3;
+  CipherText *ct1,*ct2;
 
   ct1 = LoadCipherText(ict1_fn);
   ct2 = LoadCipherText(ict2_fn);
 
+  CipherText *ct3 = malloc(sizeof(CipherText));
 
-  ct3 = HomNAND(ct3, *EK,*ct1,*ct2);
+  HomNAND(ct3, EK,ct1,ct2);
 
   SaveCipherText(ct3,oct_fn);
-
+  free(EK);
+  free(ct1);
+  free(ct2);
+  free(ct3);
 }

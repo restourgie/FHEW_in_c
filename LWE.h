@@ -30,14 +30,14 @@
   // LWE encryptions under old_sk into LWE encryptions under new_sk
   void SwitchingKeyGen(SwitchingKey* res,SecretKey *new_sk, SecretKeyN *old_sk);
 
-  void Encrypt(CipherText* ct, const SecretKey sk, int m);
-  int Decrypt(const SecretKey sk, const CipherText ct);
+  void Encrypt(CipherText* ct, SecretKey* sk, int m);
+  int Decrypt(SecretKey sk, CipherText ct);
   
  
-  void KeySwitch(CipherTextQ* res, const SwitchingKey Key, const CipherTextQN ct);
+  void KeySwitch(CipherTextQ* res, SwitchingKey* Key, CipherTextQN* ct);
 
   // Changes an LWE ciphertext modulo Q into an LWE ciphertext modulo q
-  void ModSwitch(CipherText* ct, const CipherTextQ c); 
+  void ModSwitch(CipherText* ct, CipherTextQ* c); 
   // int round_qQ(ZmodQ v);
 
 

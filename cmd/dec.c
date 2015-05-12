@@ -18,7 +18,6 @@ int main(int argc, char *argv[]) {
 
   Setup();
 
-
   SecretKey* SK = LoadSecretKey(sk_fn);
   CipherText* ct = LoadCipherText(ct_fn);
   int m = Decrypt(*SK,*ct);
