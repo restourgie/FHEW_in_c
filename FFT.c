@@ -55,11 +55,11 @@ void CalcFFT(complex_double data[], int sign){
     for (m=0;m<mmax;++m) {
       for (i=m;i<N;i+=istep) {
         j=i+mmax;
-        tempr=wr*data[j][0]-wi*data[j][1];
-        tempi=wr*data[j][1]+wi*data[j][0];
+        tempr=wr * data[j][0]-wi * data[j][1];
+        tempi=wr * data[j][1]+wi * data[j][0];
 
-        data[j][0]=data[i][0]-tempr;
-        data[j][1]=data[i][1]-tempi;
+        data[j][0]= data[i][0]-tempr;
+        data[j][1]= data[i][1]-tempi;
 
         data[i][0] += tempr;
         data[i][1] += tempi;
@@ -72,8 +72,9 @@ void CalcFFT(complex_double data[], int sign){
   //end of the algorithm
 }
 
-  
-void FFTforward(Ring_FFT* res, Ring_ModQ val) {
+//Ring_FFT => complex_double[513] => double[513][2]
+//Ring_ModQ => ZmodQ[1024] => int32_t[1024] 
+void FFTforward(Ring_FFT res, Ring_ModQ val) {
     complex_double data[N];
     for(int k=0;k<N;++k){
       data[k][0] = val[k];
@@ -81,12 +82,12 @@ void FFTforward(Ring_FFT* res, Ring_ModQ val) {
     } 
     CalcFFT(data,-1);
     for(int k=0; k < N2; ++k){
-      *res[k][0] = data[2*k+1][0];
-      *res[k][1] = data[2*k+1][1];
+      res[k][0] = data[2*k+1][0];
+      res[k][1] = data[2*k+1][1];
     }
 }
 
-void FFTbackward(Ring_ModQ* res,Ring_FFT val){
+void FFTbackward(Ring_ModQ res,Ring_FFT val){
   complex_double data[N];
   for(int k = 0;k < N2; ++k){
     data[2*k+1][0] = val[k][0]/(double)N; //NOT DONE YET

@@ -27,7 +27,4 @@ extern const float Binary_Table[3];
 
 extern const Distrib Chi_Binary;
 
-
-
-
 #endif
