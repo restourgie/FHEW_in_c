@@ -12,34 +12,29 @@
 #define K 3
 #define K2 6
 
-const long long Q = (long long) 1 << 32;
-const int q = 512;
-const int q2 = 256;
+// const long long Q = (long long) 1 << 32;
+#define Q 4294967296LL
+#define q 512
+#define q2 256
 
 typedef int32_t ZmodQ;
 typedef uint32_t uZmodQ;
 
-const ZmodQ v = (1 << 29) +1;       // Q/8 +1
-const ZmodQ v_inverse = 3758096385; // 1/v mod Q
+#define v 536870913LL       // Q/8 +1
+#define v_inverse 3758096385LL // 1/v mod Q
 
-const ZmodQ vgprime[3] = {(long long)(1 << 29) +1, (long long)1<<11, (long long)1<<22};
-const int g_bits[3] = {11, 11, 10};
-const int g_bits_32[3] = {21, 21, 22};
+extern const ZmodQ vgprime[3];
+extern const int g_bits[3];
+extern const int g_bits_32[3];
 
 
 #define KS_base 25
 #define KS_exp 7
-const ZmodQ KS_table[7] = {1,
-			   25,
-			   25*25,
-			   25*25*25,
-			   25*25*25*25,
-			   25*25*25*25*25,
-			   25*25*25*25*25*25};
+extern const ZmodQ KS_table[7];
 
 #define BS_base 23
 #define BS_exp 2
-const int BS_table[2] = {1,23};
+extern const int BS_table[2];
 
 typedef ZmodQ Ring_ModQ[N]; //Ring_ModQ => ZmodQ[1024] => int32_t[1024]
 typedef double complex_double[2];

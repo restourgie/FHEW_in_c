@@ -2,6 +2,7 @@
 #include "../LWE.h"
 #include "../FHEW.h"
 #include "common.h"
+#include "../distrib.h"
 #include <stdlib.h>
 
 void help(char* cmd){

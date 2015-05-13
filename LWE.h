@@ -28,10 +28,10 @@
   SecretKeyN* KeyGenN();
   // Generate key material (SwitchingKey) required by KeySwitch to transform 
   // LWE encryptions under old_sk into LWE encryptions under new_sk
-  void SwitchingKeyGen(SwitchingKey* res,SecretKey *new_sk, SecretKeyN *old_sk);
+  SwitchingKey* SwitchingKeyGen(SwitchingKey* res,SecretKey *new_sk, SecretKeyN *old_sk);
 
   void Encrypt(CipherText* ct, SecretKey* sk, int m);
-  int Decrypt(SecretKey sk, CipherText ct);
+  int Decrypt(SecretKey* sk, CipherText* ct);
   
  
   void KeySwitch(CipherTextQ* res, SwitchingKey* Key, CipherTextQN* ct);

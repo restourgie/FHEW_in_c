@@ -10,7 +10,7 @@ typedef Ring_FFT  dct_FFT[K2][K2];  // Decomposed Ciphertext in FFT form. dct_FF
 
 Ring_FFT t_TestMSB;
 
-void setup(){
+void Setup(){
 	Ring_ModQ tmsb;
 	for (int i = 1; i < N; ++i)
 		tmsb[i]=1;

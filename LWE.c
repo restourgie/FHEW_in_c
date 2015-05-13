@@ -10,14 +10,14 @@
 *************************************************************************/
 
 SecretKey* LWEKeyGen() {
-	SecretKey LWEsk* = malloc(sizeof(SecretKey));
+	SecretKey *LWEsk = malloc(sizeof(SecretKey));
   KeyGenRestart:;
   int s=0, ss=0;
   for (int i = 0; i < n; ++i) {
 
-    sk[i] = Sample(Chi_Binary);
-    s+= sk[i];
-    ss+= abs(sk[i]);
+    *LWEsk[i] = Sample(Chi_Binary);
+    s+= *LWEsk[i];
+    ss+= abs(*LWEsk[i]);
   }
   if (abs(s)>5) 
     goto KeyGenRestart;
@@ -28,14 +28,14 @@ SecretKey* LWEKeyGen() {
 }
 
 SecretKeyN* KeyGenN() {
-  SecretKeyN FHEWsk* = malloc(sizeof(SecretKeyN));
+  SecretKeyN *FHEWsk = malloc(sizeof(SecretKeyN));
 	for(int i =0;i < N; ++i)
-		sk[i] = Sample(Chi1); //WHY ARE THERE NO CHECKS HERE?? IT IS THE SAME
+		*FHEWsk[i] = Sample(Chi1); //WHY ARE THERE NO CHECKS HERE?? IT IS THE SAME
   return FHEWsk;
 }
 
 //GENERATE SwitchingKey //SwitchingKey => CipherTextQ[1024][25][7] //CipherTextQ = {ZmodQ a[n]; ZmodQ b;} => ZmodQ = int32_t and n = 500 
-SwitchingKeyGen(SwitchingKey* res,SecretKey *new_sk,SecretKeyN *old_sk) {
+SwitchingKey* SwitchingKeyGen(SwitchingKey* res,SecretKey *new_sk,SecretKeyN *old_sk) {
   
   for (int i = 0; i < N; ++i) 
     for (int j = 0; j < KS_base; ++j)
@@ -66,7 +66,7 @@ void Encrypt(CipherText* ct, SecretKey* sk, int m) {
     for (int i = 0; i < n; ++i)	
     {
       ct->a[i] = rand() % q;
-      ct->b = (ct->b + ct->a[i] * sk[i]) % q;
+      ct->b = (ct->b + ct->a[i] * *sk[i]) % q;
     }
 }
 
@@ -88,8 +88,8 @@ int Decrypt(SecretKey* sk, CipherText* ct) {
 *                                                                        *
 *************************************************************************/
     
-int round_qQ(ZmodQ v) {
-   return floor(.5 + (double) v * (double) q / (double) Q) + q % q;
+int round_qQ(ZmodQ var) {
+   return floor(.5 + (double) var * (double) q / (double) Q) + q % q;
 }
   
 void ModSwitch(CipherText* ct, CipherTextQ* c) {
@@ -103,10 +103,10 @@ void KeySwitch(CipherTextQ* res, SwitchingKey* Key, CipherTextQN* ct) {
   for (int k = 0; k < n; ++k) 
     res->a[k] = 0;
     
-  res->b = ct.b;
+  res->b = ct->b;
   for (int i = 0; i < N; ++i) 
   {
-    uZmodQ a = -ct.a[i];
+    uZmodQ a = -ct->a[i];
     for (int j = 0; j < KS_exp; ++j, a /= KS_base) 
     {
       uZmodQ a0 = a % KS_base;

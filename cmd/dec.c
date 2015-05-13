@@ -12,14 +12,17 @@ void help(char* cmd) {
 
 
 int main(int argc, char *argv[]) {
-	  if (argc != 3) help(argv[0]);
+	  if (argc != 3) 
+      help(argv[0]);
   char* sk_fn = argv[1]; 
   char* ct_fn = argv[2]; 
 
-  Setup();
+  // Setup(); IS THIS NEEDED?????
 
   SecretKey* SK = LoadSecretKey(sk_fn);
   CipherText* ct = LoadCipherText(ct_fn);
   int m = Decrypt(*SK,*ct);
   printf("%d\n",m);
+  free(SK);
+  free(ct);
 }

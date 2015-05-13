@@ -6,7 +6,7 @@
 #define M_PI           3.14159265358979323846
 #endif
 
-typedef double complex_double[2];
+//typedef double complex_double[2];
 
 
 void BitInvert(complex_double data[]){
@@ -75,21 +75,22 @@ void CalcFFT(complex_double data[], int sign){
   
 void FFTforward(Ring_FFT* res, Ring_ModQ val) {
     complex_double data[N];
-    for(int k=0;i<N;++k){
+    for(int k=0;k<N;++k){
       data[k][0] = val[k];
       data[k][1] = 0.0;
     } 
     CalcFFT(data,-1);
     for(int k=0; k < N2; ++k){
-      *res[k][0] = out[2*k+1][0];
-      *res[k][1] = out[2*k+1][1];
+      *res[k][0] = data[2*k+1][0];
+      *res[k][1] = data[2*k+1][1];
     }
 }
 
-void FFTbackward(Ring_ModQ* res, const Ring_FFT val){
+void FFTbackward(Ring_ModQ* res,Ring_FFT val){
   complex_double data[N];
   for(int k = 0;k < N2; ++k){
-    data[2*k+1] = val[k]/N; //NOT DONE YET
+    data[2*k+1][0] = val[k][0]/(double)N; //NOT DONE YET
+    data[2*k+1][1] = val[k][1]/(double)N;
   }
 
 }
