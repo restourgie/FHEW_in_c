@@ -48,7 +48,7 @@ void FHEWencrypt(ct_FFT* ct, Ring_FFT sk_FFT, int m) {
         // ai[k] = ((double complex) ai[k]) * ((double complex) sk_FFT[k]);
       }
 
-      FFTbackward(&res[i][1], ai);
+      FFTbackward(res[i][1], ai);
       
       for (int k = 0; k < N; ++k) 
         res[i][1][k] += Sample(Chi1);    // Add error [a,as+e]

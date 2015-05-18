@@ -16,6 +16,7 @@ fftw_plan plan_fft_forw, plan_fft_back;
 #define M_PI           3.14159265358979323846
 #endif
 
+const int DOUBLE_N = N*2;
 typedef double complex_double[2];
 
 
@@ -23,9 +24,9 @@ void BitInvert(complex_double data[]){
   int i,mv,k,rev;
   complex_double temp;
 
-  for(i = 1; i<(N*2);i++){//run through all index 1 to N
+  for(i = 1; i<(DOUBLE_N);i++){//run through all index 1 to N
     k = i;
-    mv = (N*2)/2;
+    mv = (DOUBLE_N)/2;
     rev = 0;
     while(k > 0){//Invert the index
       if ((k % 2) > 0)
@@ -54,16 +55,16 @@ void CalcFFT(complex_double data[], int sign){
 
   //Danielson-Lanzcos routine
   mmax=1;
-  while ((N*2) > mmax) {
+  while ((DOUBLE_N) > mmax) {
     istep=mmax << 1;
-    theta=sign*(2*M_PI/istep);
+    theta=-sign*(2*M_PI/istep);
     wtemp=sin(0.5*theta);
     wpr = -2.0*wtemp*wtemp;
     wpi=sin(theta);
     wr=1.0;
     wi=0.0;
     for (m=0;m<mmax;++m) {
-      for (i=m;i<(N*2);i+=istep) {
+      for (i=m;i<(DOUBLE_N);i+=istep) {
         j=i+mmax;
         tempr=wr * data[j][0]-wi * data[j][1];
         tempi=wr * data[j][1]+wi * data[j][0];
@@ -85,14 +86,14 @@ void CalcFFT(complex_double data[], int sign){
 //Ring_FFT => complex_double[513] => double[513][2]
 //Ring_ModQ => ZmodQ[1024] => int32_t[1024] 
 void FFTforward_my_version(complex_double res[],const Ring_ModQ val) {
-    complex_double data[N*2];
+    complex_double data[DOUBLE_N];
     for(int k=0;k<N;++k){
       data[k][0] = val[k];
       data[k][1] = 0.0;
       data[k+N][0] = 0.0;
       data[k+N][1] = 0.0;
     } 
-    CalcFFT(data,-1);
+    CalcFFT(data,1);
     for(int k=0; k < N2; ++k){
       res[k][0] = data[2*k+1][0];
       res[k][1] = data[2*k+1][1];
@@ -115,7 +116,7 @@ void FFTsetup() {
   plan_fft_back = fftw_plan_dft_c2r_1d(2*N, out, in,  FFTW_PATIENT);
 }
   
-void FFTforward_fftw_version(Ring_FFT res, const Ring_ModQ val) {
+void FFTforward(Ring_FFT res, const Ring_ModQ val) {
   for (int k = 0; k < N; ++k)	{
     in[k] = (double) (val[k]);
     in[k+N] = 0.0;			
@@ -151,32 +152,71 @@ int adjust_num(double num) {
     return round(adjusted);
 }
 
-void FFTforward(Ring_FFT res, const Ring_ModQ val) {
-  complex_double result[513];
-  FFTforward_my_version(result,val);
-  FFTforward_fftw_version(res,val);
-  cout << "\n\n************************************************* RESULTS OF FFT *************************************************\n\n";
-  for(int i=0;i<N2;++i){
-    if(adjust_num(creal(res[i]))!= adjust_num(result[i][0])){
-      cout << "Alert real doesnt match! Index = " << i << "   Result FFTW Real = " << creal(res[i]) << " Complex = " << cimag(res[i]) << "  Result my FFT Real = " << result[i][0] << " Complex = " << result[i][1] << endl;
-      cout << "Int Form of Real. FFTW Real = " << adjust_num(creal(res[i])) << " MY FFT Real = " << adjust_num(result[i][0]) << endl;
-      wait_on_enter();
-    }
-    if(adjust_num(cimag(res[i])) != adjust_num(result[i][1])){
-      cout << "Alert imaginary doenst match! Index = " << i << "   Result FFTW Real = " << creal(res[i]) << " Complex = " << cimag(res[i]) << "  Result my FFT Real = " << result[i][0] << " Complex = " << result[i][1] << endl;
-      wait_on_enter();
-    }
-  }
-  wait_on_enter();
-}
+// void FFTforward(Ring_FFT res, const Ring_ModQ val) {
+//   complex_double result[N2];
+//   FFTforward_my_version(result,val);
+//   FFTforward_fftw_version(res,val);
+//   cout << "\n\n************************************************* RESULTS OF FFT Forward*************************************************\n\n";
+//   for(int i=0;i<N2;++i){
+//     if(adjust_num(creal(res[i]))!= adjust_num(result[i][0])){
+//       cout << "Alert real doesnt match! Index = " << i << "   Result FFTW Real = " << creal(res[i]) << " Complex = " << cimag(res[i]) << "  Result my FFT Real = " << result[i][0] << " Complex = " << result[i][1] << endl;
+//       cout << "Int Form of Real. FFTW Real = " << adjust_num(creal(res[i])) << " MY FFT Real = " << adjust_num(result[i][0]) << endl;
+//       wait_on_enter();
+//     }
+//     if(adjust_num(cimag(res[i])) != adjust_num(result[i][1])){
+//       cout << "Alert imaginary doenst match! Index = " << i << "   Result FFTW Real = " << creal(res[i]) << " Complex = " << cimag(res[i]) << "  Result my FFT Real = " << result[i][0] << " Complex = " << result[i][1] << endl;
+//       wait_on_enter();
+//     }
+//   }
+//   wait_on_enter();
+// }
 
 
-void FFTbackward(Ring_ModQ res, const Ring_FFT val){
+void FFTbackward_FFTW_version(Ring_ModQ res, const Ring_FFT val){
+  cout << "\n\n*************************************************STARTING FFTW Backward*************************************************\n\n";
   for (int k = 0; k < N2; ++k) {
     out[2*k+1] = (double complex) val[k]/N;
+    cout << "Filling position: " << (2*k+1) << " With real value: " << creal(out[2*k+1]) << " and complex value: " << cimag(out[2*k+1]) << endl;
     out[2*k]   = (double complex) 0;
   }
   fftw_execute(plan_fft_back); 
   for (int k = 0; k < N; ++k)	
     res[k] = (long int) round(in[k]);
+}
+
+//Ring_FFT => complex_double[513] => double[513][2]
+//Ring_ModQ => ZmodQ[1024] => int32_t[1024] 
+void FFTbackward_my_version(Ring_ModQ res,const Ring_FFT val){
+  cout << "\n\n*************************************************STARTING MY FFT Backward*************************************************\n\n";
+  complex_double data[DOUBLE_N];
+  for(int k = 0;k < N2; ++k){
+    cout << "Forwards Filling position: " << (2*k+1) << " With real value: " << creal(val[k])/(double)N << " and complex value: " << (cimag(val[k])/(double)N) << endl;
+    data[2*k+1][0] = creal(val[k]); 
+    data[2*k+1][1] = cimag(val[k]);
+    data[2*k][0] = 0.0;
+    data[2*k][1] = 0.0;
+
+    if(k < (N2-2)){
+      cout << "\x1b[35mBackwards Filling position: " << DOUBLE_N-(2*k+1) << " With real value: " << creal(val[k])/(double)N << " and complex value: " << -(cimag(val[k])/(double)N) << "\x1b[0m" << endl;
+      data[DOUBLE_N-(2*k+1)][0] = creal(val[k]);
+      data[DOUBLE_N-(2*k+1)][1] = -(cimag(val[k]));
+      data[DOUBLE_N-(2*k+2)][0] = 0.0;
+      data[DOUBLE_N-(2*k+2)][1] = 0.0;
+    }
+  }
+  CalcFFT(data,-1);
+  for(int k=0; k < N; ++k)
+    res[k] = round((data[k][0]/(double)N));
+}
+
+void FFTbackward(Ring_ModQ res,const Ring_FFT val){
+  Ring_ModQ result;
+  FFTbackward_my_version(result,val);
+  FFTbackward_FFTW_version(res,val);
+  cout << "\n\n************************************************* RESULTS OF FFT Backward*************************************************\n\n";
+  for(int i =0; i<N;++i){
+    cout << "FFTW Result = " << res[i] << "   My Result = " << result[i] << endl;
+    wait_on_enter();
+  }
+  wait_on_enter();
 }
