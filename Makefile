@@ -3,6 +3,7 @@ CC=gcc
 # options I'll pass to the compiler
 CFLAGS= -Wall -O3 -std=c11
 
+
 all: cmd
 
 cmd: cmd/gen cmd/enc cmd/nand cmd/dec
@@ -19,7 +20,7 @@ FHEW.o: FHEW.h FHEW.c FFT.h LWE.h params.h
 common.o: cmd/common.c cmd/common.h 
 	$(CC) $(CFLAGS) -c cmd/common.c 
 
-cmd/gen: cmd/gen.c common.o 
+cmd/gen: cmd/gen.c common.o LWE.o FHEW.o
 	$(CC) $(CFLAGS) -o cmd/gen cmd/gen.c common.o
 
 cmd/enc: cmd/enc.c common.o 

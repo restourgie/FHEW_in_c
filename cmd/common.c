@@ -11,7 +11,7 @@
 *                                                                        *
 *************************************************************************/
 
-void SaveSecretKey(SecretKey* LWEsk, char* filepath) {
+void SaveSecretKey(SecretKey LWEsk, char* filepath) {
   FILE * f;
   f = fopen(filepath, "wb"); // wb -write binary
   if (f == NULL) {
@@ -19,7 +19,7 @@ void SaveSecretKey(SecretKey* LWEsk, char* filepath) {
     exit(EXIT_FAILURE);
   }
   printf("Writing Secret key to %s .\n", filepath);
-  fwrite(LWEsk, sizeof(SecretKey), 1, f);
+  fwrite(&LWEsk, sizeof(SecretKey), 1, f);
   fclose(f);
 }
 
@@ -108,7 +108,7 @@ EvalKey* LoadEvalKey(char* filepath) {
 *************************************************************************/
 
 
-void SaveCipherText(CipherText* ct, char* filepath){
+void SaveCipherText(CipherText ct, char* filepath){
  FILE * f;
   f = fopen(filepath, "wb"); // wb -write binary
   if (f == NULL){
@@ -116,7 +116,7 @@ void SaveCipherText(CipherText* ct, char* filepath){
     exit(EXIT_FAILURE);
   }
   printf("Writing CipherText to %s .\n", filepath);
-  assert(fwrite(ct, sizeof(CipherText), 1, f));
+  assert(fwrite(&ct, sizeof(CipherText), 1, f));
   fclose(f);
 }
 

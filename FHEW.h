@@ -15,7 +15,7 @@
   } EvalKey;
 
   void Setup();
-  EvalKey* FHEWKeyGen(SecretKey *LWEsk);
+  EvalKey* FHEWKeyGen(SecretKey LWEsk);
   void HomNAND(CipherText* res, EvalKey* EK, CipherText* ct1, CipherText* ct2) ; 
 
 #endif

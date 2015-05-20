@@ -2,7 +2,6 @@
 #include "../LWE.h"
 #include "../FHEW.h"
 #include "common.h"
-#include "../distrib.h"
 #include <stdlib.h>
 
 void help(char* cmd){
@@ -20,13 +19,12 @@ int main (int argc, char *argv[])
   char* ek_fn = argv[2];
 
   EvalKey *EK;
-  SecretKey *LWEsk;
+  SecretKey LWEsk;
 
   Setup();
-  LWEsk = LWEKeyGen();
+  LWEKeyGen(LWEsk);
   EK = FHEWKeyGen(LWEsk);
   SaveEvalKey(EK,ek_fn);
   SaveSecretKey(LWEsk,sk_fn);
-  free(LWEsk);
   free(EK);
 }

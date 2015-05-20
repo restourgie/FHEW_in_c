@@ -121,7 +121,7 @@ void FFTsetup() {
   plan_fft_back = fftw_plan_dft_c2r_1d(2*N, out, in,  FFTW_PATIENT);
 }
   
-void FFTforward(Ring_FFT res, const Ring_ModQ val) {
+void FFTforward_fftw_version(Ring_FFT res, const Ring_ModQ val) {
   for (int k = 0; k < N; ++k)	{
     in[k] = (double) (val[k]);
     in[k+N] = 0.0;			
@@ -157,24 +157,24 @@ int adjust_num(double num) {
     return round(adjusted);
 }
 
-// void FFTforward(Ring_FFT res, const Ring_ModQ val) {
-//   complex_double result[N2];
-//   FFTforward_my_version(result,val);
-//   FFTforward_fftw_version(res,val);
-//   cout << "\n\n************************************************* RESULTS OF FFT Forward*************************************************\n\n";
-//   // for(int i=0;i<N2;++i){
-//   //   if(adjust_num(creal(res[i]))!= adjust_num(result[i][0])){
-//   //     cout << "Alert real doesnt match! Index = " << i << "   Result FFTW Real = " << creal(res[i]) << " Complex = " << cimag(res[i]) << "  Result my FFT Real = " << result[i][0] << " Complex = " << result[i][1] << endl;
-//   //     cout << "Int Form of Real. FFTW Real = " << adjust_num(creal(res[i])) << " MY FFT Real = " << adjust_num(result[i][0]) << endl;
-//   //     wait_on_enter();
-//   //   }
-//   //   if(adjust_num(cimag(res[i])) != adjust_num(result[i][1])){
-//   //     cout << "Alert imaginary doenst match! Index = " << i << "   Result FFTW Real = " << creal(res[i]) << " Complex = " << cimag(res[i]) << "  Result my FFT Real = " << result[i][0] << " Complex = " << result[i][1] << endl;
-//   //     wait_on_enter();
-//   //   }
-//   // }
-//   wait_on_enter();
-// }
+void FFTforward(Ring_FFT res, const Ring_ModQ val) {
+  complex_double result[N2];
+  FFTforward_my_version(result,val);
+  FFTforward_fftw_version(res,val);
+  cout << "\n\n************************************************* RESULTS OF FFT Forward*************************************************\n\n";
+  for(int i=0;i<N2;++i){
+    if(adjust_num(creal(res[i]))!= adjust_num(result[i][0])){
+      cout << "Alert real doesnt match! Index = " << i << "   Result FFTW Real = " << creal(res[i]) << " Complex = " << cimag(res[i]) << "  Result my FFT Real = " << result[i][0] << " Complex = " << result[i][1] << endl;
+      cout << "Int Form of Real. FFTW Real = " << adjust_num(creal(res[i])) << " MY FFT Real = " << adjust_num(result[i][0]) << endl;
+      wait_on_enter();
+    }
+    if(adjust_num(cimag(res[i])) != adjust_num(result[i][1])){
+      cout << "Alert imaginary doenst match! Index = " << i << "   Result FFTW Real = " << creal(res[i]) << " Complex = " << cimag(res[i]) << "  Result my FFT Real = " << result[i][0] << " Complex = " << result[i][1] << endl;
+      wait_on_enter();
+    }
+  }
+  wait_on_enter();
+}
 
 
 void FFTbackward_FFTW_version(Ring_ModQ res, const Ring_FFT val){

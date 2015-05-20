@@ -9,48 +9,43 @@
 *                                                                        *
 *************************************************************************/
 
-SecretKey* LWEKeyGen() {
-	SecretKey *LWEsk = malloc(sizeof(SecretKey));
+void LWEKeyGen(SecretKey LWEsk) {
   KeyGenRestart:;
   int s=0, ss=0;
   for (int i = 0; i < n; ++i) {
 
-    *LWEsk[i] = Sample(Chi_Binary);
-    s+= *LWEsk[i];
-    ss+= abs(*LWEsk[i]);
+    LWEsk[i] = Sample(Chi_Binary);
+    s+= LWEsk[i];
+    ss+= abs(LWEsk[i]);
   }
   if (abs(s)>5) 
     goto KeyGenRestart;
   if (abs(ss - n/2)>5) 
     goto KeyGenRestart;
-
-  return LWEsk;
 }
 
-SecretKeyN* KeyGenN() {
-  SecretKeyN *FHEWsk = malloc(sizeof(SecretKeyN));
+void KeyGenN(SecretKeyN FHEWsk) {
 	for(int i =0;i < N; ++i)
-		*FHEWsk[i] = Sample(Chi1); //WHY ARE THERE NO CHECKS HERE?? IT IS THE SAME
-  return FHEWsk;
+		FHEWsk[i] = Sample(Chi1); //WHY ARE THERE NO CHECKS HERE?? IT IS THE SAME
+
 }
 
 //GENERATE SwitchingKey //SwitchingKey => CipherTextQ[1024][25][7] //CipherTextQ = {ZmodQ a[n]; ZmodQ b;} => ZmodQ = int32_t and n = 500 
-SwitchingKey* SwitchingKeyGen(SwitchingKey* res,SecretKey *new_sk,SecretKeyN *old_sk) {
+void SwitchingKeyGen(SwitchingKey res,SecretKey new_sk,SecretKeyN old_sk) {
   
   for (int i = 0; i < N; ++i) 
     for (int j = 0; j < KS_base; ++j)
       for (int k = 0; k < KS_exp; ++k) 
       {
           CipherTextQ ct;    
-          ct.b = -*old_sk[i]*j*KS_table[k] + Sample(Chi2);
+          ct.b = -old_sk[i]*j*KS_table[k] + Sample(Chi2);
           for (int l = 0; l < n; ++l) 
           {
             ct.a[l] = rand();
-            ct.b += ct.a[l] * *new_sk[l];
+            ct.b += ct.a[l] * new_sk[l];
           }
-          *res[i][j][k] = ct;
+          res[i][j][k] = ct;
       }
-  return res;
 }
 
 /*************************************************************************
