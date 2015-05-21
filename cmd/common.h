@@ -13,7 +13,7 @@ void SaveEvalKey(EvalKey *EK, char* filepath);
 EvalKey* LoadEvalKey(char* filepath);
 
 
-void SaveCipherText(CipherText ct, char* filepath);
+void SaveCipherText(CipherText* ct, char* filepath);
 CipherText* LoadCipherText(char* filepath);
 
 

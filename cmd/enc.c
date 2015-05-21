@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
   SecretKey *SK = LoadSecretKey(sk_fn);
   CipherText *ct = malloc(sizeof(CipherText));
   
-  Encrypt(ct, SK, message);  
+  Encrypt(ct, *SK, message);  
   SaveCipherText(ct,ct_fn);
   
   free(SK);

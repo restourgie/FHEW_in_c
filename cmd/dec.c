@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
 
   SecretKey* SK = LoadSecretKey(sk_fn);
   CipherText* ct = LoadCipherText(ct_fn);
-  int m = Decrypt(*SK,*ct);
+  int m = Decrypt(*SK,ct);
   printf("%d\n",m);
   free(SK);
   free(ct);

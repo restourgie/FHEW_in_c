@@ -1,2 +1,7 @@
 #object files
 *.o
+cmd/enc
+cmd/gen
+cmd/nand
+cmd/dec
+cmd/*.o

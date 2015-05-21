@@ -54,21 +54,21 @@ void SwitchingKeyGen(SwitchingKey res,SecretKey new_sk,SecretKeyN old_sk) {
 *                                                                        *
 *************************************************************************/
 
-void Encrypt(CipherText* ct, SecretKey* sk, int m) {
+void Encrypt(CipherText* ct, SecretKey sk, int m) {
     ct->b = (m % 4) * q / 4;//can you just do m * q / 4 because m is 0 or 1 this is always the same mod 4
     ct->b += Sample(Chi3);
     
     for (int i = 0; i < n; ++i)	
     {
       ct->a[i] = rand() % q;
-      ct->b = (ct->b + ct->a[i] * *sk[i]) % q;
+      ct->b = (ct->b + ct->a[i] * sk[i]) % q;
     }
 }
 
-int Decrypt(SecretKey* sk, CipherText* ct) {
+int Decrypt(SecretKey sk, CipherText* ct) {
     int r = ct->b;
     for (int i = 0; i < n; ++i) 
-      r -= ct->a[i] * *sk[i];
+      r -= ct->a[i] * sk[i];
     r = ((r % q) + q + q/8) % q;
     return 4 *r/q;    
 }
