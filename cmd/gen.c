@@ -21,10 +21,15 @@ int main (int argc, char *argv[])
   EvalKey *EK;
   SecretKey LWEsk;
 
+  printf("Starting setup\n");
   Setup();
+  printf("Starting LWEKeyGen\n");
   LWEKeyGen(LWEsk);
+  printf("Starting FHEWKeyGen\n");
   EK = FHEWKeyGen(LWEsk);
+  printf("Saving EvalKey\n");
   SaveEvalKey(EK,ek_fn);
+  printf("Saving SecretKey\n");
   SaveSecretKey(LWEsk,sk_fn);
   free(EK);
 }

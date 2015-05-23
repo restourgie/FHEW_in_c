@@ -12,8 +12,6 @@ typedef struct {
 
 int Sample(const Distrib Chi); /* sample integer with gaussian distribution */ 
 int some_numbers(const Distrib Chi);
-int chi_two(const Distrib Chi);
-unsigned int random_int();
 
 // Distribution of std dev 1.2
 extern const float Chi1_Table[23];

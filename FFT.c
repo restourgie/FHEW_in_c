@@ -1,5 +1,6 @@
 #include "FFT.h"
 #include "params.h"
+#include <stdio.h>
 
 
 #ifndef M_PI
@@ -10,14 +11,13 @@
 #define DOUBLE_N N*2
 #endif
 
-//typedef double complex_double[2];
 void BitInvert(complex_double data[]){
   int i,mv,k,rev;
   complex_double temp;
 
   for(i = 1; i<(DOUBLE_N);i++){//run through all index 1 to N
     k = i;
-    mv = N; //THIS USED TO BE mv = N/2 HOWEVER NOW WE USE TWICE AS BIG FFT SO AND THUS IT BECOMES N*2/2 WHICH MEANS WE CAN JUST PUT N DO NOT FORGET TO CHANGE AFTER
+    mv = (DOUBLE_N)/2;
     rev = 0;
     while(k > 0){//Invert the index
       if ((k % 2) > 0)
@@ -46,9 +46,9 @@ void CalcFFT(complex_double data[], int sign){
 
   //Danielson-Lanzcos routine
   mmax=1;
-  while (DOUBLE_N > mmax) {
+  while ((DOUBLE_N) > mmax) {
     istep=mmax << 1;
-    theta=sign*(2*M_PI/istep);
+    theta=-sign*(2*M_PI/istep);
     wtemp=sin(0.5*theta);
     wpr = -2.0*wtemp*wtemp;
     wpi=sin(theta);
@@ -77,20 +77,30 @@ void CalcFFT(complex_double data[], int sign){
 //Ring_FFT => complex_double[513] => double[513][2]
 //Ring_ModQ => ZmodQ[1024] => int32_t[1024] 
 void FFTforward(Ring_FFT res, Ring_ModQ val) {
+    //printf("\n\n****************Starting FFT****************\n\n");
     complex_double data[DOUBLE_N];
     for(int k=0;k<N;++k){
+      // printf("Index %d value: %d\n",k,val[k]);
       data[k][0] = val[k];
       data[k][1] = 0.0;
       data[k+N][0] = 0.0;
       data[k+N][1] = 0.0;
     } 
     CalcFFT(data,1);
+    // printf("\n\n****************TOTAL RESULT FFT****************\n\n");
+    // for(int i =0; i< DOUBLE_N; ++i){
+    //   printf("Index: %d real: %f Imag: %f\n",i,data[i][0],data[i][1]);
+    // }
     for(int k=0; k < N2-1; ++k){
       res[k][0] = data[2*k+1][0];
       res[k][1] = data[2*k+1][1];
     }
     res[N2][0] = 0.0;
     res[N2][1] = 0.0;
+    // printf("\n\n****************Result FFT****************\n\n");
+    // for(int i=0; i < N2; ++i){
+    //   printf("Index %d Real: %f Imag: %f\n",i,res[i][0],res[i][1]);
+    // }
 }
 
 //Ring_FFT => complex_double[513] => double[513][2]

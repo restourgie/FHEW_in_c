@@ -12,6 +12,7 @@ Ring_FFT t_TestMSB;
 
 void Setup(){
 	Ring_ModQ tmsb;
+  tmsb[0]=-1;
 	for (int i = 1; i < N; ++i)
 		tmsb[i]=1;
 	FFTforward(t_TestMSB,tmsb);

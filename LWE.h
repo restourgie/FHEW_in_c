@@ -20,11 +20,11 @@
     ZmodQ b;
   } CipherTextQN;
   
-  typedef int SecretKey[n]; // n-dimensional LWE secret key 
+  typedef int SecretKey[n]; // n-dimensional LWE secret key n = 500
   typedef int SecretKeyN[N]; // N-dimensional LWE secret key 
   typedef CipherTextQ SwitchingKey[N][KS_base][KS_exp]; //SwitchingKey => CipherTextQ[1024][25][7]
   
-  void LWEKeyGen(SecretKey LWEsk);
+  void LWEKeyGen(SecretKey sk);
   void KeyGenN();
   // Generate key material (SwitchingKey) required by KeySwitch to transform 
   // LWE encryptions under old_sk into LWE encryptions under new_sk

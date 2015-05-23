@@ -9,14 +9,14 @@
 *                                                                        *
 *************************************************************************/
 
-void LWEKeyGen(SecretKey LWEsk) {
+void LWEKeyGen(SecretKey sk) {
   KeyGenRestart:;
   int s=0, ss=0;
   for (int i = 0; i < n; ++i) {
 
-    LWEsk[i] = Sample(Chi_Binary);
-    s+= LWEsk[i];
-    ss+= abs(LWEsk[i]);
+    sk[i] = some_numbers(Chi_Binary);
+    s+= sk[i];
+    ss+= abs(sk[i]);
   }
   if (abs(s)>5) 
     goto KeyGenRestart;
@@ -25,27 +25,33 @@ void LWEKeyGen(SecretKey LWEsk) {
 }
 
 void KeyGenN(SecretKeyN FHEWsk) {
-	for(int i =0;i < N; ++i)
-		FHEWsk[i] = Sample(Chi1); //WHY ARE THERE NO CHECKS HERE?? IT IS THE SAME
+	printf("\n*****Starting KeygenN*****\n");
+  for(int i =0;i < N; ++i)
+		FHEWsk[i] = some_numbers(Chi1); //WHY ARE THERE NO CHECKS HERE?? IT IS THE SAME
+  printf("\n*****Finished KeygenN*****\n");
 
 }
 
 //GENERATE SwitchingKey //SwitchingKey => CipherTextQ[1024][25][7] //CipherTextQ = {ZmodQ a[n]; ZmodQ b;} => ZmodQ = int32_t and n = 500 
 void SwitchingKeyGen(SwitchingKey res,SecretKey new_sk,SecretKeyN old_sk) {
-  
-  for (int i = 0; i < N; ++i) 
+  printf("\n*****Starting SwitchingKeyGen*****\n");
+  for (int i = 0; i < N; ++i){ 
     for (int j = 0; j < KS_base; ++j)
       for (int k = 0; k < KS_exp; ++k) 
       {
           CipherTextQ ct;    
-          ct.b = -old_sk[i]*j*KS_table[k] + Sample(Chi2);
+          ct.b = -old_sk[i]*j*KS_table[k] + chi_two(Chi2);
           for (int l = 0; l < n; ++l) 
           {
-            ct.a[l] = rand();
+            ct.a[l] = random_int(); //I need to get this positive
+            //printf("got this number: %d \n",ct.a[l] );
             ct.b += ct.a[l] * new_sk[l];
           }
           res[i][j][k] = ct;
       }
+      printf("i is now : %d\n",i);
+    }
+  printf("\n*****Finished SwitchingKeyGen*****\n");
 }
 
 /*************************************************************************

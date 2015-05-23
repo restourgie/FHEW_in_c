@@ -1,11 +1,7 @@
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
+#include <math.h>
 #include "distrib.h" 
 #include <stdlib.h>
 #include <stdio.h>
-#include <limits.h>
 
 
 const float Chi1_Table[23] = {
@@ -53,61 +49,6 @@ const Distrib Chi_Binary = {
   Binary_Table
 };
 
-static int fd = -1;
-
-void randombytes(unsigned char *x,unsigned long long xlen)
-{
-  int i;
-
-  if (fd == -1) {
-    for (;;) {
-      fd = open("/dev/urandom",O_RDONLY);
-      if (fd != -1) break;
-      sleep(1);
-    }
-  }
-
-  while (xlen > 0) {
-    if (xlen < 1048576) i = xlen; else i = 1048576;
-
-    i = read(fd,x,i);
-    if (i < 1) {
-      sleep(1);
-      continue;
-    }
-
-    x += i;
-    xlen -= i;
-  }
-}
-
-int toInt(unsigned char* bytes) {
-    return (int)(((unsigned char)bytes[3] << 24) |
-                 ((unsigned char)bytes[2] << 16) |
-                 ((unsigned char)bytes[1] << 8) |
-                 (unsigned char)bytes[0]);
-}
-
-unsigned int random_int(){
-  int length = 4;
-  unsigned char x[length];
-  randombytes(x,length);
-  unsigned int var = toInt(x);
-  return var;
-}
-
-//25% chance on -1 50% on 0 and 25% on 1
-int some_numbers(const Distrib Chi){
-  unsigned int var = random_int();
-  double r = (double) ((double)var/(double)UINT_MAX);
-  for (int i = 0; i < Chi.max; ++i) 
-      if (r <= Chi.table[i]) 
-        return i - Chi.offset;
-  printf("Sampling Error: distribution table ending before (double) 1.0\n");
-  exit(EXIT_FAILURE);
-}
-
-
 int Sample(const Distrib Chi) { 
   if (Chi.max) {///ASK PETER
     double r = (rand()) / (RAND_MAX);
@@ -143,19 +84,4 @@ int Sample(const Distrib Chi) {
       return floor(.5 + x*s) ;
   }
 
-}
-
-
-int chi_two(Distrib Chi){
-  double bla,r,s = Chi.std_dev;
-
-  while(1){
-    unsigned int var = random_int();
-    bla = (double) ((double)var/(double)UINT_MAX);
-    bla = 16 *bla -8;
-    var = random_int();
-    r   = (double) ((double)var/(double)UINT_MAX);
-    if (r < exp(- bla*bla / 2 )) 
-      return floor(.5 + bla*s) ;
-  }
 }
