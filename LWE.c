@@ -12,9 +12,11 @@
 void LWEKeyGen(SecretKey sk) {
   KeyGenRestart:;
   int s=0, ss=0;
+  printf("Restart\n");
   for (int i = 0; i < n; ++i) {
 
     sk[i] = some_numbers(Chi_Binary);
+    // printf("got this number: %d \n",sk[i] );
     s+= sk[i];
     ss+= abs(sk[i]);
   }
@@ -44,7 +46,7 @@ void SwitchingKeyGen(SwitchingKey res,SecretKey new_sk,SecretKeyN old_sk) {
           for (int l = 0; l < n; ++l) 
           {
             ct.a[l] = random_int(); //I need to get this positive
-            //printf("got this number: %d \n",ct.a[l] );
+            // printf("got this number: %d \n",ct.a[l] );
             ct.b += ct.a[l] * new_sk[l];
           }
           res[i][j][k] = ct;

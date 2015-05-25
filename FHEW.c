@@ -38,7 +38,7 @@ void FHEWencrypt(ct_FFT ct, Ring_FFT sk_FFT, int m) {
     for (int i = 0; i < K2; ++i) 
     {
       for (int k = 0; k < N; ++k) 
-        res[i][0][k] = rand(); // % Q
+        res[i][0][k] = random_int(); // % Q //
       
       FFTforward(ai, res[i][0]);
       
@@ -52,7 +52,7 @@ void FHEWencrypt(ct_FFT ct, Ring_FFT sk_FFT, int m) {
       FFTbackward(res[i][1], ai);
       
       for (int k = 0; k < N; ++k) 
-        res[i][1][k] += Sample(Chi1);    // Add error [a,as+e]
+        res[i][1][k] += some_numbers(Chi1);    // Add error [a,as+e]
     }
     
     for (int i = 0; i < K; ++i) 
@@ -71,23 +71,48 @@ void FHEWencrypt(ct_FFT ct, Ring_FFT sk_FFT, int m) {
 *                                                                        *
 *************************************************************************/
 
-EvalKey* FHEWKeyGen(SecretKey LWEsk) {
-  EvalKey *EK = malloc(sizeof(EvalKey));
+void FHEWKeyGen(EvalKey* EK, SecretKey LWEsk){
   SecretKeyN FHEWsk;
+  
+  printf("Pointer value of EK in FHEW = %p\n", EK);
+  printf("\n Pointer value of EK->BSkey in FHEW = %p\n",&(EK->BSkey));
+  printf("\n Pointer value of EK->KSkey in FHEW = %p\n",&(EK->KSkey));
   KeyGenN(FHEWsk);
   SwitchingKeyGen((EK->KSkey),LWEsk, FHEWsk);
 
   Ring_FFT FHEWskFFT;
   FFTforward(FHEWskFFT,FHEWsk);
-
-  for (int i = 0; i < n; ++i)
+  printf("Starting another huge loop\n");
+  for (int i = 0; i < n; ++i){
     for (int j = 1; j < BS_base; ++j)
       for (int k = 0; k < BS_exp; ++k) 
       {
-        // EK->BSkey[i][j][k] = (ct_FFT*) fftw_malloc(sizeof(ct_FFT));//IS THIS NEEDED?
+        //EK->BSkey[i][j][k] = fftw_malloc(sizeof(ct_FFT));//IS THIS NEEDED?
         FHEWencrypt( (EK->BSkey[i][j][k]), FHEWskFFT, LWEsk[i] * j * BS_table[k] );
       }
-  return EK;
+      printf("i is now : %d\n",i);
+  }
+  printf("finished huge loop\n");
+  // for (int i = 0; i < n; ++i){
+  //   printf("i: %d\n",i);
+  //   for (int j = 1; j < BS_base; ++j){
+  //     printf("j: %d\n",j );
+  //     for (int k = 0; k < BS_exp; ++k){
+  //       printf("k: %d\n", k);
+  //       for(int l = 0; l < K2; ++l){
+  //         printf("l: %d\n", l);
+  //         for(int bin = 0; bin < 2; ++bin){
+  //           printf("bin: %d\n",bin);
+  //           for(int last = 0; last < N2; ++last){
+  //             printf("last: %d\n",last);
+  //             printf("BSkey real: %f imag: %f\n",EK->BSkey[i][j][k][l][bin][last][0],EK->BSkey[i][j][k][l][bin][last][1]);
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
+  // printf("Hi!\n");
 }
 
 void AddToACC(ct_FFT ACC, ct_FFT C) {

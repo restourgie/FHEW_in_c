@@ -1,6 +1,6 @@
 # the compiler to use.
 CC=gcc
-# options I'll pass to the compiler
+# options I'll pass to the compiler -fno-stack-protector
 CFLAGS= -Wall -O3 -std=c11
 LIBS= -lm
 

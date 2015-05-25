@@ -53,11 +53,28 @@ void SaveEvalKey(EvalKey *EK, char* filepath) {
   }
   printf("Writing Evaluation key to %s .\n", filepath);
   
-   // Write bootstrapping key
+//    Write bootstrapping key
   for (int i = 0; i < n; ++i)      
     for (int j = 1; j < BS_base; ++j)
-      for (int k = 0; k < BS_exp; ++k) 
-        assert(fwrite(&(EK->BSkey[i][j][k]), sizeof(ct_FFT), 1, f));
+      for (int k = 0; k < BS_exp; ++k){ 
+
+           //fwrite(&(EK->BSkey[i][j][k]), sizeof(ct_FFT), 1, f);
+      }
+    // for (int i = 0; i < n; ++i){
+    // printf("i: %d\n",i);
+    // for (int j = 1; j < BS_base; ++j){
+    //   printf("j: %d\n",j );
+    //   for (int k = 0; k < BS_exp; ++k){
+    //     printf("k: %d\n", k);
+    //     for(int l = 0; l < K2; ++l){
+    //       printf("l: %d\n", l);
+    //       for(int bin = 0; bin < 2; ++bin){
+    //         printf("bin: %d\n",bin);
+    //         for(int last = 0; last < N2; ++last){
+    //           printf("last: %d\n",last);
+    //           printf("BSkey real: %f imag: %f\n",EK->BSkey[i][j][k][l][bin][last][0],EK->BSkey[i][j][k][l][bin][last][1]);
+    //         }}}}}}
+
   // Write switching key
   for (int i = 0; i < N; ++i)
     for (int j = 0; j < KS_base; ++j)

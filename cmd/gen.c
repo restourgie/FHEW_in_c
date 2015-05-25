@@ -18,18 +18,24 @@ int main (int argc, char *argv[])
 	char* sk_fn = argv[1]; 
   char* ek_fn = argv[2];
 
-  EvalKey *EK;
   SecretKey LWEsk;
+  EvalKey *EK;
+  EK = (EvalKey*) malloc(sizeof(EvalKey));
+  printf("\n Pointer value of EK = %p\n",EK);
+  printf("\n Pointer value of EK->BSkey = %p\n",&(EK->BSkey));
+  printf("\n Pointer value of EK->KSkey = %p\n",&(EK->KSkey));
 
   printf("Starting setup\n");
   Setup();
   printf("Starting LWEKeyGen\n");
   LWEKeyGen(LWEsk);
   printf("Starting FHEWKeyGen\n");
-  EK = FHEWKeyGen(LWEsk);
+  printf("the size of EK = %lu\n",sizeof(EvalKey));
+  FHEWKeyGen(EK,LWEsk);
+  printf("\n Pointer value of EK = %p\n",EK);
   printf("Saving EvalKey\n");
-  SaveEvalKey(EK,ek_fn);
-  printf("Saving SecretKey\n");
-  SaveSecretKey(LWEsk,sk_fn);
+  // SaveEvalKey(EK,ek_fn);
+  // printf("Saving SecretKey\n");
+  // SaveSecretKey(LWEsk,sk_fn);
   free(EK);
 }

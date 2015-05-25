@@ -88,18 +88,18 @@ int toInt(unsigned char* bytes) {
                  (unsigned char)bytes[0]);
 }
 
-unsigned int random_int(){
+int random_int(){
   int length = 4;
   unsigned char x[length];
   randombytes(x,length);
   unsigned int var = toInt(x);
-  return var;
+  return abs(var);
 }
 
 //25% chance on -1 50% on 0 and 25% on 1
 int some_numbers(const Distrib Chi){
-  unsigned int var = random_int();
-  double r = (double) ((double)var/(double)UINT_MAX);
+  int var = random_int();
+  double r = (double) ((double)var/(double)INT_MAX);
   for (int i = 0; i < Chi.max; ++i) 
       if (r <= Chi.table[i]) 
         return i - Chi.offset;
@@ -150,11 +150,11 @@ int chi_two(Distrib Chi){
   double bla,r,s = Chi.std_dev;
 
   while(1){
-    unsigned int var = random_int();
-    bla = (double) ((double)var/(double)UINT_MAX);
+    int var = random_int();
+    bla = (double) ((double)var/(double)INT_MAX);
     bla = 16 *bla -8;
     var = random_int();
-    r   = (double) ((double)var/(double)UINT_MAX);
+    r   = (double) ((double)var/(double)INT_MAX);
     if (r < exp(- bla*bla / 2 )) 
       return floor(.5 + bla*s) ;
   }
