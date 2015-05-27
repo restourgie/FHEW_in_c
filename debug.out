@@ -1,0 +1,1293 @@
+sizeof BootstrappingKey: 2265408000
+EK.BSkey: 0x7f5c2cd27010
+
+Pointer value of EK.BSkey = 0x7f5c2cd27010
+
+Pointer value of EK.KSkey = 0x7f5c176ab010
+Starting setup
+Starting LWEKeyGen
+Restart
+Restart
+Restart
+Starting FHEWKeyGen
+the size of EK = 16
+Pointer value of EK in FHEW = 0x7ffc92c368f0
+
+ Pointer value of EK->BSkey in FHEW = 0x7f5c2cd27010
+
+ Pointer value of EK->KSkey in FHEW = 0x7f5c176ab010
+
+*****Starting KeygenN*****
+
+*****Finished KeygenN*****
+Starting another huge loop
+i is now : 0
+k is now :0
+Arrrrgh: i=0, j=1, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2d179290
+FFT j is now 1
+ct[i][j]: 0x7f5c2d17b2a0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2d17d2b0
+FFT j is now 1
+ct[i][j]: 0x7f5c2d17f2c0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2d1812d0
+FFT j is now 1
+ct[i][j]: 0x7f5c2d1832e0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2d1852f0
+FFT j is now 1
+ct[i][j]: 0x7f5c2d187300
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2d189310
+FFT j is now 1
+ct[i][j]: 0x7f5c2d18b320
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2d18d330
+FFT j is now 1
+ct[i][j]: 0x7f5c2d18f340
+k is now :1
+Arrrrgh: i=0, j=1, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2d1a9410
+FFT j is now 1
+ct[i][j]: 0x7f5c2d1ab420
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2d1ad430
+FFT j is now 1
+ct[i][j]: 0x7f5c2d1af440
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2d1b1450
+FFT j is now 1
+ct[i][j]: 0x7f5c2d1b3460
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2d1b5470
+FFT j is now 1
+ct[i][j]: 0x7f5c2d1b7480
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2d1b9490
+FFT j is now 1
+ct[i][j]: 0x7f5c2d1bb4a0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2d1bd4b0
+FFT j is now 1
+ct[i][j]: 0x7f5c2d1bf4c0
+k is now :0
+Arrrrgh: i=0, j=2, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2d5cb510
+FFT j is now 1
+ct[i][j]: 0x7f5c2d5cd520
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2d5cf530
+FFT j is now 1
+ct[i][j]: 0x7f5c2d5d1540
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2d5d3550
+FFT j is now 1
+ct[i][j]: 0x7f5c2d5d5560
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2d5d7570
+FFT j is now 1
+ct[i][j]: 0x7f5c2d5d9580
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2d5db590
+FFT j is now 1
+ct[i][j]: 0x7f5c2d5dd5a0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2d5df5b0
+FFT j is now 1
+ct[i][j]: 0x7f5c2d5e15c0
+k is now :1
+Arrrrgh: i=0, j=2, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2d5fb690
+FFT j is now 1
+ct[i][j]: 0x7f5c2d5fd6a0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2d5ff6b0
+FFT j is now 1
+ct[i][j]: 0x7f5c2d6016c0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2d6036d0
+FFT j is now 1
+ct[i][j]: 0x7f5c2d6056e0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2d6076f0
+FFT j is now 1
+ct[i][j]: 0x7f5c2d609700
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2d60b710
+FFT j is now 1
+ct[i][j]: 0x7f5c2d60d720
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2d60f730
+FFT j is now 1
+ct[i][j]: 0x7f5c2d611740
+k is now :0
+Arrrrgh: i=0, j=3, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2da1d790
+FFT j is now 1
+ct[i][j]: 0x7f5c2da1f7a0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2da217b0
+FFT j is now 1
+ct[i][j]: 0x7f5c2da237c0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2da257d0
+FFT j is now 1
+ct[i][j]: 0x7f5c2da277e0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2da297f0
+FFT j is now 1
+ct[i][j]: 0x7f5c2da2b800
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2da2d810
+FFT j is now 1
+ct[i][j]: 0x7f5c2da2f820
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2da31830
+FFT j is now 1
+ct[i][j]: 0x7f5c2da33840
+k is now :1
+Arrrrgh: i=0, j=3, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2da4d910
+FFT j is now 1
+ct[i][j]: 0x7f5c2da4f920
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2da51930
+FFT j is now 1
+ct[i][j]: 0x7f5c2da53940
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2da55950
+FFT j is now 1
+ct[i][j]: 0x7f5c2da57960
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2da59970
+FFT j is now 1
+ct[i][j]: 0x7f5c2da5b980
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2da5d990
+FFT j is now 1
+ct[i][j]: 0x7f5c2da5f9a0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2da619b0
+FFT j is now 1
+ct[i][j]: 0x7f5c2da639c0
+k is now :0
+Arrrrgh: i=0, j=4, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2de6fa10
+FFT j is now 1
+ct[i][j]: 0x7f5c2de71a20
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2de73a30
+FFT j is now 1
+ct[i][j]: 0x7f5c2de75a40
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2de77a50
+FFT j is now 1
+ct[i][j]: 0x7f5c2de79a60
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2de7ba70
+FFT j is now 1
+ct[i][j]: 0x7f5c2de7da80
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2de7fa90
+FFT j is now 1
+ct[i][j]: 0x7f5c2de81aa0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2de83ab0
+FFT j is now 1
+ct[i][j]: 0x7f5c2de85ac0
+k is now :1
+Arrrrgh: i=0, j=4, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2de9fb90
+FFT j is now 1
+ct[i][j]: 0x7f5c2dea1ba0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2dea3bb0
+FFT j is now 1
+ct[i][j]: 0x7f5c2dea5bc0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2dea7bd0
+FFT j is now 1
+ct[i][j]: 0x7f5c2dea9be0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2deabbf0
+FFT j is now 1
+ct[i][j]: 0x7f5c2deadc00
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2deafc10
+FFT j is now 1
+ct[i][j]: 0x7f5c2deb1c20
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2deb3c30
+FFT j is now 1
+ct[i][j]: 0x7f5c2deb5c40
+k is now :0
+Arrrrgh: i=0, j=5, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2e2c1c90
+FFT j is now 1
+ct[i][j]: 0x7f5c2e2c3ca0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2e2c5cb0
+FFT j is now 1
+ct[i][j]: 0x7f5c2e2c7cc0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2e2c9cd0
+FFT j is now 1
+ct[i][j]: 0x7f5c2e2cbce0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2e2cdcf0
+FFT j is now 1
+ct[i][j]: 0x7f5c2e2cfd00
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2e2d1d10
+FFT j is now 1
+ct[i][j]: 0x7f5c2e2d3d20
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2e2d5d30
+FFT j is now 1
+ct[i][j]: 0x7f5c2e2d7d40
+k is now :1
+Arrrrgh: i=0, j=5, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2e2f1e10
+FFT j is now 1
+ct[i][j]: 0x7f5c2e2f3e20
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2e2f5e30
+FFT j is now 1
+ct[i][j]: 0x7f5c2e2f7e40
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2e2f9e50
+FFT j is now 1
+ct[i][j]: 0x7f5c2e2fbe60
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2e2fde70
+FFT j is now 1
+ct[i][j]: 0x7f5c2e2ffe80
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2e301e90
+FFT j is now 1
+ct[i][j]: 0x7f5c2e303ea0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2e305eb0
+FFT j is now 1
+ct[i][j]: 0x7f5c2e307ec0
+k is now :0
+Arrrrgh: i=0, j=6, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2e713f10
+FFT j is now 1
+ct[i][j]: 0x7f5c2e715f20
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2e717f30
+FFT j is now 1
+ct[i][j]: 0x7f5c2e719f40
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2e71bf50
+FFT j is now 1
+ct[i][j]: 0x7f5c2e71df60
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2e71ff70
+FFT j is now 1
+ct[i][j]: 0x7f5c2e721f80
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2e723f90
+FFT j is now 1
+ct[i][j]: 0x7f5c2e725fa0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2e727fb0
+FFT j is now 1
+ct[i][j]: 0x7f5c2e729fc0
+k is now :1
+Arrrrgh: i=0, j=6, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2e744090
+FFT j is now 1
+ct[i][j]: 0x7f5c2e7460a0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2e7480b0
+FFT j is now 1
+ct[i][j]: 0x7f5c2e74a0c0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2e74c0d0
+FFT j is now 1
+ct[i][j]: 0x7f5c2e74e0e0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2e7500f0
+FFT j is now 1
+ct[i][j]: 0x7f5c2e752100
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2e754110
+FFT j is now 1
+ct[i][j]: 0x7f5c2e756120
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2e758130
+FFT j is now 1
+ct[i][j]: 0x7f5c2e75a140
+k is now :0
+Arrrrgh: i=0, j=7, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2eb66190
+FFT j is now 1
+ct[i][j]: 0x7f5c2eb681a0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2eb6a1b0
+FFT j is now 1
+ct[i][j]: 0x7f5c2eb6c1c0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2eb6e1d0
+FFT j is now 1
+ct[i][j]: 0x7f5c2eb701e0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2eb721f0
+FFT j is now 1
+ct[i][j]: 0x7f5c2eb74200
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2eb76210
+FFT j is now 1
+ct[i][j]: 0x7f5c2eb78220
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2eb7a230
+FFT j is now 1
+ct[i][j]: 0x7f5c2eb7c240
+k is now :1
+Arrrrgh: i=0, j=7, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2eb96310
+FFT j is now 1
+ct[i][j]: 0x7f5c2eb98320
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2eb9a330
+FFT j is now 1
+ct[i][j]: 0x7f5c2eb9c340
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2eb9e350
+FFT j is now 1
+ct[i][j]: 0x7f5c2eba0360
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2eba2370
+FFT j is now 1
+ct[i][j]: 0x7f5c2eba4380
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2eba6390
+FFT j is now 1
+ct[i][j]: 0x7f5c2eba83a0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2ebaa3b0
+FFT j is now 1
+ct[i][j]: 0x7f5c2ebac3c0
+k is now :0
+Arrrrgh: i=0, j=8, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2efb8410
+FFT j is now 1
+ct[i][j]: 0x7f5c2efba420
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2efbc430
+FFT j is now 1
+ct[i][j]: 0x7f5c2efbe440
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2efc0450
+FFT j is now 1
+ct[i][j]: 0x7f5c2efc2460
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2efc4470
+FFT j is now 1
+ct[i][j]: 0x7f5c2efc6480
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2efc8490
+FFT j is now 1
+ct[i][j]: 0x7f5c2efca4a0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2efcc4b0
+FFT j is now 1
+ct[i][j]: 0x7f5c2efce4c0
+k is now :1
+Arrrrgh: i=0, j=8, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2efe8590
+FFT j is now 1
+ct[i][j]: 0x7f5c2efea5a0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2efec5b0
+FFT j is now 1
+ct[i][j]: 0x7f5c2efee5c0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2eff05d0
+FFT j is now 1
+ct[i][j]: 0x7f5c2eff25e0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2eff45f0
+FFT j is now 1
+ct[i][j]: 0x7f5c2eff6600
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2eff8610
+FFT j is now 1
+ct[i][j]: 0x7f5c2effa620
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2effc630
+FFT j is now 1
+ct[i][j]: 0x7f5c2effe640
+k is now :0
+Arrrrgh: i=0, j=9, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2f40a690
+FFT j is now 1
+ct[i][j]: 0x7f5c2f40c6a0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2f40e6b0
+FFT j is now 1
+ct[i][j]: 0x7f5c2f4106c0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2f4126d0
+FFT j is now 1
+ct[i][j]: 0x7f5c2f4146e0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2f4166f0
+FFT j is now 1
+ct[i][j]: 0x7f5c2f418700
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2f41a710
+FFT j is now 1
+ct[i][j]: 0x7f5c2f41c720
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2f41e730
+FFT j is now 1
+ct[i][j]: 0x7f5c2f420740
+k is now :1
+Arrrrgh: i=0, j=9, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2f43a810
+FFT j is now 1
+ct[i][j]: 0x7f5c2f43c820
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2f43e830
+FFT j is now 1
+ct[i][j]: 0x7f5c2f440840
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2f442850
+FFT j is now 1
+ct[i][j]: 0x7f5c2f444860
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2f446870
+FFT j is now 1
+ct[i][j]: 0x7f5c2f448880
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2f44a890
+FFT j is now 1
+ct[i][j]: 0x7f5c2f44c8a0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2f44e8b0
+FFT j is now 1
+ct[i][j]: 0x7f5c2f4508c0
+k is now :0
+Arrrrgh: i=0, j=10, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2f85c910
+FFT j is now 1
+ct[i][j]: 0x7f5c2f85e920
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2f860930
+FFT j is now 1
+ct[i][j]: 0x7f5c2f862940
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2f864950
+FFT j is now 1
+ct[i][j]: 0x7f5c2f866960
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2f868970
+FFT j is now 1
+ct[i][j]: 0x7f5c2f86a980
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2f86c990
+FFT j is now 1
+ct[i][j]: 0x7f5c2f86e9a0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2f8709b0
+FFT j is now 1
+ct[i][j]: 0x7f5c2f8729c0
+k is now :1
+Arrrrgh: i=0, j=10, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2f88ca90
+FFT j is now 1
+ct[i][j]: 0x7f5c2f88eaa0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2f890ab0
+FFT j is now 1
+ct[i][j]: 0x7f5c2f892ac0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2f894ad0
+FFT j is now 1
+ct[i][j]: 0x7f5c2f896ae0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2f898af0
+FFT j is now 1
+ct[i][j]: 0x7f5c2f89ab00
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2f89cb10
+FFT j is now 1
+ct[i][j]: 0x7f5c2f89eb20
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2f8a0b30
+FFT j is now 1
+ct[i][j]: 0x7f5c2f8a2b40
+k is now :0
+Arrrrgh: i=0, j=11, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2fcaeb90
+FFT j is now 1
+ct[i][j]: 0x7f5c2fcb0ba0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2fcb2bb0
+FFT j is now 1
+ct[i][j]: 0x7f5c2fcb4bc0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2fcb6bd0
+FFT j is now 1
+ct[i][j]: 0x7f5c2fcb8be0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2fcbabf0
+FFT j is now 1
+ct[i][j]: 0x7f5c2fcbcc00
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2fcbec10
+FFT j is now 1
+ct[i][j]: 0x7f5c2fcc0c20
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2fcc2c30
+FFT j is now 1
+ct[i][j]: 0x7f5c2fcc4c40
+k is now :1
+Arrrrgh: i=0, j=11, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c2fcded10
+FFT j is now 1
+ct[i][j]: 0x7f5c2fce0d20
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c2fce2d30
+FFT j is now 1
+ct[i][j]: 0x7f5c2fce4d40
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c2fce6d50
+FFT j is now 1
+ct[i][j]: 0x7f5c2fce8d60
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c2fcead70
+FFT j is now 1
+ct[i][j]: 0x7f5c2fcecd80
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c2fceed90
+FFT j is now 1
+ct[i][j]: 0x7f5c2fcf0da0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c2fcf2db0
+FFT j is now 1
+ct[i][j]: 0x7f5c2fcf4dc0
+k is now :0
+Arrrrgh: i=0, j=12, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c30100e10
+FFT j is now 1
+ct[i][j]: 0x7f5c30102e20
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c30104e30
+FFT j is now 1
+ct[i][j]: 0x7f5c30106e40
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c30108e50
+FFT j is now 1
+ct[i][j]: 0x7f5c3010ae60
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c3010ce70
+FFT j is now 1
+ct[i][j]: 0x7f5c3010ee80
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c30110e90
+FFT j is now 1
+ct[i][j]: 0x7f5c30112ea0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c30114eb0
+FFT j is now 1
+ct[i][j]: 0x7f5c30116ec0
+k is now :1
+Arrrrgh: i=0, j=12, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c30130f90
+FFT j is now 1
+ct[i][j]: 0x7f5c30132fa0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c30134fb0
+FFT j is now 1
+ct[i][j]: 0x7f5c30136fc0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c30138fd0
+FFT j is now 1
+ct[i][j]: 0x7f5c3013afe0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c3013cff0
+FFT j is now 1
+ct[i][j]: 0x7f5c3013f000
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c30141010
+FFT j is now 1
+ct[i][j]: 0x7f5c30143020
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c30145030
+FFT j is now 1
+ct[i][j]: 0x7f5c30147040
+k is now :0
+Arrrrgh: i=0, j=13, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c30553090
+FFT j is now 1
+ct[i][j]: 0x7f5c305550a0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c305570b0
+FFT j is now 1
+ct[i][j]: 0x7f5c305590c0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c3055b0d0
+FFT j is now 1
+ct[i][j]: 0x7f5c3055d0e0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c3055f0f0
+FFT j is now 1
+ct[i][j]: 0x7f5c30561100
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c30563110
+FFT j is now 1
+ct[i][j]: 0x7f5c30565120
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c30567130
+FFT j is now 1
+ct[i][j]: 0x7f5c30569140
+k is now :1
+Arrrrgh: i=0, j=13, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c30583210
+FFT j is now 1
+ct[i][j]: 0x7f5c30585220
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c30587230
+FFT j is now 1
+ct[i][j]: 0x7f5c30589240
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c3058b250
+FFT j is now 1
+ct[i][j]: 0x7f5c3058d260
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c3058f270
+FFT j is now 1
+ct[i][j]: 0x7f5c30591280
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c30593290
+FFT j is now 1
+ct[i][j]: 0x7f5c305952a0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c305972b0
+FFT j is now 1
+ct[i][j]: 0x7f5c305992c0
+k is now :0
+Arrrrgh: i=0, j=14, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c309a5310
+FFT j is now 1
+ct[i][j]: 0x7f5c309a7320
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c309a9330
+FFT j is now 1
+ct[i][j]: 0x7f5c309ab340
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c309ad350
+FFT j is now 1
+ct[i][j]: 0x7f5c309af360
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c309b1370
+FFT j is now 1
+ct[i][j]: 0x7f5c309b3380
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c309b5390
+FFT j is now 1
+ct[i][j]: 0x7f5c309b73a0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c309b93b0
+FFT j is now 1
+ct[i][j]: 0x7f5c309bb3c0
+k is now :1
+Arrrrgh: i=0, j=14, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c309d5490
+FFT j is now 1
+ct[i][j]: 0x7f5c309d74a0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c309d94b0
+FFT j is now 1
+ct[i][j]: 0x7f5c309db4c0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c309dd4d0
+FFT j is now 1
+ct[i][j]: 0x7f5c309df4e0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c309e14f0
+FFT j is now 1
+ct[i][j]: 0x7f5c309e3500
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c309e5510
+FFT j is now 1
+ct[i][j]: 0x7f5c309e7520
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c309e9530
+FFT j is now 1
+ct[i][j]: 0x7f5c309eb540
+k is now :0
+Arrrrgh: i=0, j=15, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c30df7590
+FFT j is now 1
+ct[i][j]: 0x7f5c30df95a0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c30dfb5b0
+FFT j is now 1
+ct[i][j]: 0x7f5c30dfd5c0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c30dff5d0
+FFT j is now 1
+ct[i][j]: 0x7f5c30e015e0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c30e035f0
+FFT j is now 1
+ct[i][j]: 0x7f5c30e05600
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c30e07610
+FFT j is now 1
+ct[i][j]: 0x7f5c30e09620
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c30e0b630
+FFT j is now 1
+ct[i][j]: 0x7f5c30e0d640
+k is now :1
+Arrrrgh: i=0, j=15, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c30e27710
+FFT j is now 1
+ct[i][j]: 0x7f5c30e29720
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c30e2b730
+FFT j is now 1
+ct[i][j]: 0x7f5c30e2d740
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c30e2f750
+FFT j is now 1
+ct[i][j]: 0x7f5c30e31760
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c30e33770
+FFT j is now 1
+ct[i][j]: 0x7f5c30e35780
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c30e37790
+FFT j is now 1
+ct[i][j]: 0x7f5c30e397a0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c30e3b7b0
+FFT j is now 1
+ct[i][j]: 0x7f5c30e3d7c0
+k is now :0
+Arrrrgh: i=0, j=16, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c31249810
+FFT j is now 1
+ct[i][j]: 0x7f5c3124b820
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c3124d830
+FFT j is now 1
+ct[i][j]: 0x7f5c3124f840
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c31251850
+FFT j is now 1
+ct[i][j]: 0x7f5c31253860
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c31255870
+FFT j is now 1
+ct[i][j]: 0x7f5c31257880
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c31259890
+FFT j is now 1
+ct[i][j]: 0x7f5c3125b8a0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c3125d8b0
+FFT j is now 1
+ct[i][j]: 0x7f5c3125f8c0
+k is now :1
+Arrrrgh: i=0, j=16, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c31279990
+FFT j is now 1
+ct[i][j]: 0x7f5c3127b9a0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c3127d9b0
+FFT j is now 1
+ct[i][j]: 0x7f5c3127f9c0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c312819d0
+FFT j is now 1
+ct[i][j]: 0x7f5c312839e0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c312859f0
+FFT j is now 1
+ct[i][j]: 0x7f5c31287a00
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c31289a10
+FFT j is now 1
+ct[i][j]: 0x7f5c3128ba20
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c3128da30
+FFT j is now 1
+ct[i][j]: 0x7f5c3128fa40
+k is now :0
+Arrrrgh: i=0, j=17, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c3169ba90
+FFT j is now 1
+ct[i][j]: 0x7f5c3169daa0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c3169fab0
+FFT j is now 1
+ct[i][j]: 0x7f5c316a1ac0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c316a3ad0
+FFT j is now 1
+ct[i][j]: 0x7f5c316a5ae0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c316a7af0
+FFT j is now 1
+ct[i][j]: 0x7f5c316a9b00
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c316abb10
+FFT j is now 1
+ct[i][j]: 0x7f5c316adb20
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c316afb30
+FFT j is now 1
+ct[i][j]: 0x7f5c316b1b40
+k is now :1
+Arrrrgh: i=0, j=17, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c316cbc10
+FFT j is now 1
+ct[i][j]: 0x7f5c316cdc20
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c316cfc30
+FFT j is now 1
+ct[i][j]: 0x7f5c316d1c40
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c316d3c50
+FFT j is now 1
+ct[i][j]: 0x7f5c316d5c60
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c316d7c70
+FFT j is now 1
+ct[i][j]: 0x7f5c316d9c80
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c316dbc90
+FFT j is now 1
+ct[i][j]: 0x7f5c316ddca0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c316dfcb0
+FFT j is now 1
+ct[i][j]: 0x7f5c316e1cc0
+k is now :0
+Arrrrgh: i=0, j=18, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c31aedd10
+FFT j is now 1
+ct[i][j]: 0x7f5c31aefd20
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c31af1d30
+FFT j is now 1
+ct[i][j]: 0x7f5c31af3d40
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c31af5d50
+FFT j is now 1
+ct[i][j]: 0x7f5c31af7d60
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c31af9d70
+FFT j is now 1
+ct[i][j]: 0x7f5c31afbd80
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c31afdd90
+FFT j is now 1
+ct[i][j]: 0x7f5c31affda0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c31b01db0
+FFT j is now 1
+ct[i][j]: 0x7f5c31b03dc0
+k is now :1
+Arrrrgh: i=0, j=18, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c31b1de90
+FFT j is now 1
+ct[i][j]: 0x7f5c31b1fea0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c31b21eb0
+FFT j is now 1
+ct[i][j]: 0x7f5c31b23ec0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c31b25ed0
+FFT j is now 1
+ct[i][j]: 0x7f5c31b27ee0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c31b29ef0
+FFT j is now 1
+ct[i][j]: 0x7f5c31b2bf00
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c31b2df10
+FFT j is now 1
+ct[i][j]: 0x7f5c31b2ff20
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c31b31f30
+FFT j is now 1
+ct[i][j]: 0x7f5c31b33f40
+k is now :0
+Arrrrgh: i=0, j=19, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c31f3ff90
+FFT j is now 1
+ct[i][j]: 0x7f5c31f41fa0
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c31f43fb0
+FFT j is now 1
+ct[i][j]: 0x7f5c31f45fc0
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c31f47fd0
+FFT j is now 1
+ct[i][j]: 0x7f5c31f49fe0
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c31f4bff0
+FFT j is now 1
+ct[i][j]: 0x7f5c31f4e000
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c31f50010
+FFT j is now 1
+ct[i][j]: 0x7f5c31f52020
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c31f54030
+FFT j is now 1
+ct[i][j]: 0x7f5c31f56040
+k is now :1
+Arrrrgh: i=0, j=19, k=1
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c31f70110
+FFT j is now 1
+ct[i][j]: 0x7f5c31f72120
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c31f74130
+FFT j is now 1
+ct[i][j]: 0x7f5c31f76140
+FFT i is now 2
+FFT j is now 0
+ct[i][j]: 0x7f5c31f78150
+FFT j is now 1
+ct[i][j]: 0x7f5c31f7a160
+FFT i is now 3
+FFT j is now 0
+ct[i][j]: 0x7f5c31f7c170
+FFT j is now 1
+ct[i][j]: 0x7f5c31f7e180
+FFT i is now 4
+FFT j is now 0
+ct[i][j]: 0x7f5c31f80190
+FFT j is now 1
+ct[i][j]: 0x7f5c31f821a0
+FFT i is now 5
+FFT j is now 0
+ct[i][j]: 0x7f5c31f841b0
+FFT j is now 1
+ct[i][j]: 0x7f5c31f861c0
+k is now :0
+Arrrrgh: i=0, j=20, k=0
+Starting FHEWencrypt
+FFT i is now 0
+FFT j is now 0
+ct[i][j]: 0x7f5c32392210
+FFT j is now 1
+ct[i][j]: 0x7f5c32394220
+FFT i is now 1
+FFT j is now 0
+ct[i][j]: 0x7f5c32396230
+FFT j is now 1
+ct[i][j]: 0x7f5c32398240
+FFT i is now 2
+FFT j is n
