@@ -34,7 +34,7 @@
   int Decrypt(SecretKey sk, CipherText* ct);
   
  
-  void KeySwitch(CipherTextQ* res, SwitchingKey* Key, CipherTextQN* ct);
+  void KeySwitch(CipherTextQ* res, SwitchingKey Key, CipherTextQN* ct);
 
   // Changes an LWE ciphertext modulo Q into an LWE ciphertext modulo q
   void ModSwitch(CipherText* ct, CipherTextQ* c); 

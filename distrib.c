@@ -107,6 +107,18 @@ int some_numbers(const Distrib Chi){
   exit(EXIT_FAILURE);
 }
 
+int Sample_3(const Distrib Chi){
+  int r, s = Chi.std_dev,x;
+  int maxx = ceil(s*8);
+  while(1){
+    x = random_int() % (2*maxx +1) - maxx;
+    r = (random_int() / INT_MAX);
+    if(r < exp(- x*x / (2*s*s)))
+      return x;
+  }
+
+
+}
 
 int Sample(const Distrib Chi) { 
   if (Chi.max) {///ASK PETER

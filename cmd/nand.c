@@ -34,6 +34,8 @@ int main(int argc, char *argv[]) {
   HomNAND(ct3, EK,ct1,ct2);
 
   SaveCipherText(ct3,oct_fn);
+  free(EK->BSkey);
+  free(EK->KSkey);
   free(EK);
   free(ct1);
   free(ct2);

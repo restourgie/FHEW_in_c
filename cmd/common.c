@@ -57,21 +57,32 @@ void SaveEvalKey(EvalKey *EK, char* filepath) {
   for (int i = 0; i < n; ++i)      
     for (int j = 1; j < BS_base; ++j)
       for (int k = 0; k < BS_exp; ++k){ 
-
-           //fwrite(&(EK->BSkey[i][j][k]), sizeof(ct_FFT), 1, f);
+        fwrite(&((*EK->BSkey)[i][j][k]), sizeof(ct_FFT), 1, f);
       }
 
   // Write switching key
   for (int i = 0; i < N; ++i)
     for (int j = 0; j < KS_base; ++j)
       for (int k = 0; k < KS_exp; ++k)
-          assert(fwrite(&(EK->KSkey[i][j][k]), sizeof(CipherTextQ), 1, f));
+          assert(fwrite(&((*EK->KSkey)[i][j][k]), sizeof(CipherTextQ), 1, f));
 
   fclose(f);
 }
 
 EvalKey* LoadEvalKey(char* filepath) {
   EvalKey *EK = malloc(sizeof(EvalKey));
+  EK->BSkey = (BootstrappingKey*) malloc(sizeof(BootstrappingKey));
+  if(EK->BSkey == NULL) {
+    fprintf(stderr, "BAD BAD BAD!\n");
+    exit(EXIT_FAILURE);
+  }
+  
+  EK->KSkey = (SwitchingKey*) malloc(sizeof(SwitchingKey));
+  
+  if(EK->KSkey == NULL) {
+    fprintf(stderr, "EVEN WORSE!\n");
+    exit(EXIT_FAILURE);
+  }
   FILE * f;
   f = fopen(filepath, "rb"); // rb -read binary
   if (f == NULL){
@@ -85,8 +96,7 @@ EvalKey* LoadEvalKey(char* filepath) {
     for (int j = 1; j < BS_base; ++j)
       for (int k = 0; k < BS_exp; ++k) 
       {
-        //EK->BSkey[i][j][k] = (ct_FFT*) fftw_malloc(sizeof(ct_FFT));
-        assert(fread(&(EK->BSkey[i][j][k]), sizeof(ct_FFT), 1, f));
+        assert(fread(&((*EK->BSkey)[i][j][k]), sizeof(ct_FFT), 1, f));
       }
   printf("BSKey Read. \n");
   
@@ -96,7 +106,7 @@ EvalKey* LoadEvalKey(char* filepath) {
       for (int k = 0; k < KS_exp; ++k) 
       {
         // EK->KSkey[i][j][k] = new CipherTextQ;//??????????????????????????????????????????????????????????????
-        assert(fread(&(EK->KSkey[i][j][k]), sizeof(CipherTextQ), 1, f));
+        assert(fread(&((*EK->KSkey)[i][j][k]), sizeof(CipherTextQ), 1, f));
       }
   printf("KSKey Read : %d \t %d \t %d .\n", N, KS_base, KS_exp);
   

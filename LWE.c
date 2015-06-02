@@ -27,16 +27,16 @@ void LWEKeyGen(SecretKey sk) {
 }
 
 void KeyGenN(SecretKeyN FHEWsk) {
-	printf("\n*****Starting KeygenN*****\n");
+	// printf("\n*****Starting KeygenN*****\n");
   for(int i =0;i < N; ++i)
 		FHEWsk[i] = some_numbers(Chi1); //WHY ARE THERE NO CHECKS HERE?? IT IS THE SAME
-  printf("\n*****Finished KeygenN*****\n");
+  // printf("\n*****Finished KeygenN*****\n");
 
 }
 
 //GENERATE SwitchingKey //SwitchingKey => CipherTextQ[1024][25][7] //CipherTextQ = {ZmodQ a[n]; ZmodQ b;} => ZmodQ = int32_t and n = 500 
 void SwitchingKeyGen(SwitchingKey res,SecretKey new_sk,SecretKeyN old_sk) {
-  printf("\n*****Starting SwitchingKeyGen*****\n");
+  // printf("\n*****Starting SwitchingKeyGen*****\n");
   for (int i = 0; i < N; ++i){ 
     for (int j = 0; j < KS_base; ++j)
       for (int k = 0; k < KS_exp; ++k) 
@@ -51,9 +51,9 @@ void SwitchingKeyGen(SwitchingKey res,SecretKey new_sk,SecretKeyN old_sk) {
           }
           res[i][j][k] = ct;
       }
-      printf("i is now : %d\n",i);
+      //printf("i is now : %d\n",i);
     }
-  printf("\n*****Finished SwitchingKeyGen*****\n");
+  // printf("\n*****Finished SwitchingKeyGen*****\n");
 }
 
 /*************************************************************************
@@ -64,11 +64,11 @@ void SwitchingKeyGen(SwitchingKey res,SecretKey new_sk,SecretKeyN old_sk) {
 
 void Encrypt(CipherText* ct, SecretKey sk, int m) {
     ct->b = (m % 4) * q / 4;//can you just do m * q / 4 because m is 0 or 1 this is always the same mod 4
-    ct->b += Sample(Chi3);
+    ct->b += Sample_3(Chi3);
     
     for (int i = 0; i < n; ++i)	
     {
-      ct->a[i] = rand() % q;
+      ct->a[i] = random_int() % q;
       ct->b = (ct->b + ct->a[i] * sk[i]) % q;
     }
 }
@@ -101,7 +101,7 @@ void ModSwitch(CipherText* ct, CipherTextQ* c) {
   ct->b = round_qQ(c->b);
 }
   
-void KeySwitch(CipherTextQ* res, SwitchingKey* Key, CipherTextQN* ct) {
+void KeySwitch(CipherTextQ* res, SwitchingKey Key, CipherTextQN* ct) {
   //SwitchingKey => CipherTextQ[1024][25][7]
   for (int k = 0; k < n; ++k) 
     res->a[k] = 0;
@@ -114,9 +114,9 @@ void KeySwitch(CipherTextQ* res, SwitchingKey* Key, CipherTextQN* ct) {
     {
       uZmodQ a0 = a % KS_base;
       for (int k = 0; k < n; ++k)
-        res->a[k] -= (Key[i][a0][j])->a[k];
+        res->a[k] -= (Key[i][a0][j]).a[k];
       
-      res->b -= (Key[i][a0][j])->b;
+      res->b -= (Key[i][a0][j]).b;
     }
   } 
 }

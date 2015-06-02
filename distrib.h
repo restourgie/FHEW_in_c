@@ -14,6 +14,7 @@ int Sample(const Distrib Chi); /* sample integer with gaussian distribution */
 int some_numbers(const Distrib Chi);
 int chi_two(const Distrib Chi);
 int random_int();
+int Sample_3(const Distrib Chi);
 
 // Distribution of std dev 1.2
 extern const float Chi1_Table[23];
