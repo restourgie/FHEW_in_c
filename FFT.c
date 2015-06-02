@@ -94,13 +94,12 @@ void FFTforward(Ring_FFT res, Ring_ModQ val) {
     // }
     for(int k=0; k < N2-1; ++k){
 //	printf("here: %d\n",k);
-	t = data[2*k+1][0];
-        res[k][0] = t;
-	t = data[2*k+1][1];
-      	res[k][1] = t;
+    res[k][0] = data[2*k+1][0];
+    res[k][1] = data[2*k+1][1];
+
     }
-    res[N2][0] = 0.0;
-    res[N2][1] = 0.0;
+    res[N2-1][0] = 0.0;
+    res[N2-1][1] = 0.0;
     // printf("\n\n****************Result FFT****************\n\n");
     // for(int i=0; i < N2; ++i){
     //   printf("Index %d Real: %f Imag: %f\n",i,res[i][0],res[i][1]);

@@ -63,10 +63,10 @@ void FHEWencrypt(ct_FFT ct, Ring_FFT sk_FFT, int m) {
     }
 
     for (int i = 0; i < K2; ++i){
-      printf("FFT i is now %d\n",i);
+     printf("FFT i is now %d\n",i);
       for (int j = 0; j < 2; ++j){
         printf("FFT j is now %d\n", j);
-	printf("ct[i][j]: %p\n",ct[i][j]);
+	//printf("ct[i][j]: %p\n",ct[i][j]);
         FFTforward(ct[i][j], res[i][j]);
       }
     }
@@ -77,7 +77,7 @@ void FHEWencrypt(ct_FFT ct, Ring_FFT sk_FFT, int m) {
 *                           KEY GENERATION                               *
 *                                                                        *
 *************************************************************************/
-
+//BootstrappingKey[500][23][2] => ct_FFT[500][23][2] => ct_FFT[500][23][2][6][2] => complex_double[500][23][2][6][2][513] => double[500][23][2][6][2][513][2]
 void FHEWKeyGen(EvalKey* EK, SecretKey LWEsk){
   SecretKeyN FHEWsk;
   printf("Pointer value of EK in FHEW = %p\n", EK);
@@ -89,17 +89,27 @@ void FHEWKeyGen(EvalKey* EK, SecretKey LWEsk){
   Ring_FFT FHEWskFFT;
   FFTforward(FHEWskFFT,FHEWsk);
   printf("Starting another huge loop\n");
-  for (int i = 0; i < n; ++i){
-    printf("i is now : %d\n",i);
-    for (int j = 1; j < BS_base; ++j)
-      for (int k = 0; k < BS_exp; ++k) 
-      {
-        printf("k is now :%d\n",k);
-        //EK->BSkey[i][j][k] = fftw_malloc(sizeof(ct_FFT));//IS THIS NEEDED?
-	printf("Arrrrgh: i=%d, j=%d, k=%d\n",i,j,k);
-        FHEWencrypt( (EK->BSkey[i][j][k]), FHEWskFFT, LWEsk[i] * j * BS_table[k] );
-      } 
-  }
+  for(int i =0; i< n; ++i)
+    for(int j=0;j < BS_base;++j)
+      for(int k=0;k < BS_exp; ++k)
+        for(int l=0; l < K2; ++l)
+          for(int a =0; a <2; ++a)
+            for(int b =0; b < N2; ++b)
+              for(int c =0; c < 2; ++c){
+                 printf("Arrrrgh: i=%d, j=%d, k=%d, l=%d, a=%d, b=%d, c=%d\n",i,j,k,l,a,b,c);
+                *(EK->BSkey)[i][j][k][l][a][b][c] = 1.0;
+              }
+ //  for (int i = 0; i < n; ++i){
+ //    printf("i is now : %d\n",i);
+ //    for (int j = 1; j < BS_base; ++j)
+ //      for (int k = 0; k < BS_exp; ++k) 
+ //      {
+ //        printf("k is now :%d\n",k);
+ //        //EK->BSkey[i][j][k] = fftw_malloc(sizeof(ct_FFT));//IS THIS NEEDED?
+	// printf("Arrrrgh: i=%d, j=%d, k=%d\n",i,j,k);
+ //        FHEWencrypt( *(EK->BSkey[i][j][k]), FHEWskFFT, LWEsk[i] * j * BS_table[k] );
+ //      } 
+ //  }
   printf("finished huge loop\n");
 }
 

@@ -11,9 +11,9 @@
 	BootstrappingKey = 500*23*2*ct_FFT;
 */
 
-	typedef struct {
-		Ring_FFT v[K2][2];
-	} ct_FFT;
+	// typedef struct {
+	// 	Ring_FFT v[K2][2];
+	// } ct_FFT;
 
   typedef Ring_FFT ct_FFT[K2][2];  // Ciphertext in FFT form ct_FFT[K2][2] => Ring_FFT[6][2] => complex_double[6][2][513] => double[6][2][513][2]
   typedef ct_FFT BootstrappingKey[n][BS_base][BS_exp]; 

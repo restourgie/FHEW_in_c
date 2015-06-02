@@ -27,9 +27,9 @@ int main (int argc, char *argv[])
 		fprintf(stderr, "BAD BAD BAD!\n");
 		return -1;
 	}
-	/* TODO: check return value of malloc */
+	
 	EK.KSkey = (SwitchingKey*) malloc(sizeof(SwitchingKey));
-	/* TODO: check return value of malloc */
+	
 	if(EK.KSkey == NULL) {
 		fprintf(stderr, "EVEN WORSE!\n");
 		return -1;
