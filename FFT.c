@@ -79,7 +79,7 @@ void CalcFFT(complex_double data[], int sign){
 void FFTforward(Ring_FFT res, Ring_ModQ val) {
     //printf("\n\n****************Starting FFT****************\n\n");
     complex_double data[DOUBLE_N];
-	double t;
+	  double t;
     for(int k=0;k<N;++k){
       // printf("Index %d value: %d\n",k,val[k]);
       data[k][0] = val[k];
