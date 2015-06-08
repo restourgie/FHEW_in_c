@@ -53,7 +53,7 @@ void FHEWencrypt(ct_FFT ct, Ring_FFT sk_FFT, int m) {
       FFTbackward(res[i][1], ai);
       
       for (int k = 0; k < N; ++k) 
-        res[i][1][k] += some_numbers(Chi1);    // Add error [a,as+e]
+        res[i][1][k] += Sample_1(Chi1);    // Add error [a,as+e]
     }
     
     for (int i = 0; i < K; ++i) 
@@ -90,19 +90,15 @@ void FHEWKeyGen(EvalKey* EK, SecretKey LWEsk){
   Ring_FFT FHEWskFFT;
   FFTforward(FHEWskFFT,FHEWsk);
 
-  // printf("Starting another huge loop\n");
+  printf("Starting GENERATION of BSkey\n");
   for (int i = 0; i < n; ++i){
     //printf("i is now : %d\n",i);
     for (int j = 1; j < BS_base; ++j)
       for (int k = 0; k < BS_exp; ++k) 
-      {
-        // printf("k is now :%d\n",k);
-          //EK->BSkey[i][j][k] = fftw_malloc(sizeof(ct_FFT));//IS THIS NEEDED?
-	       // printf("Arrrrgh: i=%d, j=%d, k=%d\n",i,j,k);
         FHEWencrypt( ((*EK->BSkey)[i][j][k]), FHEWskFFT, LWEsk[i] * j * BS_table[k] );
-      } 
+    
   }
-  // printf("finished huge loop\n");
+  printf("finished GENERATION of BSkey\n");
 }
 
 void AddToACC(ct_FFT ACC, ct_FFT C) {

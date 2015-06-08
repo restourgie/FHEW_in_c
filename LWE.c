@@ -15,7 +15,7 @@ void LWEKeyGen(SecretKey sk) {
   printf("Restart\n");
   for (int i = 0; i < n; ++i) {
 
-    sk[i] = some_numbers(Chi_Binary);
+    sk[i] = Sample_1(Chi_Binary);
     // printf("got this number: %d \n",sk[i] );
     s+= sk[i];
     ss+= abs(sk[i]);
@@ -24,36 +24,40 @@ void LWEKeyGen(SecretKey sk) {
     goto KeyGenRestart;
   if (abs(ss - n/2)>5) 
     goto KeyGenRestart;
+  printf("Finished LWEKEYGEN\n");
 }
 
 void KeyGenN(SecretKeyN FHEWsk) {
-	// printf("\n*****Starting KeygenN*****\n");
+	printf("\n*****Starting KeygenN*****\n");
   for(int i =0;i < N; ++i)
-		FHEWsk[i] = some_numbers(Chi1); //WHY ARE THERE NO CHECKS HERE?? IT IS THE SAME
-  // printf("\n*****Finished KeygenN*****\n");
+		FHEWsk[i] = Sample_1(Chi1); 
+  printf("\n*****Finished KeygenN*****\n");
 
 }
 
 //GENERATE SwitchingKey //SwitchingKey => CipherTextQ[1024][25][7] //CipherTextQ = {ZmodQ a[n]; ZmodQ b;} => ZmodQ = int32_t and n = 500 
 void SwitchingKeyGen(SwitchingKey res,SecretKey new_sk,SecretKeyN old_sk) {
-  // printf("\n*****Starting SwitchingKeyGen*****\n");
+  printf("\n*****Starting SwitchingKeyGen*****\n");
   for (int i = 0; i < N; ++i){ 
-    for (int j = 0; j < KS_base; ++j)
+    for (int j = 0; j < KS_base; ++j){
       for (int k = 0; k < KS_exp; ++k) 
       {
-          CipherTextQ ct;    
-          ct.b = -old_sk[i]*j*KS_table[k] + chi_two(Chi2);
-          for (int l = 0; l < n; ++l) 
-          {
-            ct.a[l] = random_int(); //I need to get this positive
-            // printf("got this number: %d \n",ct.a[l] );
-            ct.b += ct.a[l] * new_sk[l];
-          }
-          res[i][j][k] = ct;
+        CipherTextQ ct;    
+        ct.b = -old_sk[i]*j*KS_table[k] + Sample_3(Chi2);
+        for (int l = 0; l < n; ++l) 
+        {
+          ct.a[l] = random_int(); //I need to get this positive
+          // printf("got this number: %d \n",ct.a[l] );
+          // printf("Press enter to continue...\n");
+          // getchar();
+          ct.b += ct.a[l] * new_sk[l];
+        }
+        res[i][j][k] = ct;
       }
-      //printf("i is now : %d\n",i);
     }
-  // printf("\n*****Finished SwitchingKeyGen*****\n");
+    printf("i is now : %d\n",i);
+  }
+  printf("\n*****Finished SwitchingKeyGen*****\n");
 }
 
 /*************************************************************************
@@ -64,11 +68,13 @@ void SwitchingKeyGen(SwitchingKey res,SecretKey new_sk,SecretKeyN old_sk) {
 
 void Encrypt(CipherText* ct, SecretKey sk, int m) {
     ct->b = (m % 4) * q / 4;//can you just do m * q / 4 because m is 0 or 1 this is always the same mod 4
-    ct->b += Sample_3(Chi3);
-    
+    ct->b += Sample_2(Chi3);
     for (int i = 0; i < n; ++i)	
     {
       ct->a[i] = random_int() % q;
+      printf("got this number: %d \n",ct->a[i] );
+      printf("Press enter to continue...\n");
+      getchar();
       ct->b = (ct->b + ct->a[i] * sk[i]) % q;
     }
 }
