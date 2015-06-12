@@ -38,11 +38,7 @@
 
   // Changes an LWE ciphertext modulo Q into an LWE ciphertext modulo q
   void ModSwitch(CipherText* ct, CipherTextQ* c); 
-  // int round_qQ(ZmodQ v);
 
-
-// For debbugging purpose you can use the following 
-//  void DecryptDetail(const SecretKey sk, const CipherText& ct); 
 
 
 

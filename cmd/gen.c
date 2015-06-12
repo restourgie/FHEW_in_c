@@ -35,34 +35,10 @@ int main (int argc, char *argv[])
 	printf("Starting setup\n");
 	Setup();
 	printf("Starting LWEKeyGen\n");
-	LWEKeyGen(LWEsk); //APPROVED! THIS ONE WORKS
+	LWEKeyGen(LWEsk); 
 	
 	printf("Starting FHEWKeyGen\n");
 	FHEWKeyGen(&EK,LWEsk);
-
-	//ERROR CHECK SWITCHINGKEY
-	// printf("Printing the HUGE SwitchingKey\n");
-	// for(int i =0; i < N;++i){
-	// 	//printf("\n\n**********i is %d**********\n\n",i );
-	// 	for(int j=0; j< KS_base;++j)
-	// 		for(int k=0; k < KS_exp;++k){
-	// 			// printf("%d\n",((*EK.KSkey)[i][j][k]).b);
-	// 			for(int l=0;l < n;++l)	
-	// 				printf("%d\n",((*EK.KSkey)[i][j][k]).a[l]);
-	// 		}
-	// }
-	//ERROR CHECK BSKEY
-	// printf("Printing the huge BSkey\n");
-	// for(int i =0; i< n; ++i)
-	//   for(int j=1;j < BS_base;++j)
-	//     for(int k=0;k < BS_exp; ++k)
-	//       for(int l=0; l < K2; ++l)
-	//         for(int a =0; a <2; ++a)
-	//           for(int b =0; b < N2; ++b)
-	//            {
-	//                 printf("%.4f\n",creal((*EK.BSkey)[i][j][k][l][a][b]));
-	//            }
-
 
 	printf("Saving EvalKey\n");
 	SaveEvalKey(&EK,ek_fn);

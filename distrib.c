@@ -101,12 +101,8 @@ int Sample_1(const Distrib Chi){
   int var = random_int();
   double r = (double) ((double)var/(double)INT_MAX);
   for (int i = 0; i < Chi.max; ++i) 
-      if (r <= Chi.table[i]){ 
-        //printf("First ifcond of Sample Value returned: %d\n", i - Chi.offset);
-        //printf("Press enter to continue...\n");
-        //getchar();
+      if (r <= Chi.table[i])
         return i - Chi.offset;
-      }
   printf("Sampling Error: distribution table ending before (double) 1.0\n");
   exit(EXIT_FAILURE);
 }
@@ -114,15 +110,12 @@ int Sample_1(const Distrib Chi){
 int Sample_2(const Distrib Chi){
   int r, s = Chi.std_dev,x;
   int maxx = ceil(s*8);
-  while(1){
+  while(1)
+  {
     x = random_int() % (2*maxx +1) - maxx;
     r = (random_int() / INT_MAX);
-    if(r < exp(- x*x / (2*s*s))){
-      // printf("Second ifcond of Sample Value returned: %d\n",x);
-      // printf("Press enter to continue...\n");
-      //getchar();
+    if(r < exp(- x*x / (2*s*s)))
       return x;
-    }
   }
 }
 
@@ -130,112 +123,14 @@ int Sample_2(const Distrib Chi){
 int Sample_3(Distrib Chi){
   double bla,r,s = Chi.std_dev;
 
-  while(1){
+  while(1)
+  {
     int var = random_int();
     bla = (double) ((double)var/(double)INT_MAX);
     bla = 16 *bla -8;
     var = random_int();
     r   = (double) ((double)var/(double)INT_MAX);
-    if (r < exp(- bla*bla / 2 )){ 
-      //printf("Last ifcond of Sample Value returned: %d\n", (int) floor(.5 + bla*s));
-      //printf("Press enter to continue...\n");
-      //getchar();
+    if (r < exp(- bla*bla / 2 ))
       return floor(.5 + bla*s);
-    }
   }
 }
-
-
-
-// /*********TEMP***********/
-// // int global_func1,global_func2,global_func3,global_func4,global_func5;
-// FILE *infile1,*infile2,*infile3,*infile4,*infile5,*infile6;
-
-// void file_setup(){
-//   // global_func1 =0;
-//   // global_func2 =0;
-//   // global_func3 =0;
-//   // global_func4 =0;
-//   // global_func5 =0;
-//   infile1 = fopen("insides/LWE_keygen", "r");
-//   infile2 = fopen("insides/KeygenN", "r");
-//   infile3 = fopen("insides/switchingkey_sample_chi2", "r");
-//   infile4 = fopen("insides/switchingkey_rand", "r");
-//   infile5 = fopen("insides/func5","r");
-//   infile6 = fopen("insides/bskey_sample", "r");
-//   if (infile1 == NULL || infile2 == NULL || infile3 == NULL || infile4 == NULL || infile5 == NULL || infile6 == NULL) {
-//     printf("unable to open one of the files\n");
-//     exit(EXIT_FAILURE);
-//   }
-// }
-
-// void close_files(){
-//   fclose(infile1);
-//   fclose(infile2);
-//   fclose(infile3);
-//   fclose(infile4);
-//   fclose(infile5);
-//   fclose(infile6);
-// }
-
-// int function1(){
-//   if(!feof (infile1)){
-//     int test;
-//     (void) fscanf(infile1,"%d",&test);
-//     return test;
-//   }
-//   printf("reading at END OF FILE\n");
-//   exit(EXIT_FAILURE);
-
-// }
-
-// int function2(){
-//   if(!feof (infile2)){
-//     int test;
-//     (void) fscanf(infile2,"%d",&test);
-//     return test;
-//   }
-//   printf("reading at END OF FILE\n");
-//   exit(EXIT_FAILURE);
-// }
-
-
-// int function3(){
-//   if(!feof (infile3)){
-//     int test;
-//     (void) fscanf(infile3,"%d",&test);
-//     return test;
-//   }
-//   printf("reading at END OF FILE\n");
-//   exit(EXIT_FAILURE);
-// }
-
-// int function4(){
-//   if(!feof (infile4)){
-//     int test;
-//     (void) fscanf(infile4,"%d",&test);
-//     return test;
-//   }
-//   printf("reading at END OF FILE\n");
-//   exit(EXIT_FAILURE);
-// }
-
-// int function5(){
-//   if(!feof (infile5)){
-//     int test;
-//     (void) fscanf(infile5,"%d",&test);
-//     return test;
-//   }
-//   printf("reading at END OF FILE\n");
-//   exit(EXIT_FAILURE);
-// }
-
-// int function6(){
-//   if(!feof (infile6)){
-//     int test;
-//     (void) fscanf(infile6,"%d",&test);
-//     return test;
-//   }
-//   printf("reading at END OF FILE\n");
-//   exit(EXIT_FAILURE);
-// }

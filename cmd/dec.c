@@ -17,8 +17,6 @@ int main(int argc, char *argv[]) {
   char* sk_fn = argv[1]; 
   char* ct_fn = argv[2]; 
 
-  // Setup(); IS THIS NEEDED?????
-
   SecretKey* SK = LoadSecretKey(sk_fn);
   CipherText* ct = LoadCipherText(ct_fn);
   int m = Decrypt(*SK,ct);
