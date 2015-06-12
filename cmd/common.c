@@ -19,7 +19,7 @@ void SaveSecretKey(SecretKey LWEsk, char* filepath) {
     exit(EXIT_FAILURE);
   }
   printf("Writing Secret key to %s .\n", filepath);
-  fwrite(&LWEsk, sizeof(SecretKey), 1, f);
+  fwrite(LWEsk, sizeof(SecretKey), 1, f);
   fclose(f);
 }
 
@@ -46,7 +46,7 @@ SecretKey* LoadSecretKey(char* filepath) {
 
 void SaveEvalKey(EvalKey *EK, char* filepath) {
   FILE * f;
-  f = fopen(filepath, "wb"); // wb -write binary
+  f = fopen(filepath, "w"); // wb -write binary
   if (f == NULL) {
     printf("Failed to open %s in Write-Binary mode .\n", filepath);
     exit(EXIT_FAILURE);

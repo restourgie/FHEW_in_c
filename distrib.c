@@ -118,9 +118,9 @@ int Sample_2(const Distrib Chi){
     x = random_int() % (2*maxx +1) - maxx;
     r = (random_int() / INT_MAX);
     if(r < exp(- x*x / (2*s*s))){
-      printf("Second ifcond of Sample Value returned: %d\n",x);
-      printf("Press enter to continue...\n");
-      getchar();
+      // printf("Second ifcond of Sample Value returned: %d\n",x);
+      // printf("Press enter to continue...\n");
+      //getchar();
       return x;
     }
   }

@@ -49,15 +49,13 @@ void SwitchingKeyGen(SwitchingKey res,SecretKey new_sk,SecretKeyN old_sk) {
         {
           ct.a[l] = function4();//random_int(); //I need to get this positive
           // printf("got this number for a: %d \n",ct.a[l] );
-          // printf("Press enter to continue...\n");
-          // getchar();
           ct.b += ct.a[l] * new_sk[l];
         }
         // printf("**********************b: %d \n",ct.b);
         res[i][j][k] = ct;
       }
     }
-    //printf("i is now : %d\n",i);
+    printf("i is now : %d\n",i);
   }
   printf("\n*****Finished SwitchingKeyGen*****\n");
 }
@@ -74,9 +72,9 @@ void Encrypt(CipherText* ct, SecretKey sk, int m) {
     for (int i = 0; i < n; ++i)	
     {
       ct->a[i] = random_int() % q;
-      printf("got this number: %d \n",ct->a[i] );
-      printf("Press enter to continue...\n");
-      getchar();
+      // printf("got this number: %d \n",ct->a[i] );
+      // printf("Press enter to continue...\n");
+      // getchar();
       ct->b = (ct->b + ct->a[i] * sk[i]) % q;
     }
 }

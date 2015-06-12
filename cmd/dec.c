@@ -6,7 +6,7 @@
 
 
 void help(char* cmd) {
-  printf("\nusage: %s  SecretKeyFileName EvalKeyFileName  \n\n   Decrypt the CipherText under some SecretKey and print it on the std output.\n\n",cmd);
+  printf("\nusage: %s  SecretKeyFileName CipherTextFileName  \n\n   Decrypt the CipherText under some SecretKey and print it on the std output.\n\n",cmd);
   exit(0);
 }
 

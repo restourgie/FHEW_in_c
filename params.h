@@ -3,6 +3,7 @@
 
 #include <math.h>
 #include <stdint.h>
+#include <complex.h>
 
 #define n 500
 
@@ -37,7 +38,7 @@ extern const ZmodQ KS_table[7];
 extern const int BS_table[2];
 
 typedef ZmodQ Ring_ModQ[N]; //Ring_ModQ => ZmodQ[1024] => int32_t[1024]
-typedef double complex_double[2];
-typedef complex_double Ring_FFT[N2]; //Ring_FFT => complex_double[513] => double[513][2]
+//typedef double complex_double[2];
+typedef double complex Ring_FFT[N2]; //Ring_FFT => complex_double[513] => double[513][2]
 
 #endif

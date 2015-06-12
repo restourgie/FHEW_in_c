@@ -5,7 +5,7 @@
 #include "../FHEW.h"
 
 
-void SaveSecretKey(SecretKey ct, char* filepath);
+void SaveSecretKey(SecretKey LWEsk, char* filepath);
 SecretKey* LoadSecretKey(char* filepath);
 
 
