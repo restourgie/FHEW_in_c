@@ -10,12 +10,12 @@
 *************************************************************************/
 
 void LWEKeyGen(SecretKey sk) {
-  file_setup(); //TEMPORARY
+  // file_setup(); //TEMPORARY
   KeyGenRestart:;
   int s=0, ss=0;
   printf("Restart\n");
   for (int i = 0; i < n; ++i) {
-    sk[i] = function1();//Sample_1(Chi_Binary);
+    sk[i] = Sample_1(Chi_Binary);//function1();
     //printf("got this number: %d \n",sk[i] );
     s+= sk[i];
     ss+= abs(sk[i]);
@@ -30,7 +30,7 @@ void LWEKeyGen(SecretKey sk) {
 void KeyGenN(SecretKeyN FHEWsk) {
 	printf("\n*****Starting KeygenN*****\n");
   for(int i =0;i < N; ++i)
-    FHEWsk[i] = function2();//Sample_1(Chi1); 
+    FHEWsk[i] = Sample_1(Chi1); //function2();
   
   printf("\n*****Finished KeygenN*****\n");
 
@@ -44,10 +44,10 @@ void SwitchingKeyGen(SwitchingKey res,SecretKey new_sk,SecretKeyN old_sk) {
       for (int k = 0; k < KS_exp; ++k) 
       {
         CipherTextQ ct;    
-        ct.b = -old_sk[i]*j*KS_table[k] + function3();//Sample_3(Chi2);
+        ct.b = -old_sk[i]*j*KS_table[k] + Sample_3(Chi2);//function3();//
         for (int l = 0; l < n; ++l) 
         {
-          ct.a[l] = function4();//random_int(); //I need to get this positive
+          ct.a[l] = random_int(); //I need to get this positive function4();//
           // printf("got this number for a: %d \n",ct.a[l] );
           ct.b += ct.a[l] * new_sk[l];
         }

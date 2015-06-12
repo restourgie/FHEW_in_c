@@ -39,21 +39,17 @@ void FHEWencrypt(ct_FFT ct, Ring_FFT sk_FFT, int m) {
     for (int i = 0; i < K2; ++i) 
     {
       for (int k = 0; k < N; ++k) 
-        res[i][0][k] = function5(); // % Q //
+        res[i][0][k] = random_int();//function5(); // % Q //
       
       FFTforward(ai, res[i][0]);
       
       for (int k = 0; k < N2; ++k)
-      {
-          // ai[k][0] = (ai[k][0] * sk_FFT[k][0]) - (ai[k][1] * sk_FFT[k][1]);
-          // ai[k][1] = (ai[k][0] * sk_FFT[k][1]) + (ai[k][1] * sk_FFT[k][0]);
         ai[k] = ai[k] * sk_FFT[k];
-      }
 
       FFTbackward(res[i][1], ai);
       
       for (int k = 0; k < N; ++k) 
-        res[i][1][k] += function6();//Sample_1(Chi1);    // Add error [a,as+e]
+        res[i][1][k] += Sample_1(Chi1); //function6();   // Add error [a,as+e]
     }
     
     for (int i = 0; i < K; ++i) 
@@ -94,7 +90,6 @@ void FHEWKeyGen(EvalKey* EK, SecretKey LWEsk){
       for (int k = 0; k < BS_exp; ++k) 
         FHEWencrypt( ((*EK->BSkey)[i][j][k]), FHEWskFFT, LWEsk[i] * j * BS_table[k] ); 
   }
-  close_files(); //TEMPORARY
   printf("finished GENERATION of BSkey\n");
 }
 
