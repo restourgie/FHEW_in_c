@@ -144,3 +144,98 @@ int Sample_3(Distrib Chi){
     }
   }
 }
+
+
+
+/*********TEMP***********/
+// int global_func1,global_func2,global_func3,global_func4,global_func5;
+FILE *infile1,*infile2,*infile3,*infile4,*infile5,*infile6;
+
+void file_setup(){
+  // global_func1 =0;
+  // global_func2 =0;
+  // global_func3 =0;
+  // global_func4 =0;
+  // global_func5 =0;
+  infile1 = fopen("insides/LWE_keygen", "r");
+  infile2 = fopen("insides/KeygenN", "r");
+  infile3 = fopen("insides/switchingkey_sample_chi2", "r");
+  infile4 = fopen("insides/switchingkey_rand", "r");
+  infile5 = fopen("insides/func5","r");
+  infile6 = fopen("insides/bskey_sample", "r");
+  if (infile1 == NULL || infile2 == NULL || infile3 == NULL || infile4 == NULL || infile5 == NULL || infile6 == NULL) {
+    printf("unable to open one of the files\n");
+    exit(EXIT_FAILURE);
+  }
+}
+
+void close_files(){
+  fclose(infile1);
+  fclose(infile2);
+  fclose(infile3);
+  fclose(infile4);
+  fclose(infile5);
+  fclose(infile6);
+}
+
+int function1(){
+  if(!feof (infile1)){
+    int test;
+    (void) fscanf(infile1,"%d",&test);
+    return test;
+  }
+  printf("reading at END OF FILE\n");
+  exit(EXIT_FAILURE);
+
+}
+
+int function2(){
+  if(!feof (infile2)){
+    int test;
+    (void) fscanf(infile2,"%d",&test);
+    return test;
+  }
+  printf("reading at END OF FILE\n");
+  exit(EXIT_FAILURE);
+}
+
+
+int function3(){
+  if(!feof (infile3)){
+    int test;
+    (void) fscanf(infile3,"%d",&test);
+    return test;
+  }
+  printf("reading at END OF FILE\n");
+  exit(EXIT_FAILURE);
+}
+
+int function4(){
+  if(!feof (infile4)){
+    int test;
+    (void) fscanf(infile4,"%d",&test);
+    return test;
+  }
+  printf("reading at END OF FILE\n");
+  exit(EXIT_FAILURE);
+}
+
+int function5(){
+  if(!feof (infile5)){
+    int test;
+    (void) fscanf(infile5,"%d",&test);
+    return test;
+  }
+  printf("reading at END OF FILE\n");
+  exit(EXIT_FAILURE);
+}
+
+int function6(){
+  if(!feof (infile6)){
+    int test;
+    (void) fscanf(infile6,"%d",&test);
+    return test;
+  }
+  printf("reading at END OF FILE\n");
+  exit(EXIT_FAILURE);
+}

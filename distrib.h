@@ -16,6 +16,17 @@ int Sample_3(const Distrib Chi);
 int random_int();
 int Sample_2(const Distrib Chi);
 
+/*********TEMP***********/
+void file_setup();
+void close_files();
+int function1();
+int function2();
+int function3();
+int function4();
+int function5();
+int function6();
+/*********TEMP***********/
+
 // Distribution of std dev 1.2
 extern const float Chi1_Table[23];
 
