@@ -11,9 +11,9 @@
 #define DOUBLE_N N*2
 #endif
 
-void BitInvert(complex double data[]){
+void BitInvert(double complex data[]){
   int i,mv,k,rev;
-  complex double temp;
+  double complex temp;
 
   for(i = 1; i<(DOUBLE_N);i++){//run through all index 1 to N
     k = i;
@@ -33,7 +33,7 @@ void BitInvert(complex double data[]){
   }
 }
 
-void CalcFFT(complex double data[], int sign){
+void CalcFFT(double complex data[], int sign){
   BitInvert(data);
   //variables for the fft
   unsigned long mmax,m,j,istep,i;
@@ -68,7 +68,7 @@ void CalcFFT(complex double data[], int sign){
 //Ring_FFT => complex_double[513] => double[513][2]
 //Ring_ModQ => ZmodQ[1024] => int32_t[1024] 
 void FFTforward(Ring_FFT res, Ring_ModQ val) {
-    complex double data[DOUBLE_N];
+    double complex data[DOUBLE_N];
     for(int k=0;k<N;++k){
       data[k] = val[k] + 0.0*I;
       data[k+N] = 0.0;
@@ -84,7 +84,7 @@ void FFTforward(Ring_FFT res, Ring_ModQ val) {
 //Ring_FFT => complex_double[513] => double[513][2]
 //Ring_ModQ => ZmodQ[1024] => int32_t[1024] 
 void FFTbackward(Ring_ModQ res, Ring_FFT val){
-  complex double data[DOUBLE_N];
+  double complex data[DOUBLE_N];
   for(int k = 0;k < N2-1; ++k){
     data[2*k+1] = val[k]/N;
     data[2*k] = 0.0;
