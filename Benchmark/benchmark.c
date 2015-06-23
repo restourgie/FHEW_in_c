@@ -27,7 +27,6 @@ fftw_plan plan_fft_forw, plan_fft_back;
 #endif
 
 const int DOUBLE_N = N*2;
-typedef double complex_double[2];
 
 /*****************************************************************************************************************
 *
@@ -74,9 +73,9 @@ inline void wait_on_enter()
 *
 ******************************************************************************************************************/
 
-void BitInvert(complex_double data[]){
+void BitInvert(complex double data[]){
   int i,mv,k,rev;
-  complex_double temp;
+  complex double temp;
 
   for(i = 1; i<(DOUBLE_N);i++){//run through all index 1 to N
     k = i;
@@ -89,19 +88,14 @@ void BitInvert(complex_double data[]){
             mv = mv / 2;
     }
     if(i < rev){
-
-      temp[0] = data[rev][0];
-      temp[1] = data[rev][1];
-      data[rev][0] = data[i][0];
-      data[rev][1] = data[i][1];
-      data[i][0] = temp[0];
-      data[i][1] = temp[1];
-
+      temp = data[rev];
+      data[rev] = data[i];
+      data[i] = temp;
     }
   }
 }
 
-void CalcFFT(complex_double data[], int sign){
+void CalcFFT(complex double data[], int sign){
   BitInvert(data);
   //variables for the fft
   unsigned long mmax,m,j,istep,i;
@@ -120,18 +114,14 @@ void CalcFFT(complex_double data[], int sign){
     for (m=0;m<mmax;++m) {
       for (i=m;i<(DOUBLE_N);i+=istep) {
         j=i+mmax;
-        tempr=wr * data[j][0]-wi * data[j][1];
-        tempi=wr * data[j][1]+wi * data[j][0];
-
-        data[j][0]= data[i][0]-tempr;
-        data[j][1]= data[i][1]-tempi;
-
-        data[i][0] += tempr;
-        data[i][1] += tempi;
+        tempr = wr * creal(data[j])-wi * cimag(data[j]);
+        tempi = wr * cimag(data[j])+wi * creal(data[j]);
+        data[j] = data[i] - (tempr + tempi*I);
+        data[i] += (tempr + tempi*I);
       }
       wr=(wtemp=wr)*wpr-wi*wpi+wr;
       wi=wi*wpr+wtemp*wpi+wi;
-        }
+    }
     mmax=istep;
   }
   //end of the algorithm
@@ -139,44 +129,35 @@ void CalcFFT(complex_double data[], int sign){
 
 //Ring_FFT => complex_double[513] => double[513][2]
 //Ring_ModQ => ZmodQ[1024] => int32_t[1024] 
-void FFTforward_my_version(complex_double res[],const Ring_ModQ val) {
-    complex_double data[DOUBLE_N];
+void FFTforward_my_version(Ring_FFT res, Ring_ModQ val) {
+    complex double data[DOUBLE_N];
     for(int k=0;k<N;++k){
-      data[k][0] = val[k];
-      data[k][1] = 0.0;
-      data[k+N][0] = 0.0;
-      data[k+N][1] = 0.0;
-    } 
-    CalcFFT(data,1);
-    for(int k=0; k < N2-1; ++k){
-      res[k][0] = data[2*k+1][0];
-      res[k][1] = data[2*k+1][1];
+      data[k] = val[k] + 0.0*I;
+      data[k+N] = 0.0;
     }
-    res[N2-1][0] = 0.0;
-    res[N2-1][1] = 0.0;
+    CalcFFT(data,1);
+
+    for(int k=0; k < N2-1; ++k){;
+      res[k] = data[2*k+1];
+    }
+    res[N2-1] = (double complex) 0.0;
 }
 
 //Ring_FFT => complex_double[513] => double[513][2]
 //Ring_ModQ => ZmodQ[1024] => int32_t[1024] 
-void FFTbackward_my_version(Ring_ModQ res,const Ring_FFT val){
-  complex_double data[DOUBLE_N];
+void FFTbackward_my_version(Ring_ModQ res, Ring_FFT val){
+  complex double data[DOUBLE_N];
   for(int k = 0;k < N2-1; ++k){
-    data[2*k+1][0] = creal(val[k])/(double)N; 
-    data[2*k+1][1] = cimag(val[k])/(double)N;
-    data[2*k][0] = 0.0;
-    data[2*k][1] = 0.0;
-
-    data[DOUBLE_N-(2*k+1)][0] = creal(val[k])/(double)N;
-    data[DOUBLE_N-(2*k+1)][1] = -(cimag(val[k]))/(double)N;
-    data[DOUBLE_N-(2*k+2)][0] = 0.0;
-    data[DOUBLE_N-(2*k+2)][1] = 0.0;
+    data[2*k+1] = val[k]/N;
+    data[2*k] = 0.0;
+    data[DOUBLE_N-(2*k+1)] = conj(val[k])/N;
+    data[DOUBLE_N-(2*k+2)] = 0.0;
   }
-  data[2*N2][0] = 0.0;
-  data[2*N2][1] = 0.0;
+  data[2*N2] = 0.0;
 
   CalcFFT(data,-1);
   for(int k=0; k < N; ++k)
-    res[k] = (long int) round(data[k][0]);
+    res[k] = (long int) round(creal(data[k]));
 }
 
 /*****************************************************************************************************************
