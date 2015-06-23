@@ -37,28 +37,29 @@ void CalcFFT(double complex data[], int sign){
   BitInvert(data);
   //variables for the fft
   unsigned long mmax,m,j,istep,i;
-  double wtemp,wr,wpr,wpi,wi,theta,tempr,tempi;
-
-  //Danielson-Lanzcos routine
+  double wtemp,theta;
+  double complex twiddle,wp,temp;
+  //Danielson-Lanczos routine
   mmax=1;
   while ((DOUBLE_N) > mmax) {
+    // printf("poof\n");
     istep=mmax << 1;
     theta=-sign*(2*M_PI/istep);
     wtemp=sin(0.5*theta);
-    wpr = -2.0*wtemp*wtemp;
-    wpi=sin(theta);
-    wr=1.0;
-    wi=0.0;
-    for (m=0;m<mmax;++m) {
-      for (i=m;i<(DOUBLE_N);i+=istep) {
+    wp = -2.0*wtemp*wtemp + I*sin(theta);
+    twiddle = 1.0 + I*0;
+    for (m=0;m<mmax;++m) 
+    {
+      // printf("looping\n");
+      for (i=m;i<(DOUBLE_N);i+=istep) 
+      {
+        // printf("i:%d\n",i);
         j=i+mmax;
-        tempr = wr * creal(data[j])-wi * cimag(data[j]);
-        tempi = wr * cimag(data[j])+wi * creal(data[j]);
-        data[j] = data[i] - (tempr + tempi*I);
-        data[i] += (tempr + tempi*I);
+        temp = twiddle * data[j];
+        data[j] = data[i] - temp;
+        data[i] += temp;
       }
-      wr=(wtemp=wr)*wpr-wi*wpi+wr;
-      wi=wi*wpr+wtemp*wpi+wi;
+      twiddle += twiddle*wp;
     }
     mmax=istep;
   }

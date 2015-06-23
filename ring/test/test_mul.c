@@ -10,7 +10,7 @@ int main()
   int n;
 
   for(n=0;n<NTESTS;n++)
-  {
+  { 
     fread(x.v,sizeof(uint32_t),1024,urandom);
     fread(y.v,sizeof(uint32_t),1024,urandom);
 
