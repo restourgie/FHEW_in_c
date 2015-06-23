@@ -1,4 +1,4 @@
-CC=g++
+CC=gcc
 #-fno-stack-protector
 CFLAGS= -Wall -O3 -g
 LDFLAGS= -lfftw3 -lm
