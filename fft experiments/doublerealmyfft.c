@@ -1,14 +1,15 @@
-#include "FFT.h"
-#include "params.h"
 #include <stdio.h>
+#include <complex.h>
+#include <math.h>
 
 
 #ifndef M_PI
 #define M_PI           3.14159265358979323846
 #endif
 
+#define N 1024
 #ifndef DOUBLE_N
-#define DOUBLE_N N*2
+#define DOUBLE_N 2048
 #endif
 
 void BitInvert(double complex data[]){
@@ -39,7 +40,6 @@ void CalcFFT(double complex data[], int sign){
   unsigned long mmax,m,j,istep,i;
   double wtemp,theta;
   double complex twiddle,wp,temp;
-
   //Danielson-Lanczos routine
   mmax=1;
   while ((DOUBLE_N) > mmax) {
@@ -69,35 +69,56 @@ void CalcFFT(double complex data[], int sign){
 
 //Ring_FFT => complex_double[513] => double[513][2]
 //Ring_ModQ => ZmodQ[1024] => int32_t[1024] 
-void FFTforward(Ring_FFT res, Ring_ModQ val) {
-    double complex data[DOUBLE_N];
-    for(int k=0;k<N;++k){
-      data[k] = val[k] + 0.0*I;
-      data[k+N] = 0.0;
-    }
-    CalcFFT(data,1);
+void FFTforward(double complex res[],double complex res2[], int val[]) {
+  double complex data[DOUBLE_N];
+  //fill array with two ffts of length 2048 
+  //first one is -1,1,1,1,...,1,0,0,...,0
+  //second one is -1,1,...,2,1,0,...,0
+  for(int i=0;i<N;++i){
+    data[i] = 1 + I*1;
+    data[i+N] = 0;
+  }
+  data[0] =-1 + I*-1;
 
-    for(int k=0; k < N2-1; ++k){;
-      res[k] = data[2*k+1];
-    }
-    res[N2-1] = (double complex) 0.0;
+  CalcFFT(data,1);
+
+  // for(int i=0;i<N;++i){
+  //   printf("index i:%d (%f,%f)\n",i,creal(data[i]),cimag(data[i]));
+  // }
+  //untangle them.. IT WORKS!! ONLY NOT YET WORKING FOR res[0] and res2[0]
+  for(int i=0;i<DOUBLE_N;++i){
+    res[i] = (data[i] + conj(data[DOUBLE_N-i]))/2;
+    res2[i] = (data[i] - conj(data[DOUBLE_N-i]))/(2*I);
+  }
+
 }
 
 //Ring_FFT => complex_double[513] => double[513][2]
 //Ring_ModQ => ZmodQ[1024] => int32_t[1024] 
-void FFTbackward(Ring_ModQ res, Ring_FFT val){
-  double complex data[DOUBLE_N];
-  for(int k = 0;k < N2-1; ++k){
-    data[2*k+1] = val[k]/N;
-    data[2*k] = 0.0;
-    data[DOUBLE_N-(2*k+1)] = conj(val[k])/N;
-    data[DOUBLE_N-(2*k+2)] = 0.0;
-  }
-  data[2*N2] = 0.0;
+void FFTbackward(double complex data[], int val[]){
+
 
   CalcFFT(data,-1);
   for(int k=0; k < N; ++k)
-    res[k] = (long int) round(creal(data[k]));
+    val[k] = creal(data[k]);
+}
+
+int main()
+{
+
+  double complex data[DOUBLE_N];
+  double complex data2[DOUBLE_N];
+  int buf[1];
+
+  FFTforward(data,data2,buf);
+
+  for(int i=0;i<N;++i){
+    printf("index i:%d (%f,%f)\n",i,creal(data[i]),cimag(data[i]));
+  }
+  printf("\n\nSecond!!\n\n");
+  for(int i=0;i<N;++i){
+    printf("index i:%d (%f,%f)\n",i,creal(data2[i]),cimag(data2[i]));
+  }
 }
 
 

@@ -24,7 +24,8 @@ fftw_plan plan_fft_forw, plan_fft_back;
 #define M_PI           3.14159265358979323846
 #endif
 
-const int DOUBLE_N = N*2;
+const int DOUBLE_N = N;
+
 
 /*****************************************************************************************************************
 *
@@ -75,13 +76,51 @@ inline void wait_on_enter()
 
 /*****************************************************************************************************************
 *
+*                   Rosetta code
+*
+******************************************************************************************************************/
+
+typedef double complex cplx;
+ 
+void _fft(cplx buf[], cplx out[], int n, int step)
+{
+  if (step < n) {
+    _fft(out, buf, n, step * 2);
+    _fft(out + step, buf + step, n, step * 2);
+ 
+    for (int i = 0; i < n; i += 2 * step) {
+      cplx t = cexp(-I * M_PI * i / n) * out[i + step];
+      buf[i / 2]     = out[i] + t;
+      buf[(i + n)/2] = out[i] - t;
+    }
+  }
+}
+ 
+void fft(cplx buf[], int n)
+{
+  cplx out[n];
+  for (int i = 0; i < n; i++) out[i] = buf[i];
+ 
+  _fft(buf, out, n, 1);
+}
+
+void show(const char * s, cplx buf[]) {
+  printf("%s", s);
+  for (int i = 0; i < N; i++)
+    if (!cimag(buf[i]))
+      printf("%g ", creal(buf[i]));
+    else
+      printf("(%g, %g) ", creal(buf[i]), cimag(buf[i]));
+}
+
+/*****************************************************************************************************************
+*
 *                   My FFT
 *
 ******************************************************************************************************************/
 void my_setup(){
 
 }
-
 
 
 void BitInvert(double complex data[]){
@@ -105,7 +144,6 @@ void BitInvert(double complex data[]){
     }
   }
 }
-
 
 void CalcFFT(double complex data[], int sign){
   BitInvert(data);
@@ -145,9 +183,14 @@ void FFTforward_my_version(Ring_FFT res, Ring_ModQ val) {
     double complex data[DOUBLE_N];
     for(int k=0;k<N;++k){
       data[k] = val[k] + 0.0*I;
-      data[k+N] = 0.0;
+      // data[k+N] = 0.0;
     }
     CalcFFT(data,1);
+    printf("\n\n MY FFT result\n\n");
+    for(int i=0;i<N;++i){
+      printf("Index: %d Real: %f, Imag: %f\n",i,creal(data[i]),cimag(data[i]));
+    }
+    printf("\n\n****** end *****\n\n");
 
     for(int k=0; k < N2-1; ++k){;
       res[k] = data[2*k+1];
@@ -157,20 +200,20 @@ void FFTforward_my_version(Ring_FFT res, Ring_ModQ val) {
 
 //Ring_FFT => complex_double[513] => double[513][2]
 //Ring_ModQ => ZmodQ[1024] => int32_t[1024] 
-void FFTbackward_my_version(Ring_ModQ res, Ring_FFT val){
-  double complex data[DOUBLE_N];
-  for(int k = 0;k < N2-1; ++k){
-    data[2*k+1] = val[k]/N;
-    data[2*k] = 0.0;
-    data[DOUBLE_N-(2*k+1)] = conj(val[k])/N;
-    data[DOUBLE_N-(2*k+2)] = 0.0;
-  }
-  data[2*N2] = 0.0;
+// void FFTbackward_my_version(Ring_ModQ res, Ring_FFT val){
+//   double complex data[DOUBLE_N];
+//   for(int k = 0;k < N2-1; ++k){
+//     data[2*k+1] = val[k]/N;
+//     data[2*k] = 0.0;
+//     data[DOUBLE_N-(2*k+1)] = conj(val[k])/N;
+//     data[DOUBLE_N-(2*k+2)] = 0.0;
+//   }
+//   data[2*N2] = 0.0;
 
-  CalcFFT(data,-1);
-  for(int k=0; k < N; ++k)
-    res[k] = (long int) round(creal(data[k]));
-}
+//   CalcFFT(data,-1);
+//   for(int k=0; k < N; ++k)
+//     res[k] = (long int) round(creal(data[k]));
+// }
 
 /*****************************************************************************************************************
 *
@@ -222,87 +265,42 @@ static __inline__ unsigned long GetCC(void)
 
 void FFTtest() {
   double complex result[N2];
-  Ring_FFT res[NR_TESTS];
-  Ring_ModQ val[NR_TESTS];
-  unsigned long long t[NR_TESTS];
+  //Ring_FFT res[NR_TESTS];
+  //Ring_ModQ val[NR_TESTS];
+  Ring_FFT res;
+  // unsigned long long t[NR_TESTS];
 
-  FILE * f;
-  f = fopen("random_nr", "r"); // read
-  if (f == NULL) {
-    printf("Failed to open random_nr in Read mode.\n");
-    exit(EXIT_FAILURE);
+   Ring_ModQ tmsb;   
+   tmsb[0]=-1;    
+   for (int i = 1; i < N; ++i)    
+    tmsb[i]=1; 
+
+  cplx buf[N];
+  buf[0] = -1;
+  for(int i =1;i<N;++i)
+    buf[i] = 1;
+  show("Data: ",buf);
+  fft(buf,N);
+  show("\nFFT: ",buf);
+
+  FFTforward_my_version(result,tmsb);
+  FFTforward_fftw_version(res,tmsb);
+
+  for(int i=0;i<N2;++i){
+   printf("Index = %d FFT Real = %f, %f Complex = %f, %f\n",i,creal(res[i]),creal(result[i]),cimag(res[i]),cimag(result[i]));
+    // if(adjust_num(creal(res[i]))!= adjust_num(cimag(result[i]))){
+    //   printf("Alert real doesnt match! Index = %d Result FFTW Real = %f Complex = %f Result my FFT Real = %f Complex = %f\n",i,creal(res[i]),cimag(res[i]),creal(result[i]),cimag(result[i]));
+    //   printf("Int Form of Real. FFTW Real = %d MY FFT Real = %d\n",adjust_num(creal(res[i])),adjust_num(creal(result[i])));
+    // }
+    // if(adjust_num(cimag(res[i])) != adjust_num(cimag(result[i]))){
+    //   printf("Alert imaginary doenst match! Index = %d Result FFTW Real = %f Complex = %f Result my FFT Real = %f Complex = %f\n",i,creal(res[i]),cimag(res[i]),creal(result[i]),cimag(result[i]));
+    // }
   }
-  for(int i=0;i< NR_TESTS;++i)
-    for(int j=0;j< N;++j)
-      assert(fread(&val[i][j],sizeof(int),1,f));
-
-  printf("\n\n********************************************* My FFT forward *********************************************\n\n");
-  for(int i=0;i<NR_TESTS;i++){
-    t[i] = GetCC();
-    FFTforward_my_version(result,val[i]);
-  }
-  for(int i=0;i<NR_TESTS-1;i++)
-    t[i] = t[i+1] - t[i];
-
-  qsort(t,NR_TESTS,sizeof(unsigned long long),comp);
-  printf("The median of my fft is: %llu\n",t[NR_TESTS/2]);
-  // for(int i=0;i<NR_TESTS-1;i++)
-  //   printf("index:%d %llu \n",i,t[i]);
-  // printf("\n");
-
-  printf("\n\n********************************************* FFTW forward *********************************************\n\n");
-  for(int i=0;i<NR_TESTS;i++){
-    t[i] = GetCC();
-    FFTforward_fftw_version(res[i],val[i]);
-  }
-  for(int i=0;i<NR_TESTS-1;i++)
-    t[i] = t[i+1] - t[i];
-
-  qsort(t,NR_TESTS,sizeof(unsigned long long),comp);
-  printf("The median of fftw is: %llu\n",t[NR_TESTS/2]);
-  // for(int i=0;i<NR_TESTS-1;i++)
-  //   printf(" %llu ",t[i]);
-  // printf("\n");
-
-  printf("\n\n********************************************* My FFT backward *********************************************\n\n");
-  for(int i=0;i<NR_TESTS;i++){
-    t[i] = GetCC();
-    FFTbackward_my_version(val[i],res[i]);
-  }
-  for(int i=0;i<NR_TESTS-1;i++)
-    t[i] = t[i+1] - t[i];
-
-  qsort(t,NR_TESTS,sizeof(unsigned long long),comp);
-  printf("The median of my fft is: %llu\n",t[NR_TESTS/2]);
-
-  printf("\n\n********************************************* FFTW backward *********************************************\n\n");
-  for(int i=0;i<NR_TESTS;i++){
-    t[i] = GetCC();
-    FFTbackward_FFTW_version(val[i],res[i]);
-  }
-  for(int i=0;i<NR_TESTS-1;i++)
-    t[i] = t[i+1] - t[i];
-
-  qsort(t,NR_TESTS,sizeof(unsigned long long),comp);
-  printf("The median of fftw is: %llu\n",t[NR_TESTS/2]);
-
-
-
-  // for(int i=0;i<N2;++i){
-  //  // printf("Index = %d FFT Real = %f, %f Complex = %f, %f\n",i,creal(res[i]),creal(result[i]),cimag(res[i]),cimag(result[i]));
-  //   if(adjust_num(creal(res[i]))!= adjust_num(cimag(result[i]))){
-  //     printf("Alert real doesnt match! Index = %d Result FFTW Real = %f Complex = %f Result my FFT Real = %f Complex = %f\n",i,creal(res[i]),cimag(res[i]),creal(result[i]),cimag(result[i]));
-  //     printf("Int Form of Real. FFTW Real = %d MY FFT Real = %d\n",adjust_num(creal(res[i])),adjust_num(creal(result[i])));
-  //   }
-  //   if(adjust_num(cimag(res[i])) != adjust_num(cimag(result[i]))){
-  //     printf("Alert imaginary doenst match! Index = %d Result FFTW Real = %f Complex = %f Result my FFT Real = %f Complex = %f\n",i,creal(res[i]),cimag(res[i]),creal(result[i]),cimag(result[i]));
-  //   }
-  // }
 }
 
 void FFTbackward(Ring_ModQ res, Ring_FFT val){
   Ring_ModQ result;
-  FFTbackward_my_version(result,val);
+  // FFTbackward_my_version(result,val);
   FFTbackward_FFTW_version(res,val);
   for(int i =0; i<N;++i){
     if(res[i] != result[i])
