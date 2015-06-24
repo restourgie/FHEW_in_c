@@ -79,6 +79,10 @@ inline void wait_on_enter()
 *                   My FFT
 *
 ******************************************************************************************************************/
+void my_setup(){
+
+}
+
 
 void BitInvert(double complex data[]){
   int i,mv,k,rev;
