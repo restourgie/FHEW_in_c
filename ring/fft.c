@@ -11,7 +11,7 @@
 #define N2 (N/2+1)
 
 #ifndef DOUBLE_N
-#define DOUBLE_N N*2
+#define DOUBLE_N N/2
 #endif
 
 double *in;
@@ -28,9 +28,9 @@ void BitInvert(double complex data[]){
     rev = 0;
     while(k > 0){//Invert the index
       if ((k % 2) > 0)
-              rev = rev + mv;
-            k = k / 2;
-            mv = mv / 2;
+        rev = rev + mv;
+      k = k / 2;
+      mv = mv / 2;
     }
     if(i < rev){
       temp = data[rev];
@@ -40,7 +40,8 @@ void BitInvert(double complex data[]){
   }
 }
 
-void CalcFFT(double complex data[], int sign){
+void CalcFFT(double complex data[], int sign)
+{
   BitInvert(data);
   //variables for the fft
   unsigned long mmax,m,j,istep,i;
@@ -73,23 +74,50 @@ void CalcFFT(double complex data[], int sign){
   //end of the algorithm
 }
 
-//Ring_FFT => complex_double[513] => double[513][2]
-//Ring_ModQ => ZmodQ[1024] => int32_t[1024] 
+void FFTforward(double complex *r, const uint32_t *x)
+{
+  double complex data[DOUBLE_N];
+  int k;
+  for(k=0;k<N/2;++k){
+    data[k] = x[k] + x[(N/2)+k]*I;
+  }
+  CalcFFT(data,1);
+
+  for(k=0; k < N2-1; ++k){;
+    r[k] = data[k];
+  }
+  r[N2-1] = (double complex) 0.0;
+}
+
 // void FFTforward(double complex *r, const uint32_t *x)
 // {
-//     double complex data[DOUBLE_N];
-//     int k;
-//     for(k=0;k<N;++k){
-//       data[k] = x[k] + 0.0*I;
-//       data[k+N] = 0.0;
-//     }
-//     CalcFFT(data,1);
+//   double complex data[DOUBLE_N];
+//   int k;
+//   for(k=0;k<N;++k){
+//     data[k] = x[k] + 0.0*I;
+//     data[k+N] = 0.0;
+//   }
+//   CalcFFT(data,1);
 
-//     for(k=0; k < N2-1; ++k){;
-//       r[k] = data[2*k+1];
-//     }
-//     r[N2-1] = (double complex) 0.0;
+//   for(k=0; k < N2-1; ++k){;
+//     r[k] = data[2*k+1];
+//   }
+//   r[N2-1] = (double complex) 0.0;
 // }
+
+void FFTbackward(uint32_t *r,  const double complex *x)
+{
+  double complex data[DOUBLE_N];
+  int k;
+  for(k = 0;k < N2-1; ++k){
+    data[k] = x[k]/N;
+  }
+  CalcFFT(data,-1);
+  for(k=0; k < N/2; ++k){
+    r[k] = (long int) round(creal(data[k]));
+    r[(N/2)+k] = (long int) round(cimag(data[k]));
+  }
+}
 
 // void FFTbackward(uint32_t *r,  const double complex *x)
 // {
@@ -107,30 +135,3 @@ void CalcFFT(double complex data[], int sign){
 //   for(k=0; k < N; ++k)
 //     r[k] = (long int) round(creal(data[k]));
 // }
-
-void FFTsetup() {
-  in = (double*) fftw_malloc(sizeof(double) * 2*N);
-  out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (N + 2));
-  plan_fft_forw = fftw_plan_dft_r2c_1d(2*N, in, out,  FFTW_PATIENT);
-  plan_fft_back = fftw_plan_dft_c2r_1d(2*N, out, in,  FFTW_PATIENT);
-}
-
-void FFTforward(double complex *r, const uint32_t *x) {
-  for (int k = 0; k < N; ++k) {
-    in[k] = (double) (x[k]);
-    in[k+N] = 0.0;      
-  }
-  fftw_execute(plan_fft_forw); 
-  for (int k = 0; k < N2; ++k) 
-    r[k] = (double complex) out[2*k+1];       
-}
-
-void FFTbackward(uint32_t *r, const double complex *x){
-  for (int k = 0; k < N2; ++k) {
-    out[2*k+1] = (double complex) x[k]/N;
-    out[2*k]   = (double complex) 0;
-  }
-  fftw_execute(plan_fft_back); 
-  for (int k = 0; k < N; ++k) 
-    r[k] = (long int) round(in[k]);
-}
