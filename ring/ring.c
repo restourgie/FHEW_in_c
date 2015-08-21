@@ -15,25 +15,16 @@ static void ringdef_print()
 
 void ring_mul(ring_t *r, const ring_t *x, const ring_t *y)
 {
-  /* Very simple schoolbook multiplication. Works. */
-  // int i,j;
-  // for(i=0;i<1024;i++)
-  //   r->v[i] = 0;
-  // for(i=0;i<1024;i++)
-  // {
-  //   for(j=0;j<1024;j++)
-  //   {
-  //     if(i+j < 1024)
-  //       r->v[i+j] += x->v[i] * y->v[j];
-  //     else
-  //       r->v[i+j-1024] -= x->v[i] * y->v[j];
-  //   }
-  // }
-  /* FFT based multiplication. Doesn't work. */
+
+  /* FFT based multiplication. */
   
-  double complex rfft[513];
-  double complex xfft[513];
-  double complex yfft[513];
+  // double complex rfft[513];
+  // double complex xfft[513];
+  // double complex yfft[513];
+  // int i;
+  double complex rfft[2048];
+  double complex xfft[2048];
+  double complex yfft[2048];
   int i;
 
   FFTforward(xfft,x->v);
@@ -41,6 +32,9 @@ void ring_mul(ring_t *r, const ring_t *x, const ring_t *y)
 
   for(i=0;i<513;i++)
     rfft[i] = xfft[i] * yfft[i];
+
+  // for(i=0;i<2048;i++)
+  //   rfft[i] = xfft[i] * yfft[i];
 
   FFTbackward(r->v,rfft);
 }
