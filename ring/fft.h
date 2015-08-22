@@ -6,6 +6,7 @@
 
 void FFTforward(double complex *r, const uint32_t *x);
 void FFTbackward(uint32_t *r,  const double complex *x);
+// void FFTbackward(uint32_t *r, double complex *x);
 void FFTsetup();
 
 #endif
