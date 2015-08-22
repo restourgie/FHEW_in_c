@@ -11,7 +11,7 @@
 #define N2 (N/2+1)
 
 #ifndef DOUBLE_N
-#define DOUBLE_N N/2
+#define DOUBLE_N N
 #endif
 
 double *in;
@@ -80,11 +80,12 @@ void FFTforward(double complex *r, const uint32_t *x)
   int k;
   for(k=0;k<N/2;++k){
     data[k] = x[k] + x[(N/2)+k]*I;
+    data[(N/2)+k] = (double complex) 0.0;
   }
   CalcFFT(data,1);
 
   for(k=0; k < N2-1; ++k){;
-    r[k] = data[k];
+    r[k] = data[2*k+1];
   }
   r[N2-1] = (double complex) 0.0;
 }
