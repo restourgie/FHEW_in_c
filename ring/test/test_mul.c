@@ -3,30 +3,12 @@
 #include <stdbool.h>
 #include <assert.h>
 
-#define NTESTS 1000
+#define NTESTS 1
 #define THRESHOLD 2
 
 void wait_on_enter(){
   printf("\nPress ENTER to continue\n");
   getchar();
-}
-
-void exact_mul(ring_t *r, const ring_t *x, const ring_t *y)
-{
-  /* Very simple schoolbook multiplication. Works. */
-  int i,j;
-  for(i=0;i<1024;i++)
-    r->v[i] = 0;
-  for(i=0;i<1024;i++)
-  {
-    for(j=0;j<1024;j++)
-    {
-      if(i+j < 1024)
-        r->v[i+j] += x->v[i] * y->v[j];
-      else
-        r->v[i+j-1024] -= x->v[i] * y->v[j];
-    }
-  }
 }
 
 uint32_t myabs(uint32_t a)
@@ -37,23 +19,23 @@ uint32_t myabs(uint32_t a)
 void ones_test(){
   ring_t r,x,y;
 
-  for(int i=0;i<1024;++i){
+  for(int i=0;i<REALDIM;++i){
     x.v[i] = 0;
     y.v[i] = 0;
   }
 
-  for(int i=0;i<1024;++i){
+  for(int i=0;i<REALDIM;++i){
     x.v[i] = 1;
-    for(int j=0;j<1024;++j){
+    for(int j=0;j<REALDIM;++j){
       y.v[j] = 1;
       ring_mul(&r,&x,&y);
-      if((i+j) < 1024){
+      if((i+j) < REALDIM){
         assert(r.v[i+j] == 1);
         // printf("%u\n",r.v[i+j]);
       }
       else
       {
-        assert(r.v[i+j-1024] == (unsigned int) -1);
+        assert(r.v[i+j-REALDIM] == (unsigned int) -1);
         // printf("%u\n",r.v[i+j-1024]);
       }
       y.v[j] = 0;
@@ -70,21 +52,27 @@ void rand_test(){
   
   for(n=0;n<NTESTS;n++)
   { 
-    fread(x.v,sizeof(uint32_t),1024,urandom);
-    fread(y.v,sizeof(uint32_t),1024,urandom);
-    for(i=0;i<1024;i++){
-    //   // printf("y.v[%d] = %d\n",i,y.v[i]);
-    //   //y.v[i] &= 0x7ff; gets 957 of 1000 success
-      y.v[i] &= 0x3ff;
-    //   // printf("new value y.v[%d] = %d\n",i,y.v[i]);
-    //   //wait_on_enter();
+    // fread(x.v,sizeof(uint32_t),REALDIM,urandom);
+    // fread(y.v,sizeof(uint32_t),REALDIM,urandom);
+    // for(i=0;i<REALDIM;i++){
+    // //   // printf("y.v[%d] = %d\n",i,y.v[i]);
+    // //   //y.v[i] &= 0x7ff; gets 957 of 1000 success
+    //   y.v[i] &= 0x3ff;
+    // //   // printf("new value y.v[%d] = %d\n",i,y.v[i]);
+    // //   //wait_on_enter();
+    // }
+
+    for(i=0;i<REALDIM;++i){
+      x.v[i] = fgetc(urandom);
+      y.v[i] = fgetc(urandom);
     }
 
-    ring_mul(&r,&x,&y);
+    // ring_mul(&r,&x,&y);
+    complex_mul(&r,&x,&y);
     exact_mul(&re,&x,&y);
     bool error = false;
     
-    for(i=0;i<1024;i++)
+    for(i=0;i<REALDIM;i++)
     {
 
       if(myabs(r.v[i] - re.v[i]) > THRESHOLD){
@@ -107,8 +95,8 @@ void rand_test(){
 
 int main()
 {
-  //rand_test();
-  ones_test();
+  rand_test();
+  //ones_test();
 
   return 0;
 }
