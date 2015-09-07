@@ -82,10 +82,7 @@ void inverse_phi(double complex *x,int n,int lo,double complex root)
 			// printf("lo = %d, i = %d, m = %d\n",lo,i,m);
 			// printf("x[i]= ( %f + I * %f) x[i+m] = ( %f + I * %f)\n",creal(x[i]),cimag(x[i]),creal(x[i+m]),cimag(x[i+m]) );
 			temp = x[i] + x[i+m];
-			// if(sign == 1)
-				x[i+m] =  (x[i] - x[i+m]) * conj(root);
-			// else
-			// 	x[i+m] =  (x[i+m] - x[i]) * conj(root);
+			x[i+m] =  (x[i] - x[i+m]) * conj(root);
 
 			x[i] = temp;
 			// printf("x[i]= ( %f + I * %f) x[i+m] = ( %f + I * %f)\n",creal(x[i]),cimag(x[i]),creal(x[i+m]),cimag(x[i+m]) );
