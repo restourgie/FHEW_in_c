@@ -79,9 +79,12 @@ void rand_test(){
     //   // printf("new value y.v[%d] = %d\n",i,y.v[i]);
     //   //wait_on_enter();
     }
-
+    printf("starting FFT mul\n");
     ring_mul(&r,&x,&y);
+    printf("finished FFT\n");
+    printf("starting schoolbook\n");
     exact_mul(&re,&x,&y);
+    printf("finished schoolbook\n");
     bool error = false;
     
     for(i=0;i<1024;i++)
@@ -107,8 +110,8 @@ void rand_test(){
 
 int main()
 {
-  //rand_test();
-  ones_test();
+  rand_test();
+  //ones_test();
 
   return 0;
 }
