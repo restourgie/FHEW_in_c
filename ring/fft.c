@@ -7,7 +7,7 @@
 #define M_PI           3.14159265358979323846
 #endif
 
-#define N 1024
+#define N 4
 #define N2 (N/2+1)
 
 #ifndef DOUBLE_N
@@ -107,6 +107,11 @@ void FFTforward(double complex *r, const uint32_t *x)
   r[N2-1] = (double complex) 0.0;
 }
 
+void CPLX_FFTforward(double complex *r)
+{
+  CalcFFT(r,1);
+}
+
 
 // //TESTING OTHER TYPE
 // void FFTforward(double complex *r, const uint32_t *x)
@@ -165,4 +170,9 @@ void FFTbackward(uint32_t *r,  const double complex *x)
   CalcFFT(data,-1);
   for(k=0; k < N; ++k)
     r[k] = (long int) round(creal(data[k]));
+}
+
+void CPLX_FFTbackward(double complex *r)
+{
+    CalcFFT(r,-1);
 }
