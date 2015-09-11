@@ -4,6 +4,10 @@
 #include <math.h>
 
 #define M_PI 3.14159265358979323846
+typedef double complex data_t;
+
+#define W(N,k) (cexp(-2.0f * M_PI * I * (double)k / (double) N))
+
 
 /******************************************************************
 *
@@ -37,38 +41,66 @@ void to_real(const double complex *cplx_x, ring_t *x)
 
 /******************************************************************
 *
-*	COMPLEX MULTIPLICATION
+* FFT MULTIPLICATION
 *
 ******************************************************************/
-void naive_complex_mul(ring_t *r, const ring_t *x, const ring_t *y)
-{	
- 	double complex cplx_x[CPLXDIM];
-  	double complex cplx_y[CPLXDIM];
-  	double complex cplx_res[CPLXDIM];
+void ditfft2(data_t *in,data_t *out,int stride,int N){
+  // print_complex(out);
+  if(N == 2){
+    out[0] = in[0] + in[stride];
+    out[N/2] = in[0] - in[stride];
+  }
+  else{
+    ditfft2(in,out,stride << 1,N >> 1);
+    ditfft2(in+stride,out+N/2,stride <<1, N>>1);
 
-  	to_complex(x,cplx_x);
-  	to_complex(y,cplx_y);
-
-    double complex t;
-    double complex big[REALDIM];
-
-    for(int i=0;i<REALDIM;++i)
-      big[i] = 0;
-
-    for(int i =0;i<CPLXDIM;++i)
-      for(int j=0;j<CPLXDIM;++j)
-        big[i+j] += cplx_x[i] * cplx_y[j];    
-
-    for(int i=CPLXDIM;i<REALDIM;++i){
-      // printf("%f + i%f\n",creal(big[i+512]),cimag(big[i+512]));
-      t = big[i] * (0+I*1);
-      // printf("%f + i%f\n",creal(t),cimag(t));
-      cplx_res[i-CPLXDIM] = big[i-CPLXDIM] + t;
+    { /* k=0 -> no mult */
+      data_t Ek = out[0];
+      data_t Ok = out[N/2];
+      out[0] = Ek + Ok;
+      out[N/2] = Ek - Ok;
     }
-    // printf("\nNAIVE COMPLEX CALC\n");
-    // print_complex(cplx_res);
-    to_real(cplx_res,r);   
+
+    int k;
+    for(k=1;k<N/2;k++){
+      data_t Ek = out[k];
+      data_t Ok = out[(k+N/2)];
+      out[k] =    Ek + W(N,k) * Ok;
+      out[(k+N/2)] =  Ek - W(N,k) *Ok;
+    }
+  }
 }
+
+void fft_mul(ring_t *r, const ring_t *x, const ring_t *y)
+{
+  double complex cplx_x[CPLXDIM];
+  double complex cplx_y[CPLXDIM];
+  double complex cplx_res[CPLXDIM];
+
+  double complex out_x[CPLXDIM];
+  double complex out_y[CPLXDIM];
+
+  to_complex(x,cplx_x);
+  to_complex(y,cplx_y);
+
+  ditfft2(cplx_x,out_x,1,CPLXDIM);
+  ditfft2(cplx_y,out_y,1,CPLXDIM);
+
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    cplx_res = out_y[i] * out_x[i];
+  }
+
+
+
+}
+
+
+/******************************************************************
+*
+* SMART COMPLEX MULTIPLICATION
+*
+******************************************************************/
 
 void inverse_phi(double complex *x,int n,int lo,double complex root)
 {	
@@ -103,9 +135,9 @@ void recursive_phi(double complex *x,int n,int lo,double complex root)
       // printf("lo = %d, i = %d, m = %d\n",lo,i,m);
       // printf("temp: ( %f + I * %f)\n",creal(temp),cimag(temp) );
 	      //phiprime
-	      x[i+m] = x[i] - temp;
+      x[i+m] = x[i] - temp;
 	      //phi
-	      x[i] = x[i] + temp;
+      x[i] = x[i] + temp;
     }
     // print_complex(x);
     recursive_phi(x,m,lo,csqrt(root));
@@ -113,67 +145,33 @@ void recursive_phi(double complex *x,int n,int lo,double complex root)
   }
 }
 
+
 void smart_complex_mul(ring_t *r, const ring_t *x, const ring_t *y)
 {
 	double complex cplx_x[CPLXDIM];
-  	double complex cplx_y[CPLXDIM];
-  	double complex cplx_res[CPLXDIM];
+	double complex cplx_y[CPLXDIM];
+	double complex cplx_res[CPLXDIM];
 
-  	to_complex(x,cplx_x);
-  	to_complex(y,cplx_y);
-
-  	double complex root = 0+I*1;
-  	root = csqrt(root);
-  	
-  	// printf("\n*********************** POLY X start ***********************\n");	
-  	// print_complex(cplx_x);
-  	recursive_phi(cplx_x,CPLXDIM,0,root);
-  	// print_complex(cplx_x);
-  	// printf("\n*********************** POLY X end ***********************\n");
-  	// printf("\n***********************INVERSE POLY X start***********************\n");
-  	// inverse_phi(cplx_x,CPLXDIM,0,root,1);
-  	// printf("\n***********************INVERSE POLY X end***********************\n");
-  	// print_complex(cplx_x);
-
-  	// printf("\nSMART COMPLEX CALC POLY Y\n");
-  	//print_complex(cplx_y);
-  	recursive_phi(cplx_y,CPLXDIM,0,root);
-  	// print_complex(cplx_y);
+	to_complex(x,cplx_x);
+	to_complex(y,cplx_y);
 
 
-  	
- // 	double complex test[CPLXDIM];
- // 	test[0] = -266339.000000 + I * 110623.000000;
-	// test[1] = -225798.000000 + I * 50944.000000;
-	// test[2] = -195563.000000 + I * 71298.000000;
-	// test[3] = -181704.000000 + I * 136320.000000;
-	// test[4] = -146400.000000 + I * 116352.000000;
-	// test[5] = -128248.000000 + I * 160754.000000;
-	// test[6] = -109350.000000 + I * 278158.000000;
-	// test[7] = -24202.000000 + I * 301782.000000;
 
-	// printf("\nRESULT TEST\n");
-	// print_complex(test);
-	// printf("\nFFTING THE RESULT \n");
-	// recursive_phi(test,CPLXDIM,0,root);
-	// print_complex(test);
-	// printf("\nBACKWARDS\n");
-	// inverse_phi(test,CPLXDIM,0,root);
-	// print_complex(test);
+	double complex root = 0+I*1;
+	root = csqrt(root);
+	
+	recursive_phi(cplx_x,CPLXDIM,0,root);
+	recursive_phi(cplx_y,CPLXDIM,0,root);
 
 
-  	for (int i = 0; i < CPLXDIM; ++i)
-  	{
-  		cplx_res[i] = (cplx_x[i] * cplx_y[i])/CPLXDIM;
-  	}
+	for (int i = 0; i < CPLXDIM; ++i)
+	{
+		cplx_res[i] = (cplx_x[i] * cplx_y[i])/CPLXDIM;
+	}
 
-  	// printf("\nSMART COMPLEX CALC RESULT\n");
-  	// print_complex(cplx_res);
-  	inverse_phi(cplx_res,CPLXDIM,0,root);
-  	// print_complex(cplx_res);
+	inverse_phi(cplx_res,CPLXDIM,0,root);
 
-  	to_real(cplx_res,r);
-
+	to_real(cplx_res,r);
 }
 
 /******************************************************************
@@ -198,4 +196,39 @@ void naive_real_mul(ring_t *r, const ring_t *x, const ring_t *y)
         r->v[i+j-REALDIM] -= x->v[i] * y->v[j];
     }
   }
+}
+
+/******************************************************************
+*
+* COMPLEX MULTIPLICATION
+*
+******************************************************************/
+void naive_complex_mul(ring_t *r, const ring_t *x, const ring_t *y)
+{ 
+  double complex cplx_x[CPLXDIM];
+  double complex cplx_y[CPLXDIM];
+  double complex cplx_res[CPLXDIM];
+
+  to_complex(x,cplx_x);
+  to_complex(y,cplx_y);
+
+  double complex t;
+  double complex big[REALDIM];
+
+  for(int i=0;i<REALDIM;++i)
+    big[i] = 0;
+
+  for(int i =0;i<CPLXDIM;++i)
+    for(int j=0;j<CPLXDIM;++j)
+      big[i+j] += cplx_x[i] * cplx_y[j];    
+
+  for(int i=CPLXDIM;i<REALDIM;++i){
+    // printf("%f + i%f\n",creal(big[i+512]),cimag(big[i+512]));
+    t = big[i] * (0+I*1);
+    // printf("%f + i%f\n",creal(t),cimag(t));
+    cplx_res[i-CPLXDIM] = big[i-CPLXDIM] + t;
+  }
+  // printf("\nNAIVE COMPLEX CALC\n");
+  // print_complex(cplx_res);
+  to_real(cplx_res,r);   
 }
