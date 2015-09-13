@@ -38,8 +38,39 @@ void ditfft2(data_t *in,data_t *out,int stride,int N){
 			data_t Ek = out[k];
 			data_t Ok = out[(k+N/2)];
 			out[k] = 		Ek + W(N,k) * Ok;
-			out[(k+N/2)] = 	Ek - W(N,k) *Ok;
+			out[(k+N/2)] = 	Ek - W(N,k) * Ok;
 		}
+	}
+}
+
+void invfft2(data_t *in,data_t *out,int stride,int N){
+	
+	if(N == 2)
+	{
+		in[0] = out[0] + out[N/2];
+		in[stride] = out[0] - out[N/2];
+		// out[0] = in[0] + in[stride];
+		// out[N/2] = in[0] - in[stride];
+	}
+	else
+	{
+
+		{ /* k=0 -> no mult */
+			data_t Ek = out[0];
+			data_t Ok = out[N/2];
+			out[0] = Ek + Ok;
+			out[N/2] = Ek - Ok;
+		}
+
+		int k;
+		for(k=1;k<N/2;k++){
+			data_t Ek = out[k];
+			data_t Ok = out[(k+N/2)];
+			out[k] = 		Ek + Ok;
+			out[(k+N/2)] = 	conj(W(N,k))*(Ek - Ok);
+		}
+		invfft2(in,out,stride << 1,N >> 1);
+		invfft2(in+stride,out+N/2,stride <<1, N>>1);
 	}
 }
 
@@ -48,17 +79,18 @@ int main()
 	data_t out[CPLXDIM];
 
 	for (int i = 0; i < CPLXDIM; ++i)
-		{	
-			out[i] =0;
-			if(i < CPLXDIM/2)
-				in[i] = 1;
-			else
-				in[i] = 0;
-		}
+	{
+		if(i <4)
+			in[i]=1;
+		else
+			in[i]=0;
+	}
 
 	print_complex(in);	
 	ditfft2(in,out,1,CPLXDIM);
 	print_complex(out);
+	invfft2(in,out,1,CPLXDIM);
+	print_complex(in);
 
 	return 0;
 }

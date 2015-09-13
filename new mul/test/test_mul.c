@@ -24,6 +24,7 @@ void rand_test(){
       y.v[i] = fgetc(urandom);
     }
 
+
     // x.v[0] = 58;
     // x.v[1] =37;
     // x.v[2] =238;
@@ -58,10 +59,13 @@ void rand_test(){
     // y.v[14] = 149;
     // y.v[15] = 77;
 
-
-    smart_complex_mul(&r,&x,&y);
-    naive_complex_mul(&re,&x,&y);
-    // naive_real_mul(&re,&x,&y);
+    // normal_FFT_mul(&re,&x,&y);
+    split_radix_FFT_mul(&re,&x,&y);
+    // twisted_FFT_mul(&r,&x,&y);
+    naive_cyclic_real_mul(&r,&x,&y);
+    // smart_complex_mul(&r,&x,&y);
+    // naive_complex_mul(&r,&x,&y);
+    // naive_real_mul(&r,&x,&y);
     bool error = false;
     
     for(i=0;i<REALDIM;i++)
