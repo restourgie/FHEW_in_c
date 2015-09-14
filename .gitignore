@@ -1,7 +1,11 @@
 #object files
 *.o
+*.dSYM/
 cmd/enc
 cmd/gen
 cmd/nand
 cmd/dec
 cmd/*.o
+new\ mul/test/test_mul
+ring/test_mul
+
