@@ -131,8 +131,8 @@ void smart_complex_mul(ring_t *r, const ring_t *x, const ring_t *y)
 	}
 
 	inverse_phi(cplx_res,CPLXDIM,0,root);
-  printf("\n\n**************SMART COMPLEX MUL RESULT**************\n");
-  print_complex(cplx_res,CPLXDIM);
+  // printf("\n\n**************SMART COMPLEX MUL RESULT**************\n");
+  // print_complex(cplx_res,CPLXDIM);
 	to_real(cplx_res,r);
 }
 
@@ -310,9 +310,9 @@ void twisted_FFT_mul(ring_t *r, const ring_t *x, const ring_t *y)
   }
   // printf("\n\n**************TWISTED FFT MUL RESULT Before inverse**************\n");
   // print_complex(cplx_res,REALDIM);
-  // printf("\n\n**************TWISTED FFT MUL RESULT**************\n");
+  printf("\n\n**************TWISTED FFT MUL RESULT**************\n");
   twisted_inverse_FFT(cplx_res,REALDIM,0);
-  // print_complex(cplx_res,REALDIM);
+  print_complex(cplx_res,REALDIM);
 
   for (int i = 0; i < REALDIM; ++i)
   {
@@ -346,7 +346,6 @@ void split_radix_recursive(double complex *x,int n,int lo)
     split_radix_recursive(x,m,lo);
 
     lo = lo+m;
-    //temp_n = m;
     m = m/2;
 
     //Go from (x^2n +1 to x^n -i and x^n +i)
@@ -436,6 +435,11 @@ void split_radix_FFT_mul(ring_t *r, const ring_t *x, const ring_t *y)
   }
 }
 
+/******************************************************************
+*
+* SPLIT RADIX FFT NEGACYCLIC MULTIPLICATION
+*
+******************************************************************/
 void negacyclic_split_radix_mul(ring_t *r, const ring_t *x, const ring_t *y)
 {
   double complex cplx_x[CPLXDIM];
@@ -444,10 +448,16 @@ void negacyclic_split_radix_mul(ring_t *r, const ring_t *x, const ring_t *y)
 
   to_complex(x,cplx_x);
   to_complex(y,cplx_y);
-  twist(cplx_x,REALDIM,CPLXDIM,0);
-  twist(cplx_y,REALDIM,CPLXDIM,0);
+  // printf("\n\n**************Normal X**************\n");
+  // print_complex(cplx_x,CPLXDIM);
+  twist(cplx_x,2*REALDIM,CPLXDIM,0);
+  // printf("\n\n**************TWISTED X**************\n");
+  // print_complex(cplx_x,CPLXDIM);
+  twist(cplx_y,2*REALDIM,CPLXDIM,0);
 
   split_radix_recursive(cplx_x,CPLXDIM,0);
+  // printf("\n\n**************FFT X**************\n");
+  // print_complex(cplx_x,CPLXDIM);
 
   split_radix_recursive(cplx_y,CPLXDIM,0);
 
@@ -457,12 +467,91 @@ void negacyclic_split_radix_mul(ring_t *r, const ring_t *x, const ring_t *y)
   }
 
   split_radix_inverse(cplx_res,CPLXDIM,0);
-  untwist(cplx_res,REALDIM,CPLXDIM,0);
-  printf("\n\n**************split-radix FFT MUL RESULT**************\n");
-  print_complex(cplx_res,CPLXDIM);
+  untwist(cplx_res,2*REALDIM,CPLXDIM,0);
+  // printf("\n\n**************split-radix FFT MUL RESULT**************\n");
+  // print_complex(cplx_res,CPLXDIM);
 
   to_real(cplx_res,r);
 }
+
+/******************************************************************
+*
+* Tangent FFT MULTIPLICATION
+*
+******************************************************************/
+// void tangent_recursive(double complex *x,int n,int lo)
+// {
+//   double complex temp;
+//   if(n == 2){
+//     temp = x[lo];
+//     x[lo] = temp + x[lo+1];
+//     x[lo+1] = temp - x[lo+1];
+//   }
+//   else if(n > 2){
+//     int m = n/2;
+//     //Go from (x^4n +1 to x^2n -1 and x^2n +1)
+//     for(int i=lo; i < lo+m;++i)
+//     {
+//       temp = x[i];
+//       x[i] = temp + x[i+m];
+//       x[i+m] = temp - x[i+m];
+//     }
+//     //Do recursive step for (x^2n -1)
+//     tangent_recursive(x,m,lo);
+
+//     lo = lo+m;
+//     m = m/2;
+//     //Go from (x^2n +1) to (x^n -i) and (x^n +i)
+//     for (int i = lo; i < lo+m; ++i)
+//     {
+//       temp = x[i];
+//       x[i] = temp + I * x[i+m];
+//       x[i+m] = temp - I * x[i+m];
+//     }
+
+//   }
+
+// }
+
+// void tangent_recursive_scaled(double complex *x,int n,int lo)
+// {
+
+// }
+
+
+// void tangent_FFT_mul(ring_t *r, const ring_t *x, const ring_t *y)
+// {
+//   double complex cplx_x[REALDIM];
+//   double complex cplx_y[REALDIM];
+//   double complex cplx_res[REALDIM];
+
+//   for (int i = 0; i < REALDIM; ++i)
+//   {
+//     cplx_x[i] = x->v[i];
+//     cplx_y[i] = y->v[i];
+//   }
+//   // printf("\n\n**************APPLY split-radix FFT**************\n");
+//   // print_complex(cplx_x,REALDIM);
+//   tangent_recursive(cplx_x,REALDIM,0);
+
+//   // print_complex(cplx_x,REALDIM);
+//   // tangent_recursive(cplx_y,REALDIM,0);
+
+//   // for (int i = 0; i < REALDIM; ++i)
+//   // {
+//   //   cplx_res[i] = (cplx_x[i] * cplx_y[i])/REALDIM;
+//   // }
+//   // // printf("\n\n**************TWISTED FFT MUL RESULT Before inverse**************\n");
+//   // // print_complex(cplx_res,REALDIM);
+//   // // printf("\n\n**************split-radix FFT MUL RESULT**************\n");
+//   // split_radix_inverse(cplx_res,REALDIM,0);
+//   // // print_complex(cplx_res,REALDIM);
+
+//   // for (int i = 0; i < REALDIM; ++i)
+//   // {
+//   //   r->v[i] = round(creal(cplx_res[i]));
+//   // }
+// }
 
 /******************************************************************
 *
@@ -542,7 +631,7 @@ void naive_complex_mul(ring_t *r, const ring_t *x, const ring_t *y)
     // printf("%f + i%f\n",creal(t),cimag(t));
     cplx_res[i-CPLXDIM] = big[i-CPLXDIM] + t;
   }
-  printf("\n\n**************NAIVE COMPLEX CALC**************\n");
-  print_complex(cplx_res,CPLXDIM);
+  // printf("\n\n**************NAIVE COMPLEX CALC**************\n");
+  // print_complex(cplx_res,CPLXDIM);
   to_real(cplx_res,r);   
 }

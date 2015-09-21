@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#define CPLXDIM 4
+#define CPLXDIM 512
 #define REALDIM (2*CPLXDIM)
 
 typedef struct {

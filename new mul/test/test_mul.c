@@ -2,7 +2,7 @@
 #include "../mul.h"
 #include <stdbool.h>
 
-#define NTESTS 1
+#define NTESTS 1000
 #define THRESHOLD 2
 
 uint32_t myabs(uint32_t a)
@@ -25,10 +25,10 @@ void rand_test(){
     }
 
 
-    x.v[0] = 58;
-    x.v[1] =37;
-    x.v[2] =238;
-    x.v[3] =155;
+    // x.v[0] = 58;
+    // x.v[1] =37;
+    // x.v[2] =238;
+    // x.v[3] =155;
     // x.v[4] =1;
     // x.v[5] =153;
     // x.v[6] =239;
@@ -42,10 +42,10 @@ void rand_test(){
     // x.v[14] = 149;
     // x.v[15] = 77;
 
-    y.v[0] = 58;
-    y.v[1] =37;
-    y.v[2] =238;
-    y.v[3] =155;
+    // y.v[0] = 58;
+    // y.v[1] =37;
+    // y.v[2] =238;
+    // y.v[3] =155;
     // y.v[4] =1;
     // y.v[5] =153;
     // y.v[6] =239;
@@ -64,8 +64,8 @@ void rand_test(){
     // twisted_FFT_mul(&r,&x,&y);
     // naive_cyclic_real_mul(&r,&x,&y);
     negacyclic_split_radix_mul(&re,&x,&y);
-    smart_complex_mul(&r,&x,&y);
-    // naive_complex_mul(&r,&x,&y);
+    // smart_complex_mul(&r,&x,&y);
+    naive_complex_mul(&r,&x,&y);
     // naive_real_mul(&r,&x,&y);
     bool error = false;
     
