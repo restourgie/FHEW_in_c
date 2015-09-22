@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <complex.h>
 
-#define CPLXDIM 8
+#define CPLXDIM 512
 #define REALDIM (2*CPLXDIM)
 
 #ifndef M_PI
@@ -15,8 +15,13 @@ typedef struct {
   uint32_t v[REALDIM];
 } ring_t;
 
+typedef struct {
+	double real[CPLXDIM];
+	double imag[CPLXDIM];
+} cplx;
+
 void print_complex(const double complex *a, int N);
-void print_double(const double *a, int N);
+void print_double(const cplx *x, int N);
 void to_complex(const ring_t *x, double complex *cplx_x);
 void to_real(const double complex *cplx_x, ring_t *x);
 void twist(double complex *cplx_x,int n,int m,int lo);

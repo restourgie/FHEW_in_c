@@ -3,7 +3,7 @@
 // #include "../support.h"
 #include <stdbool.h>
 
-#define NTESTS 1
+#define NTESTS 1000
 #define THRESHOLD 2
 
 uint32_t myabs(uint32_t a)
@@ -26,39 +26,39 @@ void rand_test(){
     }
 
 
-    x.v[0] = 58;
-    x.v[1] =37;
-    x.v[2] =238;
-    x.v[3] =155;
-    x.v[4] =1;
-    x.v[5] =153;
-    x.v[6] =239;
-    x.v[7] =69;
-    x.v[8] =239;
-    x.v[9] =152;
-    x.v[10] =60;
-    x.v[11] =43;
-    x.v[12] =148;
-    x.v[13] = 235;
-    x.v[14] = 149;
-    x.v[15] = 77;
+    // x.v[0] = 58;
+    // x.v[1] =37;
+    // x.v[2] =238;
+    // x.v[3] =155;
+    // x.v[4] =1;
+    // x.v[5] =153;
+    // x.v[6] =239;
+    // x.v[7] =69;
+    // x.v[8] =239;
+    // x.v[9] =152;
+    // x.v[10] =60;
+    // x.v[11] =43;
+    // x.v[12] =148;
+    // x.v[13] = 235;
+    // x.v[14] = 149;
+    // x.v[15] = 77;
 
-    y.v[0] = 58;
-    y.v[1] =37;
-    y.v[2] =238;
-    y.v[3] =155;
-    y.v[4] =1;
-    y.v[5] =153;
-    y.v[6] =239;
-    y.v[7] =69;
-    y.v[8] =239;
-    y.v[9] =152;
-    y.v[10] =60;
-    y.v[11] =43;
-    y.v[12] =148;
-    y.v[13] = 235;
-    y.v[14] = 149;
-    y.v[15] = 77;
+    // y.v[0] = 58;
+    // y.v[1] =37;
+    // y.v[2] =238;
+    // y.v[3] =155;
+    // y.v[4] =1;
+    // y.v[5] =153;
+    // y.v[6] =239;
+    // y.v[7] =69;
+    // y.v[8] =239;
+    // y.v[9] =152;
+    // y.v[10] =60;
+    // y.v[11] =43;
+    // y.v[12] =148;
+    // y.v[13] = 235;
+    // y.v[14] = 149;
+    // y.v[15] = 77;
 
     // normal_FFT_mul(&re,&x,&y);
     // split_radix_FFT_mul(&re,&x,&y);
@@ -74,12 +74,12 @@ void rand_test(){
     for(i=0;i<REALDIM;i++)
     {
 
-      // if(myabs(r.v[i] - re.v[i]) > THRESHOLD){
-      //   printf("school: %u \n", re.v[i]);
-      //   printf("mine: %u \n",r.v[i]);
-      //   printf("difference: %u\n\n",myabs(r.v[i] - re.v[i]));
-      //   error = true;
-      // }
+      if(myabs(r.v[i] - re.v[i]) > THRESHOLD){
+        printf("school: %u \n", re.v[i]);
+        printf("mine: %u \n",r.v[i]);
+        printf("difference: %u\n\n",myabs(r.v[i] - re.v[i]));
+        error = true;
+      }
       
     }
     if(!error)

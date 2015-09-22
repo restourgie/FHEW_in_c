@@ -17,9 +17,9 @@ void print_complex(const double complex *a, int N){
     printf("\n");
 }
 
-void print_double(const double *a,int N){
+void print_double(const cplx *x,int N){
   for (int i = 0; i < N; ++i)
-  printf("cplxpoly[%d] = %f + i * %f\n",i,a[i],a[i+CPLXDIM]);
+  printf("cplxpoly[%d] = %f + i * %f\n",i,x->real[i],x->imag[i]);
     printf("\n");
 }
 

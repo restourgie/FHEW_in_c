@@ -10,6 +10,7 @@
 ******************************************************************/
 void split_radix_recursive(double complex *x,int n,int lo)
 {
+
   double complex temp;
   if(n == 2){
     temp = x[lo];
@@ -30,16 +31,23 @@ void split_radix_recursive(double complex *x,int n,int lo)
     lo = lo+m;
     m = m/2;
 
+    // printf("BEFORE THE I STEP\n");
+    // print_complex(x,CPLXDIM);
     //Go from (x^2n +1 to x^n -i and x^n +i)
     for (int i = lo; i < lo+m; ++i)
     {
+      // printf("i = %d, m = %d\n",i,m );
       temp = x[i];
       x[i] = temp + I * x[i+m];
       x[i+m] = temp - I * x[i+m];
     }
+    // printf("AFTER THE I STEP\n");
+    // print_complex(x,CPLXDIM);
     twist(x,n,m,lo);
     split_radix_recursive(x,m,lo);
     untwist(x,n,m,lo+m);
+    // printf("AFTER UNTWISTING\n");
+    // print_complex(x,CPLXDIM);
     split_radix_recursive(x,m,lo+m);
   }
 }
@@ -63,12 +71,17 @@ void split_radix_recursive_inverse(double complex *x,int n,int lo)
     twist(x,n,m,lo+m);
     split_radix_recursive_inverse(x,m,lo);
     untwist(x,n,m,lo);
+    // printf("BEFORE\n");
+    // print_complex(x,CPLXDIM);
     for (int i = lo; i < lo+m; ++i)
     {
+      // printf("i = %d, m = %d\n",i,m );
       temp = x[i];
       x[i] = temp + x[i+m];
       x[i+m] = (temp - x[i+m])*-I;
     }
+    // printf("AFTER\n");
+    // print_complex(x,CPLXDIM);
     m = m*2;
     lo = lo -m;
     // printf("m = %d lo = %d\n",m,lo );
