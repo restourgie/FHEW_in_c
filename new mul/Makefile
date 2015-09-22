@@ -1,9 +1,11 @@
 CC=/usr/bin/gcc
 CFLAGS=-Wall -Wextra -g -std=c11
 LIBS=-lm
+DEPS = mul.h support.h fft/fft_negacyc.h fft/split_radix_fft.h fft/split_radix_fast.h
+CFILES = mul.c test/test_mul.c fft/fft_negacyc.c fft/split_radix_fft.c fft/split_radix_fast.c support.c
 
-test/test_mul: mul.c mul.h test/test_mul.c
-	$(CC) $(CFLAGS) mul.c test/test_mul.c $(LIBS) -o $@
+test/test_mul: $(CFILES) $(DEPS)
+	$(CC) $(CFLAGS) $(CFILES) $(LIBS) -o $@
 
 .PHONY: clean
 

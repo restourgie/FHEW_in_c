@@ -1,0 +1,82 @@
+#include <complex.h>
+#include <stdio.h>
+#include <math.h>
+#include "../support.h"
+
+/******************************************************************
+*
+* SPLIT RADIX FFT MULTIPLICATION
+*
+******************************************************************/
+void split_radix_recursive(double complex *x,int n,int lo)
+{
+  double complex temp;
+  if(n == 2){
+    temp = x[lo];
+    x[lo] = temp + x[lo+1];
+    x[lo+1] = temp - x[lo+1];
+  }
+  else if(n > 2){
+    int m = n/2;
+    //Go from (x^4n +1 to x^2n -1 and x^2n +1)
+    for(int i=lo; i < lo+m;++i){
+      temp = x[i];
+      x[i] = temp + x[i+m];
+      x[i+m] = temp - x[i+m];
+    }
+    //Do recursive step for (x^2n -1)
+    split_radix_recursive(x,m,lo);
+
+    lo = lo+m;
+    m = m/2;
+
+    //Go from (x^2n +1 to x^n -i and x^n +i)
+    for (int i = lo; i < lo+m; ++i)
+    {
+      temp = x[i];
+      x[i] = temp + I * x[i+m];
+      x[i+m] = temp - I * x[i+m];
+    }
+    twist(x,n,m,lo);
+    split_radix_recursive(x,m,lo);
+    untwist(x,n,m,lo+m);
+    split_radix_recursive(x,m,lo+m);
+  }
+}
+
+void split_radix_recursive_inverse(double complex *x,int n,int lo)
+{
+  // printf("N = %d\n",n);
+  // print_complex(x,REALDIM);
+  double complex temp;
+  if(n == 2){
+    temp = x[lo];
+    x[lo] = temp + x[lo+1];
+    x[lo+1] = temp - x[lo+1];
+  }
+  else if(n > 2){
+    // printf("n = %d lo = %d\n",n,lo );
+    int m = n/4;
+    lo = lo+n/2;
+    // printf("m = %d lo = %d\n",m,lo );
+    split_radix_recursive_inverse(x,m,lo+m);
+    twist(x,n,m,lo+m);
+    split_radix_recursive_inverse(x,m,lo);
+    untwist(x,n,m,lo);
+    for (int i = lo; i < lo+m; ++i)
+    {
+      temp = x[i];
+      x[i] = temp + x[i+m];
+      x[i+m] = (temp - x[i+m])*-I;
+    }
+    m = m*2;
+    lo = lo -m;
+    // printf("m = %d lo = %d\n",m,lo );
+    split_radix_recursive_inverse(x,m,lo);
+    for(int i=lo; i < lo+m;++i){
+      temp = x[i];
+      x[i] = temp + x[i+m];
+      x[i+m] = temp - x[i+m];
+    }
+  }
+}
