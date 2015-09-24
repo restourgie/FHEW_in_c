@@ -1,47 +1,46 @@
 #include <stdio.h>
 #include <math.h>
-#include "../support.h"
+#include "../mul.h"
 #include "split_radix_non_rec.h"
-#include "split_radix_fast.h"
 
-#define calc_cos(N,k) (cos(2.0 * M_PI * (double)k / (double) N))
-#define calc_sin(N,k) (sin(2.0 * M_PI * (double)k / (double) N))
+// #define calc_cos(N,k) (cos(2.0 * M_PI * (double)k / (double) N))
+// #define calc_sin(N,k) (sin(2.0 * M_PI * (double)k / (double) N))
 
-void new_twist(cplx *cplx_x,int n,int m,int lo)
-{
-  double a,b,c,d;
-  int j = 1;
-  for (int i = lo+1; i < lo+m; ++i)
-  {	
-  	a = cplx_x->real[i];
-  	b = cplx_x->imag[i];	
-  	c = calc_cos(n,j);
-  	d = calc_sin(n,j);
+// void fast_twist(cplx *cplx_x,int n,int m,int lo)
+// {
+//   double a,b,c,d;
+//   int j = 1;
+//   for (int i = lo+1; i < lo+m; ++i)
+//   {	
+//   	a = cplx_x->real[i];
+//   	b = cplx_x->imag[i];	
+//   	c = calc_cos(n,j);
+//   	d = calc_sin(n,j);
   	 
-    //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
-  	cplx_x->real[i] = (a*c) - (b*d);
-  	cplx_x->imag[i] = (a*d) + (b*c);
-    ++j;
-  }
-}
+//     //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+//   	cplx_x->real[i] = (a*c) - (b*d);
+//   	cplx_x->imag[i] = (a*d) + (b*c);
+//     ++j;
+//   }
+// }
 
-void new_untwist(cplx *cplx_x,int n,int m,int lo)
-{
-  double a,b,c,d;
-  int j = 1;
-  for (int i = lo+1; i < lo+m; ++i)
-  {
-    a = cplx_x->real[i];
-  	b = cplx_x->imag[i];	
-  	c = calc_cos(n,j);
-  	d = -calc_sin(n,j);
+// void fast_untwist(cplx *cplx_x,int n,int m,int lo)
+// {
+//   double a,b,c,d;
+//   int j = 1;
+//   for (int i = lo+1; i < lo+m; ++i)
+//   {
+//     a = cplx_x->real[i];
+//   	b = cplx_x->imag[i];	
+//   	c = calc_cos(n,j);
+//   	d = -calc_sin(n,j);
   	 
-    //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
-  	cplx_x->real[i] = (a*c) - (b*d);
-  	cplx_x->imag[i] = (a*d) + (b*c);
-    ++j;
-  }
-}
+//     //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+//   	cplx_x->real[i] = (a*c) - (b*d);
+//   	cplx_x->imag[i] = (a*d) + (b*c);
+//     ++j;
+//   }
+// }
 
 /******************************************************************
 *
@@ -130,7 +129,7 @@ void split_radix_8(cplx *x,int lo)
 		x->real[i+m] = temp_real;
 	}
 	//left branch of right branch
-	new_twist(x,8,m,lo);
+	fast_twist(x,8,m,lo);
 	temp_real = x->real[lo];
 	temp_im = x->imag[lo];
 
@@ -140,7 +139,7 @@ void split_radix_8(cplx *x,int lo)
 	x->real[lo+1] = temp_real - x->real[lo+1];
 	x->imag[lo+1] = temp_im - x->imag[lo+1];
 	//Right branch of right branch
-	new_untwist(x,8,m,lo+m);
+	fast_untwist(x,8,m,lo+m);
 	lo +=m;
 	temp_real = x->real[lo];
 	temp_im = x->imag[lo];
@@ -193,10 +192,10 @@ void split_radix_16(cplx *x,int lo)
 		x->real[i+m] = temp_real;
 	}
 	//left branch of right branch
-	new_twist(x,16,m,lo);
+	fast_twist(x,16,m,lo);
 	split_radix_4(x,lo);
 	//Right branch of right branch
-	new_untwist(x,16,m,lo+m);
+	fast_untwist(x,16,m,lo+m);
 	split_radix_4(x,lo+m);
 }
 
@@ -241,10 +240,10 @@ void split_radix_32(cplx *x,int lo)
 		x->real[i+m] = temp_real;
 	}
 	//left branch of right branch
-	new_twist(x,32,m,lo);
+	fast_twist(x,32,m,lo);
 	split_radix_8(x,lo);
 	//Right branch of right branch
-	new_untwist(x,32,m,lo+m);
+	fast_untwist(x,32,m,lo+m);
 	split_radix_8(x,lo+m);
 }
 
@@ -289,10 +288,10 @@ void split_radix_64(cplx *x,int lo)
 		x->real[i+m] = temp_real;
 	}
 	//left branch of right branch
-	new_twist(x,64,m,lo);
+	fast_twist(x,64,m,lo);
 	split_radix_16(x,lo);
 	//Right branch of right branch
-	new_untwist(x,64,m,lo+m);
+	fast_untwist(x,64,m,lo+m);
 	split_radix_16(x,lo+m);
 }
 
@@ -337,10 +336,10 @@ void split_radix_128(cplx *x,int lo)
 		x->real[i+m] = temp_real;
 	}
 	//left branch of right branch
-	new_twist(x,128,m,lo);
+	fast_twist(x,128,m,lo);
 	split_radix_32(x,lo);
 	//Right branch of right branch
-	new_untwist(x,128,m,lo+m);
+	fast_untwist(x,128,m,lo+m);
 	split_radix_32(x,lo+m);
 }
 
@@ -385,10 +384,10 @@ void split_radix_256(cplx *x)
 		x->real[i+m] = temp_real;
 	}
 	//left branch of right branch
-	new_twist(x,256,m,128);
+	fast_twist(x,256,m,128);
 	split_radix_64(x,128);
 	//Right branch of right branch
-	new_untwist(x,256,m,128+m);
+	fast_untwist(x,256,m,128+m);
 	split_radix_64(x,128+m);
 }
 
@@ -433,9 +432,9 @@ void split_radix_512(cplx *x)
 		x->real[i+m] = temp_real;
 	}
 	//left branch of right branch
-	new_twist(x,512,m,256);
+	fast_twist(x,512,m,256);
 	split_radix_128(x,256);
 	//Right branch of right branch
-	new_untwist(x,512,m,256+m);
+	fast_untwist(x,512,m,256+m);
 	split_radix_128(x,385);
 }

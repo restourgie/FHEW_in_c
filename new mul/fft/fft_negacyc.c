@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "fft_negacyc.h"
-#include "../support.h"
+
 
 /******************************************************************
 *

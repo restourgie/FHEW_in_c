@@ -64,9 +64,8 @@ void rand_test(){
     // split_radix_FFT_mul(&re,&x,&y);
     // twisted_FFT_mul(&r,&x,&y);
     // naive_cyclic_real_mul(&r,&x,&y);
-    // split_radix_mul(&re,&x,&y);
+    split_radix_mul(&re,&x,&y);
     split_radix_non_rec_mul(&re,&x,&y);
-    split_radix_fast_mul(&r,&x,&y);
     // smart_complex_mul(&r,&x,&y);
     // naive_complex_mul(&r,&x,&y);
     // naive_real_mul(&r,&x,&y);
