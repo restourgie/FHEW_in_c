@@ -6,6 +6,60 @@
 #include "fft/fft_negacyc.h"
 #include "fft/split_radix_fft.h"
 #include "fft/split_radix_fast.h"
+#include "fft/split_radix_non_rec.h"
+
+/******************************************************************
+*
+* SPLIT RADIX FFT NON REC MULTIPLICATION
+*
+******************************************************************/
+void split_radix_non_rec_mul(ring_t *r, const ring_t *x, const ring_t *y){
+  // printf("\n\n**************split-radix FAST**************\n");
+  cplx cplx_x,cplx_y,cplx_res;
+
+  int j = CPLXDIM;
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    cplx_x.real[i] = x->v[i];
+    cplx_y.real[i] = y->v[i];
+    cplx_x.imag[i] = x->v[j];
+    cplx_y.imag[i] = y->v[j];
+    ++j;
+  }
+  fast_twist(&cplx_x,2*REALDIM,CPLXDIM,0);
+  split_radix_512(&cplx_x);
+  
+  printf("\n\n**************X AFTER FFT**************\n");
+  print_double(&cplx_x,CPLXDIM);
+  // fast_twist(&cplx_y,2*REALDIM,CPLXDIM,0);
+
+  // split_radix_fast(&cplx_y,CPLXDIM,0);
+
+  // double a,b,c,d;
+  // for (int i = 0; i < CPLXDIM; ++i)
+  // {
+  //   a = cplx_x.real[i];
+  //     b = cplx_x.imag[i]; 
+  //     c = cplx_y.real[i];
+  //     d = cplx_y.imag[i];
+  //     //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+  //     cplx_res.real[i] = ((a*c) - (b*d))/CPLXDIM;
+  //     cplx_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
+  // }
+  // // printf("\n\n**************STARTING INVERSE**************\n");
+  // split_radix_fast_inverse(&cplx_res,CPLXDIM,0);
+  // fast_untwist(&cplx_res,2*REALDIM,CPLXDIM,0);
+  // // printf("\n\n**************MULT RES**************\n");
+  // // print_double(&cplx_res,CPLXDIM);
+
+  // j = CPLXDIM;
+  // for (int i = 0; i < CPLXDIM; ++i)
+  // {
+  //   r->v[i] = cplx_res.real[i];
+  //   r->v[j] = cplx_res.imag[i];
+  //   ++j; 
+  // }
+}
 
 /******************************************************************
 *
@@ -25,43 +79,37 @@ void split_radix_fast_mul(ring_t *r, const ring_t *x, const ring_t *y){
 		cplx_y.imag[i] = y->v[j];
 		++j;
 	}
-	// printf("\n\n**************Normal X**************\n");
-	// print_double(&cplx_x,CPLXDIM);
 	fast_twist(&cplx_x,2*REALDIM,CPLXDIM,0);
-	// printf("\n\n**************X AFTER TWIST**************\n");
-	// print_double(&cplx_x,CPLXDIM);
-
 	split_radix_fast(&cplx_x,CPLXDIM,0);
-	// printf("\n\n**************X AFTER FFT**************\n");
-	// print_double(&cplx_x,CPLXDIM);
-	fast_twist(&cplx_y,2*REALDIM,CPLXDIM,0);
+	printf("\n\n**************X FFT WORKING**************\n");
+  print_double(&cplx_x,CPLXDIM);
+ //  fast_twist(&cplx_y,2*REALDIM,CPLXDIM,0);
+	// split_radix_fast(&cplx_y,CPLXDIM,0);
 
-	split_radix_fast(&cplx_y,CPLXDIM,0);
+	// double a,b,c,d;
+	// for (int i = 0; i < CPLXDIM; ++i)
+	// {
+	// 	a = cplx_x.real[i];
+ //  		b = cplx_x.imag[i];	
+ //  		c = cplx_y.real[i];
+ //  		d = cplx_y.imag[i];
+ //    	//(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+ //    	cplx_res.real[i] = ((a*c) - (b*d))/CPLXDIM;
+ //    	cplx_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
+	// }
+	// // printf("\n\n**************STARTING INVERSE**************\n");
+	// split_radix_fast_inverse(&cplx_res,CPLXDIM,0);
+	// fast_untwist(&cplx_res,2*REALDIM,CPLXDIM,0);
+	// // printf("\n\n**************MULT RES**************\n");
+	// // print_double(&cplx_res,CPLXDIM);
 
-	double a,b,c,d;
-	for (int i = 0; i < CPLXDIM; ++i)
-	{
-		a = cplx_x.real[i];
-  		b = cplx_x.imag[i];	
-  		c = cplx_y.real[i];
-  		d = cplx_y.imag[i];
-    	//(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
-    	cplx_res.real[i] = ((a*c) - (b*d))/CPLXDIM;
-    	cplx_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
-	}
-	// printf("\n\n**************STARTING INVERSE**************\n");
-	split_radix_fast_inverse(&cplx_res,CPLXDIM,0);
-	fast_untwist(&cplx_res,2*REALDIM,CPLXDIM,0);
-	// printf("\n\n**************MULT RES**************\n");
-	// print_double(&cplx_res,CPLXDIM);
-
-	j = CPLXDIM;
-	for (int i = 0; i < CPLXDIM; ++i)
-	{
-		r->v[i] = cplx_res.real[i];
-		r->v[j] = cplx_res.imag[i];
-		++j; 
-	}
+	// j = CPLXDIM;
+	// for (int i = 0; i < CPLXDIM; ++i)
+	// {
+	// 	r->v[i] = cplx_res.real[i];
+	// 	r->v[j] = cplx_res.imag[i];
+	// 	++j; 
+	// }
 }
 
 /******************************************************************
