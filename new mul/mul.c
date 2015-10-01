@@ -1,14 +1,18 @@
 #include <complex.h>
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 #include "mul.h"
 #include "fft/fft_negacyc.h"
 #include "fft/split_radix_fft.h"
-#include "fft/split_radix_non_rec.h"
+#include "fft/sr_precomp.h"
+#include "fft/sr_vector.h"
 
 #define W(N,k) (cexp(2.0 * M_PI * I * (double)k / (double) N))
 #define calc_cos(N,k) (cos(2.0 * M_PI * (double)k / (double) N))
 #define calc_sin(N,k) (sin(2.0 * M_PI * (double)k / (double) N))
+
+double **table;
 
 /******************************************************************
 *
@@ -46,42 +50,6 @@ void to_real(const double complex *cplx_x, ring_t *x)
   }
 }
 
-void fast_twist(cplx *cplx_x,int n,int m,int lo)
-{
-  double a,b,c,d;
-  int j = 1;
-  for (int i = lo+1; i < lo+m; ++i)
-  { 
-    a = cplx_x->real[i];
-    b = cplx_x->imag[i];  
-    c = calc_cos(n,j);
-    d = calc_sin(n,j);
-     
-    //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
-    cplx_x->real[i] = (a*c) - (b*d);
-    cplx_x->imag[i] = (a*d) + (b*c);
-    ++j;
-  }
-}
-
-void fast_untwist(cplx *cplx_x,int n,int m,int lo)
-{
-  double a,b,c,d;
-  int j = 1;
-  for (int i = lo+1; i < lo+m; ++i)
-  {
-    a = cplx_x->real[i];
-    b = cplx_x->imag[i];  
-    c = calc_cos(n,j);
-    d = -calc_sin(n,j);
-     
-    //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
-    cplx_x->real[i] = (a*c) - (b*d);
-    cplx_x->imag[i] = (a*d) + (b*c);
-    ++j;
-  }
-}
-
 void twist(double complex *cplx_x,int n,int m,int lo)
 {
   // printf("n = %d, m = %d, lo = %d\n",n,m,lo );
@@ -93,7 +61,6 @@ void twist(double complex *cplx_x,int n,int m,int lo)
     ++j;
   }
 }
-
 
 void untwist(double complex *cplx_x,int n,int m,int lo)
 {
@@ -109,10 +76,102 @@ void untwist(double complex *cplx_x,int n,int m,int lo)
 
 /******************************************************************
 *
-* SPLIT RADIX FFT NON REC MULTIPLICATION
+* LOOKUPTABLE TWIST
 *
 ******************************************************************/
-void split_radix_non_rec_mul(ring_t *r, const ring_t *x, const ring_t *y){
+void table_twist(cplx *cplx_x,int n,int m,int lo)
+{
+  double a,b,c,d;
+  int j = 1, scale = ROOTDIM/n;
+  for (int i = lo+1; i < lo+m; ++i)
+  { 
+    a = cplx_x->real[i];
+    b = cplx_x->imag[i];  
+    c = table[0][scale*j];
+    d = table[1][scale*j];
+     
+    //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+    cplx_x->real[i] = (a*c) - (b*d);
+    cplx_x->imag[i] = (a*d) + (b*c);
+    ++j;
+  }
+}
+
+void table_untwist(cplx *cplx_x,int n,int m,int lo)
+{
+  double a,b,c,d;
+  int j = 1, scale = ROOTDIM/n;
+  for (int i = lo+1; i < lo+m; ++i)
+  {
+    a = cplx_x->real[i];
+    b = cplx_x->imag[i];  
+    c = table[0][scale*j];
+    d = -table[1][scale*j];
+     
+    //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+    cplx_x->real[i] = (a*c) - (b*d);
+    cplx_x->imag[i] = (a*d) + (b*c);
+    ++j;
+  }
+}
+
+void init_table(){
+  table = malloc(sizeof *table * 2);
+  table[0] = malloc(sizeof *table[0] *ROOTDIM);
+  table[1] = malloc(sizeof *table[1] *ROOTDIM);
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    table[0][i] = calc_cos(ROOTDIM,i);
+    table[1][i] = calc_sin(ROOTDIM,i);
+  }
+}
+
+/******************************************************************
+*
+* LOOKUPTABLE VECTOR TWIST
+*
+******************************************************************/
+void vector_twist(cplx *cplx_x,int n,int m,int lo)
+{
+  double a,b,c,d;
+  int j = 1, scale = ROOTDIM/n;
+  for (int i = lo+1; i < lo+m; ++i)
+  { 
+    a = cplx_x->real[i];
+    b = cplx_x->imag[i];  
+    c = table[0][scale*j];
+    d = table[1][scale*j];
+     
+    //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+    cplx_x->real[i] = (a*c) - (b*d);
+    cplx_x->imag[i] = (a*d) + (b*c);
+    ++j;
+  }
+}
+
+void vector_untwist(cplx *cplx_x,int n,int m,int lo)
+{
+  double a,b,c,d;
+  int j = 1, scale = ROOTDIM/n;
+  for (int i = lo+1; i < lo+m; ++i)
+  {
+    a = cplx_x->real[i];
+    b = cplx_x->imag[i];  
+    c = table[0][scale*j];
+    d = -table[1][scale*j];
+     
+    //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+    cplx_x->real[i] = (a*c) - (b*d);
+    cplx_x->imag[i] = (a*d) + (b*c);
+    ++j;
+  }
+}
+/******************************************************************
+*
+* SPLIT RADIX PRECOMPUTED AND VECTORIZED FFT MULTIPLICATION
+*
+******************************************************************/
+void sr_vector_mul(ring_t *r, const ring_t *x, const ring_t *y){
   // printf("\n\n**************split-radix FAST**************\n");
   cplx cplx_x,cplx_y,cplx_res;
 
@@ -125,39 +184,92 @@ void split_radix_non_rec_mul(ring_t *r, const ring_t *x, const ring_t *y){
     cplx_y.imag[i] = y->v[j];
     ++j;
   }
-  fast_twist(&cplx_x,2*REALDIM,CPLXDIM,0);
-  split_radix_512(&cplx_x);
+  table_twist(&cplx_x,ROOTDIM,CPLXDIM,0);
+  sr_vector(&cplx_x,CPLXDIM,0);
   
-  printf("\n\n**************X AFTER FFT**************\n");
-  print_double(&cplx_x,CPLXDIM);
-  // fast_twist(&cplx_y,2*REALDIM,CPLXDIM,0);
+  // printf("\n\n**************X AFTER FFT**************\n");
+  // print_double(&cplx_x,CPLXDIM);
+  table_twist(&cplx_y,ROOTDIM,CPLXDIM,0);
 
-  // split_radix_fast(&cplx_y,CPLXDIM,0);
+  sr_vector(&cplx_y,CPLXDIM,0);
 
-  // double a,b,c,d;
-  // for (int i = 0; i < CPLXDIM; ++i)
-  // {
-  //   a = cplx_x.real[i];
-  //     b = cplx_x.imag[i]; 
-  //     c = cplx_y.real[i];
-  //     d = cplx_y.imag[i];
-  //     //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
-  //     cplx_res.real[i] = ((a*c) - (b*d))/CPLXDIM;
-  //     cplx_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
-  // }
+  double a,b,c,d;
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+      a = cplx_x.real[i];
+      b = cplx_x.imag[i]; 
+      c = cplx_y.real[i];
+      d = cplx_y.imag[i];
+      //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+      cplx_res.real[i] = ((a*c) - (b*d))/CPLXDIM;
+      cplx_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
+  }
   // // printf("\n\n**************STARTING INVERSE**************\n");
-  // split_radix_fast_inverse(&cplx_res,CPLXDIM,0);
-  // fast_untwist(&cplx_res,2*REALDIM,CPLXDIM,0);
+  sr_vector_inverse(&cplx_res,CPLXDIM,0);
+  table_untwist(&cplx_res,ROOTDIM,CPLXDIM,0);
   // // printf("\n\n**************MULT RES**************\n");
   // // print_double(&cplx_res,CPLXDIM);
 
-  // j = CPLXDIM;
-  // for (int i = 0; i < CPLXDIM; ++i)
-  // {
-  //   r->v[i] = cplx_res.real[i];
-  //   r->v[j] = cplx_res.imag[i];
-  //   ++j; 
-  // }
+  j = CPLXDIM;
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    r->v[i] = cplx_res.real[i];
+    r->v[j] = cplx_res.imag[i];
+    ++j; 
+  }
+}
+
+/******************************************************************
+*
+* SPLIT RADIX PRECOMPUTED FFT MULTIPLICATION
+*
+******************************************************************/
+void sr_precomp_mul(ring_t *r, const ring_t *x, const ring_t *y){
+  // printf("\n\n**************split-radix FAST**************\n");
+  cplx cplx_x,cplx_y,cplx_res;
+
+  int j = CPLXDIM;
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    cplx_x.real[i] = x->v[i];
+    cplx_y.real[i] = y->v[i];
+    cplx_x.imag[i] = x->v[j];
+    cplx_y.imag[i] = y->v[j];
+    ++j;
+  }
+  table_twist(&cplx_x,ROOTDIM,CPLXDIM,0);
+  sr_precomp(&cplx_x,CPLXDIM,0);
+  
+  // printf("\n\n**************X AFTER FFT**************\n");
+  // print_double(&cplx_x,CPLXDIM);
+  table_twist(&cplx_y,ROOTDIM,CPLXDIM,0);
+
+  sr_precomp(&cplx_y,CPLXDIM,0);
+
+  double a,b,c,d;
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+      a = cplx_x.real[i];
+      b = cplx_x.imag[i]; 
+      c = cplx_y.real[i];
+      d = cplx_y.imag[i];
+      //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+      cplx_res.real[i] = ((a*c) - (b*d))/CPLXDIM;
+      cplx_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
+  }
+  // // printf("\n\n**************STARTING INVERSE**************\n");
+  sr_precomp_inverse(&cplx_res,CPLXDIM,0);
+  table_untwist(&cplx_res,ROOTDIM,CPLXDIM,0);
+  // // printf("\n\n**************MULT RES**************\n");
+  // // print_double(&cplx_res,CPLXDIM);
+
+  j = CPLXDIM;
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    r->v[i] = cplx_res.real[i];
+    r->v[j] = cplx_res.imag[i];
+    ++j; 
+  }
 }
 
 /******************************************************************
@@ -182,27 +294,48 @@ void split_radix_mul(ring_t *r, const ring_t *x, const ring_t *y)
   twist(cplx_y,2*REALDIM,CPLXDIM,0);
 
   split_radix_recursive(cplx_x,CPLXDIM,0);
-  printf("\n\n**************FFT X**************\n");
-  print_complex(cplx_x,CPLXDIM);
+  // printf("\n\n**************FFT X**************\n");
+  // print_complex(cplx_x,CPLXDIM);
 
-  // split_radix_recursive(cplx_y,CPLXDIM,0);
+  split_radix_recursive(cplx_y,CPLXDIM,0);
 
-  // for (int i = 0; i < CPLXDIM; ++i)
-  // {
-  //   cplx_res[i] = (cplx_x[i] * cplx_y[i])/CPLXDIM;
-  // }
-  // split_radix_recursive_inverse(cplx_res,CPLXDIM,0);
-  // untwist(cplx_res,2*REALDIM,CPLXDIM,0);
-  // // printf("\n\n**************split-radix FFT MUL RESULT**************\n");
-  // // print_complex(cplx_res,CPLXDIM);
- 
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    cplx_res[i] = (cplx_x[i] * cplx_y[i])/CPLXDIM;
+  }
+  split_radix_recursive_inverse(cplx_res,CPLXDIM,0);
+  untwist(cplx_res,2*REALDIM,CPLXDIM,0);
+  // printf("\n\n**************split-radix FFT MUL RESULT**************\n");
+  // print_complex(cplx_res,CPLXDIM);
 
-  // to_real(cplx_res,r);
+  to_real(cplx_res,r);
 }
 
 void normal_fft_mul(ring_t *r, const ring_t *x, const ring_t *y)
 {
-	smart_complex_mul(r,x,y);
+  double complex cplx_x[CPLXDIM];
+  double complex cplx_y[CPLXDIM];
+  double complex cplx_res[CPLXDIM];
+
+  to_complex(x,cplx_x);
+  to_complex(y,cplx_y);
+
+  double complex root = I;
+  root = csqrt(root);
+  
+  recursive_phi(cplx_x,CPLXDIM,0,root);
+  recursive_phi(cplx_y,CPLXDIM,0,root);
+
+
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    cplx_res[i] = (cplx_x[i] * cplx_y[i])/CPLXDIM;
+  }
+
+  inverse_phi(cplx_res,CPLXDIM,0,root);
+  // printf("\n\n**************SMART COMPLEX MUL RESULT**************\n");
+  // print_complex(cplx_res,CPLXDIM);
+  to_real(cplx_res,r);
 }
 
 /******************************************************************

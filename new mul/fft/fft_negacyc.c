@@ -51,31 +51,3 @@ void recursive_phi(double complex *x,int n,int lo,double complex root)
     recursive_phi(x,m,lo + m,csqrt(-root));
   }
 }
-
-
-void smart_complex_mul(ring_t *r, const ring_t *x, const ring_t *y)
-{
-	double complex cplx_x[CPLXDIM];
-	double complex cplx_y[CPLXDIM];
-	double complex cplx_res[CPLXDIM];
-
-	to_complex(x,cplx_x);
-	to_complex(y,cplx_y);
-
-	double complex root = I;
-	root = csqrt(root);
-	
-	recursive_phi(cplx_x,CPLXDIM,0,root);
-	recursive_phi(cplx_y,CPLXDIM,0,root);
-
-
-	for (int i = 0; i < CPLXDIM; ++i)
-	{
-		cplx_res[i] = (cplx_x[i] * cplx_y[i])/CPLXDIM;
-	}
-
-	inverse_phi(cplx_res,CPLXDIM,0,root);
-  // printf("\n\n**************SMART COMPLEX MUL RESULT**************\n");
-  // print_complex(cplx_res,CPLXDIM);
-	to_real(cplx_res,r);
-}

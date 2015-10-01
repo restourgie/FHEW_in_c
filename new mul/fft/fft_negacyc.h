@@ -3,6 +3,7 @@
 
 #include "../mul.h"
 
-void smart_complex_mul(ring_t *r, const ring_t *x, const ring_t *y);
+void inverse_phi(double complex *x,int n,int lo,double complex root);
+void recursive_phi(double complex *x,int n,int lo,double complex root);
 
 #endif

@@ -16,7 +16,8 @@ void rand_test(){
   ring_t r,re,x,y;
   int n,i;
   int success = 0;
-  
+  init_table();
+
   for(n=0;n<NTESTS;n++)
   { 
 
@@ -60,13 +61,9 @@ void rand_test(){
     // y.v[14] = 149;
     // y.v[15] = 77;
 
-    // normal_FFT_mul(&re,&x,&y);
-    // split_radix_FFT_mul(&re,&x,&y);
-    // twisted_FFT_mul(&r,&x,&y);
-    // naive_cyclic_real_mul(&r,&x,&y);
+    // normal_fft_mul(&r,&x,&y);
     split_radix_mul(&re,&x,&y);
-    split_radix_non_rec_mul(&re,&x,&y);
-    // smart_complex_mul(&r,&x,&y);
+    sr_precomp_mul(&r,&x,&y);
     // naive_complex_mul(&r,&x,&y);
     // naive_real_mul(&r,&x,&y);
     bool error = false;
