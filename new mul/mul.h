@@ -21,6 +21,12 @@ typedef struct {
 	double imag[CPLXDIM];
 } cplx;
 
+typedef struct
+{	
+	double *real;
+	double *imag;
+}cplx_ptr;
+
 void print_complex(const double complex *a, int N);
 void print_double(const cplx *x,int N);
 void to_complex(const ring_t *x, double complex *cplx_x);

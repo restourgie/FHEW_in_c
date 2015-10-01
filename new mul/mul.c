@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <immintrin.h>
 #include "mul.h"
 #include "fft/fft_negacyc.h"
 #include "fft/split_radix_fft.h"
@@ -131,25 +132,26 @@ void init_table(){
 * LOOKUPTABLE VECTOR TWIST
 *
 ******************************************************************/
-void vector_twist(cplx *cplx_x,int n,int m,int lo)
+void vector_twist(cplx_ptr *cplx_x,int n,int m,int lo)
 {
   double a,b,c,d;
-  int j = 1, scale = ROOTDIM/n;
-  for (int i = lo+1; i < lo+m; ++i)
+  __m256d real_x,imag_x,real_tbl,imag_tbl;
+  int j = 0, scale = ROOTDIM/n;
+  for (int i = lo+1; i < lo+m; i+=4)
   { 
-    a = cplx_x->real[i];
-    b = cplx_x->imag[i];  
-    c = table[0][scale*j];
-    d = table[1][scale*j];
+    real_x = _mm256_load_pd(cplx_x->real+i);
+    imag_x = _mm256_load_pd(cplx_x->imag+i);
+    real_tbl = _mm256_load_pd(table[0][scale*j]);
+    imag_tbl = _mm256_load_pd(table[1][scale*j]);
      
     //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
     cplx_x->real[i] = (a*c) - (b*d);
     cplx_x->imag[i] = (a*d) + (b*c);
-    ++j;
+    j+=4;
   }
 }
 
-void vector_untwist(cplx *cplx_x,int n,int m,int lo)
+void vector_untwist(cplx_ptr *cplx_x,int n,int m,int lo)
 {
   double a,b,c,d;
   int j = 1, scale = ROOTDIM/n;
@@ -173,7 +175,13 @@ void vector_untwist(cplx *cplx_x,int n,int m,int lo)
 ******************************************************************/
 void sr_vector_mul(ring_t *r, const ring_t *x, const ring_t *y){
   // printf("\n\n**************split-radix FAST**************\n");
-  cplx cplx_x,cplx_y,cplx_res;
+  cplx_ptr cplx_x,cplx_y,cplx_res;
+  cplx_x.real = (double*)aligned_alloc(64, CPLXDIM * sizeof(double));
+  cplx_x.imag = (double*)aligned_alloc(64, CPLXDIM * sizeof(double));
+  cplx_y.real = (double*)aligned_alloc(64, CPLXDIM * sizeof(double));
+  cplx_y.imag = (double*)aligned_alloc(64, CPLXDIM * sizeof(double));
+  cplx_res.real = (double*)aligned_alloc(64, CPLXDIM * sizeof(double));
+  cplx_res.imag = (double*)aligned_alloc(64, CPLXDIM * sizeof(double));
 
   int j = CPLXDIM;
   for (int i = 0; i < CPLXDIM; ++i)
@@ -184,12 +192,12 @@ void sr_vector_mul(ring_t *r, const ring_t *x, const ring_t *y){
     cplx_y.imag[i] = y->v[j];
     ++j;
   }
-  table_twist(&cplx_x,ROOTDIM,CPLXDIM,0);
+  vector_twist(&cplx_x,ROOTDIM,CPLXDIM,0);
   sr_vector(&cplx_x,CPLXDIM,0);
   
   // printf("\n\n**************X AFTER FFT**************\n");
   // print_double(&cplx_x,CPLXDIM);
-  table_twist(&cplx_y,ROOTDIM,CPLXDIM,0);
+  vector_twist(&cplx_y,ROOTDIM,CPLXDIM,0);
 
   sr_vector(&cplx_y,CPLXDIM,0);
 
@@ -206,7 +214,7 @@ void sr_vector_mul(ring_t *r, const ring_t *x, const ring_t *y){
   }
   // // printf("\n\n**************STARTING INVERSE**************\n");
   sr_vector_inverse(&cplx_res,CPLXDIM,0);
-  table_untwist(&cplx_res,ROOTDIM,CPLXDIM,0);
+  vector_untwist(&cplx_res,ROOTDIM,CPLXDIM,0);
   // // printf("\n\n**************MULT RES**************\n");
   // // print_double(&cplx_res,CPLXDIM);
 
