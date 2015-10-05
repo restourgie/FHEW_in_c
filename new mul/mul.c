@@ -117,13 +117,16 @@ void table_untwist(cplx *cplx_x,int n,int m,int lo)
 }
 
 void init_table(){
-  table = malloc(sizeof *table * 2);
-  table[0] = malloc(sizeof *table[0] *ROOTDIM);
-  table[1] = malloc(sizeof *table[1] *ROOTDIM);
+
+  table = malloc(sizeof *table * 3);
+  table[0] = (double*)aligned_alloc(64, ROOTDIM * sizeof(double));
+  table[1] = (double*)aligned_alloc(64, ROOTDIM * sizeof(double));
+  table[2] = (double*)aligned_alloc(64, ROOTDIM * sizeof(double));
   for (int i = 0; i < CPLXDIM; ++i)
   {
     table[0][i] = calc_cos(ROOTDIM,i);
     table[1][i] = calc_sin(ROOTDIM,i);
+    table[2][i] = -table[1][i];
   }
 }
 
@@ -134,37 +137,44 @@ void init_table(){
 ******************************************************************/
 void vector_twist(cplx_ptr *cplx_x,int n,int m,int lo)
 {
-  double a,b,c,d;
-  __m256d real_x,imag_x,real_tbl,imag_tbl;
+  __m256d real_x,imag_x,real_tbl,imag_tbl,imag_temp,real_temp;
   int j = 0, scale = ROOTDIM/n;
   for (int i = lo+1; i < lo+m; i+=4)
   { 
     real_x = _mm256_load_pd(cplx_x->real+i);
     imag_x = _mm256_load_pd(cplx_x->imag+i);
-    real_tbl = _mm256_load_pd(table[0][scale*j]);
-    imag_tbl = _mm256_load_pd(table[1][scale*j]);
+    real_tbl = _mm256_load_pd(&table[0][scale*j]);
+    imag_tbl = _mm256_load_pd(&table[1][scale*j]);
      
     //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
-    cplx_x->real[i] = (a*c) - (b*d);
-    cplx_x->imag[i] = (a*d) + (b*c);
+    real_temp = _mm256_mul_pd(imag_x,imag_tbl);
+    imag_temp = _mm256_mul_pd(real_x,imag_tbl);
+    real_x = _mm256_fmsub_pd(real_x,real_tbl,real_temp);
+    imag_x = _mm256_fmadd_pd(imag_x,real_tbl,imag_temp);
+    _mm256_store_pd(cplx_x->real+i,real_x);
+    _mm256_store_pd(cplx_x->imag+i,imag_x);
     j+=4;
   }
 }
 
 void vector_untwist(cplx_ptr *cplx_x,int n,int m,int lo)
 {
-  double a,b,c,d;
+  __m256d real_x,imag_x,real_tbl,imag_tbl,imag_temp,real_temp;
   int j = 1, scale = ROOTDIM/n;
   for (int i = lo+1; i < lo+m; ++i)
   {
-    a = cplx_x->real[i];
-    b = cplx_x->imag[i];  
-    c = table[0][scale*j];
-    d = -table[1][scale*j];
+    real_x = _mm256_load_pd(cplx_x->real+i);
+    imag_x = _mm256_load_pd(cplx_x->imag+i);
+    real_tbl = _mm256_load_pd(&table[0][scale*j]);
+    imag_tbl = _mm256_load_pd(&table[2][scale*j]);
      
     //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
-    cplx_x->real[i] = (a*c) - (b*d);
-    cplx_x->imag[i] = (a*d) + (b*c);
+    real_temp = _mm256_mul_pd(imag_x,imag_tbl);
+    imag_temp = _mm256_mul_pd(real_x,imag_tbl);
+    real_x = _mm256_fmsub_pd(real_x,real_tbl,real_temp);
+    imag_x = _mm256_fmadd_pd(imag_x,real_tbl,imag_temp);
+    _mm256_store_pd(cplx_x->real+i,real_x);
+    _mm256_store_pd(cplx_x->imag+i,imag_x);
     ++j;
   }
 }
@@ -193,12 +203,13 @@ void sr_vector_mul(ring_t *r, const ring_t *x, const ring_t *y){
     ++j;
   }
   vector_twist(&cplx_x,ROOTDIM,CPLXDIM,0);
+  // printf("\n\n**************X AFTER TWIST**************\n");
+  // print_double(&cplx_x,CPLXDIM);
   sr_vector(&cplx_x,CPLXDIM,0);
   
   // printf("\n\n**************X AFTER FFT**************\n");
   // print_double(&cplx_x,CPLXDIM);
   vector_twist(&cplx_y,ROOTDIM,CPLXDIM,0);
-
   sr_vector(&cplx_y,CPLXDIM,0);
 
   double a,b,c,d;
