@@ -1,7 +1,7 @@
 #ifndef MUL_H
 #define MUL_H
 
-#define CPLXDIM 512
+#define CPLXDIM 8
 #define REALDIM (2*CPLXDIM)
 #define ROOTDIM (2*REALDIM)
 
@@ -35,6 +35,8 @@ void twist(double complex *cplx_x,int n,int m,int lo);
 void untwist(double complex *cplx_x,int n,int m,int lo);
 void table_twist(cplx *cplx_x,int n,int m,int lo);
 void table_untwist(cplx *cplx_x,int n,int m,int lo);
+void vector_untwist(cplx_ptr *cplx_x,int n,int m,int lo);
+void vector_twist(cplx_ptr *cplx_x,int n,int m,int lo);
 
 void init_table();
 void naive_real_mul(ring_t *r, const ring_t *x, const ring_t *y);
@@ -42,5 +44,6 @@ void naive_complex_mul(ring_t *r, const ring_t *x, const ring_t *y);
 void split_radix_mul(ring_t *r, const ring_t *x, const ring_t *y);
 void normal_fft_mul(ring_t *r, const ring_t *x, const ring_t *y);
 void sr_precomp_mul(ring_t *r, const ring_t *x, const ring_t *y);
+void sr_vector_mul(ring_t *r, const ring_t *x, const ring_t *y);
 
 #endif

@@ -24,10 +24,10 @@ void sr_vector(cplx_ptr *x,int n,int lo){
     //Go from (x^4n +1 to x^2n -1 and x^2n +1)
     for(int i=lo; i < lo+m;i+=4){
       //LOAD REAL,LOAD IMAG i AND LOAD REAL,LOAD IMAG i + m
-      real_x = _mm256_load_pd(cplx_x->real+i);
-      imag_x = _mm256_load_pd(cplx_x->imag+i);
-      real_y = _mm256_load_pd(cplx_x->real+i+m);
-      imag_y = _mm256_load_pd(cplx_x->imag+i+m);
+      real_x = _mm256_load_pd(x->real+i);
+      imag_x = _mm256_load_pd(x->imag+i);
+      real_y = _mm256_load_pd(x->real+i+m);
+      imag_y = _mm256_load_pd(x->imag+i+m);
 
       //TEMP IS X - Y 
       real_temp = _mm256_sub_pd(real_x,real_y);
@@ -37,10 +37,10 @@ void sr_vector(cplx_ptr *x,int n,int lo){
       real_x = _mm256_add_pd(real_x,real_y);
       imag_x = _mm256_add_pd(imag_x,imag_y);
 
-      _mm256_store_pd(cplx_x->real+i,real_x);
-	  _mm256_store_pd(cplx_x->imag+i,imag_x);
-	  _mm256_store_pd(cplx_x->real+i+m,real_temp);
-	  _mm256_store_pd(cplx_x->imag+i+m,imag_temp);
+      _mm256_store_pd(x->real+i,real_x);
+	  _mm256_store_pd(x->imag+i,imag_x);
+	  _mm256_store_pd(x->real+i+m,real_temp);
+	  _mm256_store_pd(x->imag+i+m,imag_temp);
     }
     //Do recursive step for (x^2n -1)
     sr_vector(x,m,lo);
@@ -53,10 +53,10 @@ void sr_vector(cplx_ptr *x,int n,int lo){
     {
 
       //LOAD REAL,LOAD IMAG i AND LOAD REAL,LOAD IMAG i + m
-      real_x = _mm256_load_pd(cplx_x->real+i);
-      imag_x = _mm256_load_pd(cplx_x->imag+i);
-      real_y = _mm256_load_pd(cplx_x->real+i+m);
-      imag_y = _mm256_load_pd(cplx_x->imag+i+m);	  
+      real_x = _mm256_load_pd(x->real+i);
+      imag_x = _mm256_load_pd(x->imag+i);
+      real_y = _mm256_load_pd(x->real+i+m);
+      imag_y = _mm256_load_pd(x->imag+i+m);	  
 
       //(a + ib) - i(c + id) = (a + ib) - (-d + ic) = (a+d + i(b-c))
       real_temp = _mm256_add_pd(real_x,imag_y);
@@ -66,10 +66,10 @@ void sr_vector(cplx_ptr *x,int n,int lo){
       real_x = _mm256_sub_pd(real_x,imag_y);
       imag_x = _mm256_add_pd(imag_x,real_y);
       
-      _mm256_store_pd(cplx_x->real+i,real_x);
-	  _mm256_store_pd(cplx_x->imag+i,imag_x);
-	  _mm256_store_pd(cplx_x->real+i+m,real_temp);
-	  _mm256_store_pd(cplx_x->imag+i+m,imag_temp);
+      _mm256_store_pd(x->real+i,real_x);
+	  _mm256_store_pd(x->imag+i,imag_x);
+	  _mm256_store_pd(x->real+i+m,real_temp);
+	  _mm256_store_pd(x->imag+i+m,imag_temp);
     }
     vector_twist(x,n,m,lo);
     sr_vector(x,m,lo);

@@ -28,8 +28,14 @@ void print_complex(const double complex *a, int N){
 
 void print_double(const cplx *x,int N){
   for (int i = 0; i < N; ++i)
-  printf("cplxpoly[%d] = %f + i * %f\n",i,x->real[i],x->imag[i]);
-    printf("\n");
+    printf("cplxpoly[%d] = %f + i * %f\n",i,x->real[i],x->imag[i]);
+  printf("\n");
+}
+
+void print_cplx(const cplx_ptr *x,int N){
+  for (int i = 0; i < N; ++i)
+    printf("cplxpoly[%d] = %f + i * %f\n",i,x->real[i],x->imag[i]);
+  printf("\n");
 }
 
 /******************************************************************
@@ -149,8 +155,14 @@ void vector_twist(cplx_ptr *cplx_x,int n,int m,int lo)
     //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
     real_temp = _mm256_mul_pd(imag_x,imag_tbl);
     imag_temp = _mm256_mul_pd(real_x,imag_tbl);
-    real_x = _mm256_fmsub_pd(real_x,real_tbl,real_temp);
-    imag_x = _mm256_fmadd_pd(imag_x,real_tbl,imag_temp);
+    //REPLACED FOR COMMENTED SECTION
+    real_x = _mm256_mul_pd(real_x,real_tbl);
+    imag_x = _mm256_mul_pd(imag_x,real_tbl);
+    real_x = _mm256_sub_pd(real_x,real_temp);
+    imag_temp = _mm256_add_pd(imag_x,imag_temp);
+    //THESE ARE NOT WORKING 
+    // real_x = _mm256_fmsub_pd(real_x,real_tbl,real_temp);
+    // imag_x = _mm256_fmadd_pd(imag_x,real_tbl,imag_temp);
     _mm256_store_pd(cplx_x->real+i,real_x);
     _mm256_store_pd(cplx_x->imag+i,imag_x);
     j+=4;
@@ -171,8 +183,14 @@ void vector_untwist(cplx_ptr *cplx_x,int n,int m,int lo)
     //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
     real_temp = _mm256_mul_pd(imag_x,imag_tbl);
     imag_temp = _mm256_mul_pd(real_x,imag_tbl);
-    real_x = _mm256_fmsub_pd(real_x,real_tbl,real_temp);
-    imag_x = _mm256_fmadd_pd(imag_x,real_tbl,imag_temp);
+    //REPLACED FOR COMMENTED SECTION
+    real_x = _mm256_mul_pd(real_x,real_tbl);
+    imag_x = _mm256_mul_pd(imag_x,real_tbl);
+    real_x = _mm256_sub_pd(real_x,real_temp);
+    imag_temp = _mm256_add_pd(imag_x,imag_temp);
+    //THESE ARE NOT WORKING 
+    // real_x = _mm256_fmsub_pd(real_x,real_tbl,real_temp);
+    // imag_x = _mm256_fmadd_pd(imag_x,real_tbl,imag_temp);
     _mm256_store_pd(cplx_x->real+i,real_x);
     _mm256_store_pd(cplx_x->imag+i,imag_x);
     ++j;
@@ -203,39 +221,39 @@ void sr_vector_mul(ring_t *r, const ring_t *x, const ring_t *y){
     ++j;
   }
   vector_twist(&cplx_x,ROOTDIM,CPLXDIM,0);
-  // printf("\n\n**************X AFTER TWIST**************\n");
-  // print_double(&cplx_x,CPLXDIM);
-  sr_vector(&cplx_x,CPLXDIM,0);
+  printf("\n\n**************X AFTER TWIST**************\n");
+  print_cplx(&cplx_x,CPLXDIM);
+  // sr_vector(&cplx_x,CPLXDIM,0);
   
-  // printf("\n\n**************X AFTER FFT**************\n");
-  // print_double(&cplx_x,CPLXDIM);
-  vector_twist(&cplx_y,ROOTDIM,CPLXDIM,0);
-  sr_vector(&cplx_y,CPLXDIM,0);
+  // // printf("\n\n**************X AFTER FFT**************\n");
+  // // print_double(&cplx_x,CPLXDIM);
+  // vector_twist(&cplx_y,ROOTDIM,CPLXDIM,0);
+  // sr_vector(&cplx_y,CPLXDIM,0);
 
-  double a,b,c,d;
-  for (int i = 0; i < CPLXDIM; ++i)
-  {
-      a = cplx_x.real[i];
-      b = cplx_x.imag[i]; 
-      c = cplx_y.real[i];
-      d = cplx_y.imag[i];
-      //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
-      cplx_res.real[i] = ((a*c) - (b*d))/CPLXDIM;
-      cplx_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
-  }
-  // // printf("\n\n**************STARTING INVERSE**************\n");
-  sr_vector_inverse(&cplx_res,CPLXDIM,0);
-  vector_untwist(&cplx_res,ROOTDIM,CPLXDIM,0);
-  // // printf("\n\n**************MULT RES**************\n");
-  // // print_double(&cplx_res,CPLXDIM);
+  // double a,b,c,d;
+  // for (int i = 0; i < CPLXDIM; ++i)
+  // {
+  //     a = cplx_x.real[i];
+  //     b = cplx_x.imag[i]; 
+  //     c = cplx_y.real[i];
+  //     d = cplx_y.imag[i];
+  //     //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+  //     cplx_res.real[i] = ((a*c) - (b*d))/CPLXDIM;
+  //     cplx_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
+  // }
+  // // // printf("\n\n**************STARTING INVERSE**************\n");
+  // sr_vector_inverse(&cplx_res,CPLXDIM,0);
+  // vector_untwist(&cplx_res,ROOTDIM,CPLXDIM,0);
+  // // // printf("\n\n**************MULT RES**************\n");
+  // // // print_double(&cplx_res,CPLXDIM);
 
-  j = CPLXDIM;
-  for (int i = 0; i < CPLXDIM; ++i)
-  {
-    r->v[i] = cplx_res.real[i];
-    r->v[j] = cplx_res.imag[i];
-    ++j; 
-  }
+  // j = CPLXDIM;
+  // for (int i = 0; i < CPLXDIM; ++i)
+  // {
+  //   r->v[i] = cplx_res.real[i];
+  //   r->v[j] = cplx_res.imag[i];
+  //   ++j; 
+  // }
 }
 
 /******************************************************************
@@ -257,38 +275,38 @@ void sr_precomp_mul(ring_t *r, const ring_t *x, const ring_t *y){
     ++j;
   }
   table_twist(&cplx_x,ROOTDIM,CPLXDIM,0);
-  sr_precomp(&cplx_x,CPLXDIM,0);
+    printf("\n\n**************X AFTER FFT**************\n");
+  print_double(&cplx_x,CPLXDIM);
+  // sr_precomp(&cplx_x,CPLXDIM,0);
   
-  // printf("\n\n**************X AFTER FFT**************\n");
-  // print_double(&cplx_x,CPLXDIM);
-  table_twist(&cplx_y,ROOTDIM,CPLXDIM,0);
+  // table_twist(&cplx_y,ROOTDIM,CPLXDIM,0);
 
-  sr_precomp(&cplx_y,CPLXDIM,0);
+  // sr_precomp(&cplx_y,CPLXDIM,0);
 
-  double a,b,c,d;
-  for (int i = 0; i < CPLXDIM; ++i)
-  {
-      a = cplx_x.real[i];
-      b = cplx_x.imag[i]; 
-      c = cplx_y.real[i];
-      d = cplx_y.imag[i];
-      //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
-      cplx_res.real[i] = ((a*c) - (b*d))/CPLXDIM;
-      cplx_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
-  }
-  // // printf("\n\n**************STARTING INVERSE**************\n");
-  sr_precomp_inverse(&cplx_res,CPLXDIM,0);
-  table_untwist(&cplx_res,ROOTDIM,CPLXDIM,0);
-  // // printf("\n\n**************MULT RES**************\n");
-  // // print_double(&cplx_res,CPLXDIM);
+  // double a,b,c,d;
+  // for (int i = 0; i < CPLXDIM; ++i)
+  // {
+  //     a = cplx_x.real[i];
+  //     b = cplx_x.imag[i]; 
+  //     c = cplx_y.real[i];
+  //     d = cplx_y.imag[i];
+  //     //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+  //     cplx_res.real[i] = ((a*c) - (b*d))/CPLXDIM;
+  //     cplx_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
+  // }
+  // // // printf("\n\n**************STARTING INVERSE**************\n");
+  // sr_precomp_inverse(&cplx_res,CPLXDIM,0);
+  // table_untwist(&cplx_res,ROOTDIM,CPLXDIM,0);
+  // // // printf("\n\n**************MULT RES**************\n");
+  // // // print_double(&cplx_res,CPLXDIM);
 
-  j = CPLXDIM;
-  for (int i = 0; i < CPLXDIM; ++i)
-  {
-    r->v[i] = cplx_res.real[i];
-    r->v[j] = cplx_res.imag[i];
-    ++j; 
-  }
+  // j = CPLXDIM;
+  // for (int i = 0; i < CPLXDIM; ++i)
+  // {
+  //   r->v[i] = cplx_res.real[i];
+  //   r->v[j] = cplx_res.imag[i];
+  //   ++j; 
+  // }
 }
 
 /******************************************************************

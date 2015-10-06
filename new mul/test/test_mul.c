@@ -27,22 +27,22 @@ void rand_test(){
     }
 
 
-    // x.v[0] = 58;
-    // x.v[1] =37;
-    // x.v[2] =238;
-    // x.v[3] =155;
-    // x.v[4] =1;
-    // x.v[5] =153;
-    // x.v[6] =239;
-    // x.v[7] =69;
-    // x.v[8] =239;
-    // x.v[9] =152;
-    // x.v[10] =60;
-    // x.v[11] =43;
-    // x.v[12] =148;
-    // x.v[13] = 235;
-    // x.v[14] = 149;
-    // x.v[15] = 77;
+    x.v[0] = 58;
+    x.v[1] =37;
+    x.v[2] =238;
+    x.v[3] =155;
+    x.v[4] =1;
+    x.v[5] =153;
+    x.v[6] =239;
+    x.v[7] =69;
+    x.v[8] =239;
+    x.v[9] =152;
+    x.v[10] =60;
+    x.v[11] =43;
+    x.v[12] =148;
+    x.v[13] = 235;
+    x.v[14] = 149;
+    x.v[15] = 77;
 
     // y.v[0] = 58;
     // y.v[1] =37;
@@ -63,7 +63,8 @@ void rand_test(){
 
     // normal_fft_mul(&r,&x,&y);
     split_radix_mul(&re,&x,&y);
-    sr_precomp_mul(&r,&x,&y);
+    // sr_precomp_mul(&r,&x,&y);
+    sr_vector_mul(&r,&x,&y);
     // naive_complex_mul(&r,&x,&y);
     // naive_real_mul(&r,&x,&y);
     bool error = false;
