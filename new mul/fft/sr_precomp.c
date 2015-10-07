@@ -24,7 +24,7 @@ void sr_precomp(cplx *x,int n,int lo)
   }
   else if(n > 2){
     int m = n/2;
-    //Go from (x^4n +1 to x^2n -1 and x^2n +1)
+    //Go from (x^4n-1 to x^2n -1 and x^2n +1)
     for(int i=lo; i < lo+m;++i){
       temp_real = x->real[i];
       temp_im = x->imag[i];
