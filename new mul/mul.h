@@ -40,6 +40,7 @@ void table_untwist(cplx *cplx_x,int n,int m,int lo);
 void vector_twist(cplx_ptr *cplx_x,int n,int m,int lo);
 void vector_untwist(cplx_ptr *cplx_x,int n,int m,int lo);
 
+
 void init_table();
 void init_table_vctr();
 void naive_real_mul(ring_t *r, const ring_t *x, const ring_t *y);

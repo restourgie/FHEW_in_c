@@ -26,16 +26,22 @@ void print_complex(const double complex *a, int N){
     printf("\n");
 }
 
-void print_cplx(cplx_ptr x,int n){
-  for (int i = 0; i < n; ++i)
-    printf("cplxpoly[%d] = %f + i * %f\n",i,x.real[i],x.imag[i]);
-  printf("\n");
-}
+// void print_cplx(cplx_ptr x,int n){
+//   for (int i = 0; i < n; ++i)
+//     printf("cplxpoly[%d] = %f + i * %f\n",i,x.real[i],x.imag[i]);
+//   printf("\n");
+// }
 
 void print_double(const cplx *x,int N){
   for (int i = 0; i < N; ++i)
-  printf("cplxpoly[%d] = %f + i * %f\n",i,x->real[i],x->imag[i]);
-    printf("\n");
+    printf("cplxpoly[%d] = %f + i * %f\n",i,x->real[i],x->imag[i]);
+  printf("\n");
+}
+
+void print_cplx(const cplx_ptr *x,int N){
+  for (int i = 0; i < N; ++i)
+    printf("cplxpoly[%d] = %f + i * %f\n",i,x->real[i],x->imag[i]);
+  printf("\n");
 }
 
 /******************************************************************
@@ -345,8 +351,9 @@ void sr_precomp_mul(ring_t *r, const ring_t *x, const ring_t *y){
     ++j;
   }
   table_twist(&cplx_x,ROOTDIM,CPLXDIM,0);
-  sr_precomp(&cplx_x,CPLXDIM,0);
-  
+    // printf("\n\n**************X AFTER FFT**************\n");
+  // print_double(&cplx_x,CPLXDIM);
+  // sr_precomp(&cplx_x,CPLXDIM,0);
   // printf("\n\n**************X AFTER FFT**************\n");
   // print_double(&cplx_x,CPLXDIM);
   table_twist(&cplx_y,ROOTDIM,CPLXDIM,0);
