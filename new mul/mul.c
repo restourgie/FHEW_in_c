@@ -8,6 +8,7 @@
 #include "fft/split_radix_fft.h"
 #include "fft/sr_precomp.h"
 #include "fft/sr_vector.h"
+#include "fft/fftw.h"
 
 /******************************************************************
 *
@@ -56,6 +57,30 @@ void init(){
   init_table_vctr();
   //PRECOMP TABLES FOR PRECOMP FFT
   init_table();
+  //PRECOMP FFTW
+  FFTsetup();
+}
+
+/******************************************************************
+*
+* FFTW MULTIPLICATION
+*
+******************************************************************/
+void fftw_mul(ring_t *r, const ring_t *x, const ring_t *y){
+  double complex cplx_x[CPLXDIM+1];
+  double complex cplx_y[CPLXDIM+1];
+  double complex cplx_res[CPLXDIM+1];
+
+  FFTWforward(cplx_x,x);
+  FFTWforward(cplx_y,y);
+
+  for (int i = 0; i < CPLXDIM+1; ++i)
+  {
+    cplx_res[i] = cplx_x[i] * cplx_y[i];
+  }
+
+  FFTWbackward(r,cplx_res);
+
 }
 
 /******************************************************************

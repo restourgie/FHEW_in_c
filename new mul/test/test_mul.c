@@ -28,7 +28,8 @@ void rand_test(){
     // normal_fft_mul(&r,&x,&y);
     // split_radix_mul(&re,&x,&y);
     sr_vector_mul(&r,&x,&y);
-    sr_precomp_mul(&re,&x,&y);
+    fftw_mul(&re,&x,&y);
+    // sr_precomp_mul(&re,&x,&y);
     // naive_complex_mul(&r,&x,&y);
     // naive_real_mul(&r,&x,&y);
     bool error = false;
