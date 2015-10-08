@@ -4,7 +4,7 @@
 #include <immintrin.h>
 #include "../mul.h"
 
-double **table;
+double **LUT1,**LUT2,**LUT3;
 
 /*
 * This function initializes the lookup tables(LUTs) 
@@ -524,4 +524,36 @@ void sr_vector_inverse(cplx_ptr *x,int n,int lo){
     _mm_store_pd(x->real+lo+m,real_temp_small);
     _mm_store_pd(x->imag+lo+m,imag_temp_small);
   }
+}
+
+void fft_vector_forward(cplx_ptr *cplx_res, const ring_t *x){
+  int j = CPLXDIM;
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    cplx_res->real[i] = x->v[i];
+    cplx_res->imag[i] = x->v[j];
+    ++j;
+  }
+  // print_cplx(cplx_res,CPLXDIM);
+  vector_twist(cplx_res,ROOTDIM,CPLXDIM,0);
+  // print_cplx(cplx_res,CPLXDIM);
+  sr_vector(cplx_res,CPLXDIM,0);
+  // print_cplx(cplx_res,CPLXDIM);
+}
+
+void fft_vector_backward(cplx_ptr *cplx_x,ring_t *res)
+{
+  // print_cplx(cplx_x,CPLXDIM);
+  sr_vector_inverse(cplx_x,CPLXDIM,0);
+  // print_cplx(cplx_x,CPLXDIM);
+  vector_untwist(cplx_x,ROOTDIM,CPLXDIM,0);
+  // print_cplx(cplx_x,CPLXDIM);
+  int j = CPLXDIM;
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    res->v[i] = cplx_x->real[i]/CPLXDIM;
+    res->v[j] = cplx_x->imag[i]/CPLXDIM;
+    ++j; 
+  }
+  
 }

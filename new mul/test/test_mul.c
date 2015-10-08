@@ -46,41 +46,41 @@ void rand_test(){
       x.v[i] = fgetc(urandom);
       y.v[i] = fgetc(urandom);
     }
-    // start = rdtsc();
-    // normal_fft_mul(&r,&x,&y);
+    start = rdtsc();
+    // normal_fft_mul(&re,&x,&y);
     // split_radix_mul(&re,&x,&y);
     sr_vector_mul(&r,&x,&y);
-    fftw_mul(&re,&x,&y);
+    // fftw_mul(&re,&x,&y);
     // sr_precomp_mul(&re,&x,&y);
     // naive_complex_mul(&r,&x,&y);
     // naive_real_mul(&r,&x,&y);
-    // end = rdtsc();
-    bool error = false;
+    end = rdtsc();
+    // bool error = false;
     
-    for(i=0;i<REALDIM;i++)
-    {
+    // for(i=0;i<REALDIM;i++)
+    // {
 
-      if(myabs(r.v[i] - re.v[i]) > THRESHOLD){
-        printf("school: %u \n", re.v[i]);
-        printf("mine: %u \n",r.v[i]);
-        printf("difference: %u\n\n",myabs(r.v[i] - re.v[i]));
-        error = true;
-      }
+    //   if(myabs(r.v[i] - re.v[i]) > THRESHOLD){
+    //     printf("school: %u \n", re.v[i]);
+    //     printf("mine: %u \n",r.v[i]);
+    //     printf("difference: %u\n\n",myabs(r.v[i] - re.v[i]));
+    //     error = true;
+    //   }
       
-    }
-    if(!error)
-      success++;
-    // cycles[n] = end - start;
+    // }
+    // if(!error)
+    //   success++;
+    cycles[n] = end - start;
   }
   // printf("Ammount of successful multiplications: %d\n", success);
 
   fclose(urandom);
-  // qsort(cycles,sizeof(cycles)/sizeof(*cycles),sizeof(*cycles),compare);
-  // for (int i = 0; i < NTESTS; ++i)
-  // {
-	 //  printf("%lu\n",cycles[i]); //<< "index[" << i << "] : "
-  // }
-  // printf("middle: %lu\n",cycles[499]);
+  qsort(cycles,sizeof(cycles)/sizeof(*cycles),sizeof(*cycles),compare);
+  for (int i = 0; i < NTESTS; ++i)
+  {
+	  printf("%lu\n",cycles[i]); //<< "index[" << i << "] : "
+  }
+  printf("middle: %lu\n",cycles[499]);
 
 }
 
