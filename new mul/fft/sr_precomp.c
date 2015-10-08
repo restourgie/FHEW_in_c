@@ -177,3 +177,20 @@ void sr_precomp_inverse(cplx *x,int n,int lo)
     }
   }
 }
+
+void fft_precompsr_forward(cplx *x){
+  table_twist(x,ROOTDIM,CPLXDIM,0);
+  sr_precomp(x,CPLXDIM,0);
+}
+
+void fft_precompsr_backward(cplx *x,ring_t *r){
+  sr_precomp_inverse(x,CPLXDIM,0);
+  table_untwist(x,ROOTDIM,CPLXDIM,0);
+  int j = CPLXDIM;
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    r->v[i] = x->real[i];
+    r->v[j] = x->imag[i];
+    ++j; 
+  }
+}

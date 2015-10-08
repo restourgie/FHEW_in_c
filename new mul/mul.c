@@ -10,7 +10,7 @@
 #include "fft/sr_vector.h"
 #include "fft/fftw.h"
 
-
+cplx_ptr vec_x,vec_y,vec_res;
 
 /******************************************************************
 *
@@ -61,6 +61,12 @@ void init(){
   init_table();
   //PRECOMP FFTW
   FFTsetup();
+  posix_memalign((void**)&vec_x.real,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vec_x.imag,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vec_y.real,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vec_y.imag,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vec_res.real,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vec_res.imag,32, CPLXDIM * sizeof(double));
 }
 
 /******************************************************************
@@ -92,27 +98,28 @@ void fftw_mul(ring_t *r, const ring_t *x, const ring_t *y){
 ******************************************************************/
 void sr_vector_mul(ring_t *r, const ring_t *x, const ring_t *y){
   // printf("\n\n**************split-radix FAST**************\n");
-  cplx_ptr cplx_x,cplx_y,cplx_res;
-  posix_memalign((void**)&cplx_x.real,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&cplx_x.imag,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&cplx_y.real,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&cplx_y.imag,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&cplx_res.real,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&cplx_res.imag,32, CPLXDIM * sizeof(double));
+  int j = CPLXDIM;
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    vec_x.real[i] = x->v[i];
+    vec_x.imag[i] = x->v[j];
+    
+    vec_y.real[i] = y->v[i];
+    vec_y.imag[i] = y->v[j]; 
+    ++j;
+  }
 
-
-  fft_vector_forward(&cplx_x,x);
-  // print_cplx(&cplx_x,CPLXDIM);
-  fft_vector_forward(&cplx_y,y);
+  fft_vector_forward(&vec_x);
+  fft_vector_forward(&vec_y);
   
   __m256d real_x,imag_x,real_y,imag_y,imag_temp,real_temp;
   // double a,b,c,d;
   for (int i = 0; i < CPLXDIM; i+=4)
   {
-    real_x = _mm256_load_pd(cplx_x.real+i);
-    imag_x = _mm256_load_pd(cplx_x.imag+i);
-    real_y = _mm256_load_pd(cplx_y.real+i);
-    imag_y = _mm256_load_pd(cplx_y.imag+i);
+    real_x = _mm256_load_pd(vec_x.real+i);
+    imag_x = _mm256_load_pd(vec_x.imag+i);
+    real_y = _mm256_load_pd(vec_y.real+i);
+    imag_y = _mm256_load_pd(vec_y.imag+i);
 
     //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
     //real_temp = bd
@@ -131,20 +138,19 @@ void sr_vector_mul(ring_t *r, const ring_t *x, const ring_t *y){
     //THESE ARE NOT WORKING 
     // real_x = _mm256_fmsub_pd(real_x,real_tbl,real_temp);
     // imag_x = _mm256_fmadd_pd(imag_x,real_tbl,imag_temp);
-    _mm256_store_pd(cplx_res.real+i,real_x);
-    _mm256_store_pd(cplx_res.imag+i,imag_x);
+    _mm256_store_pd(vec_res.real+i,real_x);
+    _mm256_store_pd(vec_res.imag+i,imag_x);
 
-    // a = cplx_x.real[i];
-    // b = cplx_x.imag[i]; 
-    // c = cplx_y.real[i];
-    // d = cplx_y.imag[i];
+    // a = vec_x.real[i];
+    // b = vec_x.imag[i]; 
+    // c = vec_y.real[i];
+    // d = vec_y.imag[i];
     // //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
-    // cplx_res.real[i] = ((a*c) - (b*d))/CPLXDIM;
-    // cplx_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
+    // vec_res.real[i] = ((a*c) - (b*d))/CPLXDIM;
+    // vec_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
   }
-  // print_cplx(&cplx_res,CPLXDIM);
-  fft_vector_backward(&cplx_res,r);
-  
+  // print_cplx(&vec_res,CPLXDIM);
+  fft_vector_backward(&vec_res,r); 
 }
 
 /******************************************************************
@@ -153,7 +159,6 @@ void sr_vector_mul(ring_t *r, const ring_t *x, const ring_t *y){
 *
 ******************************************************************/
 void sr_precomp_mul(ring_t *r, const ring_t *x, const ring_t *y){
-  // printf("\n\n**************split-radix FAST**************\n");
   cplx cplx_x,cplx_y,cplx_res;
 
   int j = CPLXDIM;
@@ -165,11 +170,9 @@ void sr_precomp_mul(ring_t *r, const ring_t *x, const ring_t *y){
     cplx_y.imag[i] = y->v[j];
     ++j;
   }
-  table_twist(&cplx_x,ROOTDIM,CPLXDIM,0);
-  sr_precomp(&cplx_x,CPLXDIM,0);
-
-  table_twist(&cplx_y,ROOTDIM,CPLXDIM,0);
-  sr_precomp(&cplx_y,CPLXDIM,0);
+  
+  fft_precompsr_forward(&cplx_x);
+  fft_precompsr_forward(&cplx_y);
 
   double a,b,c,d;
   for (int i = 0; i < CPLXDIM; ++i)
@@ -182,19 +185,7 @@ void sr_precomp_mul(ring_t *r, const ring_t *x, const ring_t *y){
       cplx_res.real[i] = ((a*c) - (b*d))/CPLXDIM;
       cplx_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
   }
-  // // printf("\n\n**************STARTING INVERSE**************\n");
-  sr_precomp_inverse(&cplx_res,CPLXDIM,0);
-  table_untwist(&cplx_res,ROOTDIM,CPLXDIM,0);
-  // // printf("\n\n**************MULT RES**************\n");
-  // print_double(&cplx_res,CPLXDIM);
-
-  j = CPLXDIM;
-  for (int i = 0; i < CPLXDIM; ++i)
-  {
-    r->v[i] = cplx_res.real[i];
-    r->v[j] = cplx_res.imag[i];
-    ++j; 
-  }
+  fft_precompsr_backward(&cplx_res,r);
 }
 
 /******************************************************************
@@ -211,20 +202,14 @@ void split_radix_mul(ring_t *r, const ring_t *x, const ring_t *y)
   to_complex(x,cplx_x);
   to_complex(y,cplx_y);
 
-  
-  twist(cplx_x,ROOTDIM,CPLXDIM,0);
-  split_radix_recursive(cplx_x,CPLXDIM,0);
-
-  twist(cplx_y,ROOTDIM,CPLXDIM,0);
-  split_radix_recursive(cplx_y,CPLXDIM,0);
-
+  fft_sr_forward(cplx_x);
+  fft_sr_forward(cplx_y);
 
   for (int i = 0; i < CPLXDIM; ++i)
   {
     cplx_res[i] = (cplx_x[i] * cplx_y[i])/CPLXDIM;
   }
-  split_radix_recursive_inverse(cplx_res,CPLXDIM,0);
-  untwist(cplx_res,ROOTDIM,CPLXDIM,0);
+  fft_sr_backward(cplx_res);
 
   to_real(cplx_res,r);
 }
@@ -256,8 +241,7 @@ void normal_fft_mul(ring_t *r, const ring_t *x, const ring_t *y)
   }
 
   inverse_phi(cplx_res,CPLXDIM,0,root);
-  // printf("\n\n**************SMART COMPLEX MUL RESULT**************\n");
-  // print_complex(cplx_res,CPLXDIM);
+
   to_real(cplx_res,r);
 }
 
@@ -310,12 +294,9 @@ void naive_complex_mul(ring_t *r, const ring_t *x, const ring_t *y)
       big[i+j] += cplx_x[i] * cplx_y[j];    
 
   for(int i=CPLXDIM;i<REALDIM;++i){
-    // printf("%f + i%f\n",creal(big[i+512]),cimag(big[i+512]));
     t = big[i] * (0+I*1);
-    // printf("%f + i%f\n",creal(t),cimag(t));
     cplx_res[i-CPLXDIM] = big[i-CPLXDIM] + t;
   }
-  // printf("\n\n**************NAIVE COMPLEX CALC**************\n");
-  // print_complex(cplx_res,CPLXDIM);
+
   to_real(cplx_res,r);   
 }

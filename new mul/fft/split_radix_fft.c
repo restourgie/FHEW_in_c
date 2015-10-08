@@ -118,3 +118,15 @@ void split_radix_recursive_inverse(double complex *x,int n,int lo)
   }
 }
 
+void fft_sr_forward(double complex *x)
+{
+  twist(x,ROOTDIM,CPLXDIM,0);
+  split_radix_recursive(x,CPLXDIM,0);
+}
+
+void fft_sr_backward(double complex *x)
+{
+  split_radix_recursive_inverse(x,CPLXDIM,0);
+  untwist(x,ROOTDIM,CPLXDIM,0);
+}
+
