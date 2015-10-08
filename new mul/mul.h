@@ -9,6 +9,10 @@
     #define M_PI 3.14159265358979323846
 #endif
 
+#define W(N,k) (cexp(2.0 * M_PI * I * (double)k / (double) N))
+#define calc_cos(N,k) (cos(2.0 * M_PI * (double)k / (double) N))
+#define calc_sin(N,k) (sin(2.0 * M_PI * (double)k / (double) N))
+
 #include <stdint.h>
 #include <complex.h>
 
@@ -31,18 +35,10 @@ double **LUT1,**LUT2,**LUT3;
 
 void print_complex(const double complex *a, int N);
 void print_double(const cplx *x,int N);
-void to_complex(const ring_t *x, double complex *cplx_x);
-void to_real(const double complex *cplx_x, ring_t *x);
-void twist(double complex *cplx_x,int n,int m,int lo);
-void untwist(double complex *cplx_x,int n,int m,int lo);
-void table_twist(cplx *cplx_x,int n,int m,int lo);
-void table_untwist(cplx *cplx_x,int n,int m,int lo);
-void vector_twist(cplx_ptr *cplx_x,int n,int m,int lo);
-void vector_untwist(cplx_ptr *cplx_x,int n,int m,int lo);
+//void to_complex(const ring_t *x, double complex *cplx_x);
+//void to_real(const double complex *cplx_x, ring_t *x);
 
-
-void init_table();
-void init_table_vctr();
+void init();
 void naive_real_mul(ring_t *r, const ring_t *x, const ring_t *y);
 void naive_complex_mul(ring_t *r, const ring_t *x, const ring_t *y);
 void split_radix_mul(ring_t *r, const ring_t *x, const ring_t *y);

@@ -1,7 +1,64 @@
 #include <complex.h>
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 #include "../mul.h"
+
+double **table;
+
+void init_table(){
+  table = malloc(sizeof *table * 3);
+  table[0] = malloc(ROOTDIM * sizeof(double));
+  table[1] = malloc(ROOTDIM * sizeof(double));
+  table[2] = malloc(ROOTDIM * sizeof(double));
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    table[0][i] = calc_cos(ROOTDIM,i);
+    table[1][i] = calc_sin(ROOTDIM,i);
+    table[2][i] = -table[1][i];
+  }
+}
+
+/******************************************************************
+*
+* LOOKUPTABLE TWIST
+*
+******************************************************************/
+void table_twist(cplx *cplx_x,int n,int m,int lo)
+{
+  double a,b,c,d;
+  int j = 1, scale = ROOTDIM/n;
+  for (int i = lo+1; i < lo+m; ++i)
+  { 
+    a = cplx_x->real[i];
+    b = cplx_x->imag[i];  
+    c = table[0][scale*j];
+    d = table[1][scale*j];
+     
+    //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+    cplx_x->real[i] = (a*c) - (b*d);
+    cplx_x->imag[i] = (a*d) + (b*c);
+    ++j;
+  }
+}
+
+void table_untwist(cplx *cplx_x,int n,int m,int lo)
+{
+  double a,b,c,d;
+  int j = 1, scale = ROOTDIM/n;
+  for (int i = lo+1; i < lo+m; ++i)
+  {
+    a = cplx_x->real[i];
+    b = cplx_x->imag[i];  
+    c = table[0][scale*j];
+    d = -table[1][scale*j];
+     
+    //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+    cplx_x->real[i] = (a*c) - (b*d);
+    cplx_x->imag[i] = (a*d) + (b*c);
+    ++j;
+  }
+}
 
 /******************************************************************
 *

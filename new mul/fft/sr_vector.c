@@ -4,6 +4,146 @@
 #include <immintrin.h>
 #include "../mul.h"
 
+double **table;
+
+/*
+* This function initializes the lookup tables(LUTs) 
+* We calculate all the roots of unity for 8,16,32,64,128,256 and 512
+* We also calculate the first 512 roots of unity for 2048 
+* This is needed for Bernsteins trick (x^512-i) equals (x^512-1) when twisted
+* with the roots of 2048
+*/
+void init_table_vctr(){
+
+  int size = 8, j=8;
+  LUT1 = malloc(sizeof *LUT1 * size);
+  LUT2 = malloc(sizeof *LUT2 * size);
+  LUT3 = malloc(sizeof *LUT3 * size);
+  for (int i = 0; i < size-1; ++i)
+  {
+    posix_memalign((void**)&LUT1[i],32, j * sizeof(double));
+    posix_memalign((void**)&LUT2[i],32, j * sizeof(double));
+    posix_memalign((void**)&LUT3[i],32, j * sizeof(double));
+    for (int root = 0; root < j; ++root)
+    {
+      LUT1[i][root] = calc_cos(j,root);
+      LUT2[i][root] = calc_sin(j,root);
+      LUT3[i][root] = -LUT2[i][root];
+    }
+    j = j<<1;
+  }
+  posix_memalign((void**)&LUT1[7],32, 512 * sizeof(double));
+  posix_memalign((void**)&LUT2[7],32, 512 * sizeof(double));
+  posix_memalign((void**)&LUT3[7],32, 512 * sizeof(double));
+  
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+      LUT1[7][i] = calc_cos(ROOTDIM,i);
+      LUT2[7][i] = calc_sin(ROOTDIM,i);
+      LUT3[7][i] = -LUT2[7][i]; 
+  }
+}
+
+/******************************************************************
+*
+* LOOKUPTABLES FOR VECTOR TWIST
+*
+******************************************************************/
+void vector_twist(cplx_ptr *cplx_x,int n,int m,int lo)
+{
+  __m256d real_x,imag_x,real_tbl,imag_tbl,imag_temp,real_temp;
+  int j = 0, scale;
+  if(n==ROOTDIM)
+    scale = 7;
+  else
+    scale = log2(n)-3;
+  for (int i = lo; i < lo+m; i+=4)
+  { 
+    // for (int bla = j; bla < j+4; ++bla)
+    // {
+    //   printf("root= %f + i * %f\n",table[0][scale*bla],table[1][scale*bla]);
+    // }
+    real_x = _mm256_load_pd(cplx_x->real+i);
+    imag_x = _mm256_load_pd(cplx_x->imag+i);
+    real_tbl = _mm256_load_pd(&LUT1[scale][j]);
+    imag_tbl = _mm256_load_pd(&LUT2[scale][j]);
+     
+    //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+    //real_temp = bd
+    real_temp = _mm256_mul_pd(imag_x,imag_tbl);
+    //imag_temp = ad
+    imag_temp = _mm256_mul_pd(real_x,imag_tbl);
+    //REPLACED FOR COMMENTED SECTION
+    //real_x = ac
+    real_x = _mm256_mul_pd(real_x,real_tbl);
+    //imag_x = bc
+    imag_x = _mm256_mul_pd(imag_x,real_tbl);
+    //real_x = ac - bd => real_x - real_temp
+    real_x = _mm256_sub_pd(real_x,real_temp);
+    //imag_x = ad + bc => imag_temp + imag_x
+    imag_x = _mm256_add_pd(imag_x,imag_temp);
+    //THESE ARE NOT WORKING 
+    // real_x = _mm256_fmsub_pd(real_x,real_tbl,real_temp);
+    // imag_x = _mm256_fmadd_pd(imag_x,real_tbl,imag_temp);
+    _mm256_store_pd(cplx_x->real+i,real_x);
+    _mm256_store_pd(cplx_x->imag+i,imag_x);
+    j+=4;
+  }
+}
+
+void vector_untwist(cplx_ptr *cplx_x,int n,int m,int lo)
+{
+  __m256d real_x,imag_x,real_tbl,imag_tbl,imag_temp,real_temp;
+  int j = 0, scale;
+  if(n==ROOTDIM)
+    scale = 7;
+  else
+    scale = log2(n)-3;
+  for (int i = lo; i < lo+m; i+=4)
+  { 
+    // for (int bla = j; bla < j+4; ++bla)
+    // {
+    //   printf("root= %f + i * %f\n",table[0][scale*bla],table[1][scale*bla]);
+    // }
+    real_x = _mm256_load_pd(cplx_x->real+i);
+    imag_x = _mm256_load_pd(cplx_x->imag+i);
+    real_tbl = _mm256_load_pd(&LUT1[scale][j]);
+    imag_tbl = _mm256_load_pd(&LUT3[scale][j]);
+     
+    //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+    //real_temp = bd
+    real_temp = _mm256_mul_pd(imag_x,imag_tbl);
+    //imag_temp = ad
+    imag_temp = _mm256_mul_pd(real_x,imag_tbl);
+    //REPLACED FOR COMMENTED SECTION
+    //real_x = ac
+    real_x = _mm256_mul_pd(real_x,real_tbl);
+    //imag_x = bc
+    imag_x = _mm256_mul_pd(imag_x,real_tbl);
+
+    //real_x = ac - bd => real_x - real_temp
+    real_x = _mm256_sub_pd(real_x,real_temp);
+    //imag_x = ad + bc => imag_temp + imag_x
+    imag_x = _mm256_add_pd(imag_x,imag_temp);
+    //THESE ARE NOT WORKING 
+    // real_x = _mm256_fmsub_pd(real_x,real_tbl,real_temp);
+    // imag_x = _mm256_fmadd_pd(imag_x,real_tbl,imag_temp);
+    _mm256_store_pd(cplx_x->real+i,real_x);
+    _mm256_store_pd(cplx_x->imag+i,imag_x);
+    j+=4;
+  }
+}
+
+/******************************************************************
+*
+* FFT FORWARD WITH VECTORISATION
+* THIS FFT HAS 3 CASES FOR THE MOST OPTIMAL FFT
+* FOR SIZE 4 WHERE EACH CASE IS HANDLED INDIVIDUALLY
+* FOR SIZE 8 WHERE THE LEFT BRANCH CAN BE RECURSIVLY CALLED
+* AND THE RIGHT BRANCH IS HANLED IN THE MOST EFFICTIENT WAY
+* FOR SIZE 16 AND LARGER THAT IS THE GENERAL CASE AND CAN DO RECURSIVE CALLS DOWN 
+*
+******************************************************************/
 void sr_vector(cplx_ptr *x,int n,int lo){
   double temp_real,temp_im;
   __m256d real_x,imag_x,real_y,imag_y,imag_temp,real_temp;
@@ -189,6 +329,16 @@ void sr_vector(cplx_ptr *x,int n,int lo){
   }
 }
 
+/******************************************************************
+*
+* FFT BACKWARD WITH VECTORISATION
+* THIS FFT HAS 3 CASES FOR THE MOST OPTIMAL FFT
+* FOR SIZE 4 WHERE EACH CASE IS HANDLED INDIVIDUALLY
+* FOR SIZE 8 WHERE THE LEFT BRANCH CAN BE RECURSIVLY CALLED
+* AND THE RIGHT BRANCH IS HANLED IN THE MOST EFFICTIENT WAY
+* FOR SIZE 16 AND LARGER THAT IS THE GENERAL CASE AND CAN DO RECURSIVE CALLS DOWN 
+*
+******************************************************************/
 void sr_vector_inverse(cplx_ptr *x,int n,int lo){
   double temp_real,temp_im;
   __m256d real_x,imag_x,real_y,imag_y,imag_temp,real_temp;
