@@ -1,0 +1,23 @@
+#include <stdint.h>
+#include <algorithm>
+#include <vector>
+
+uint64_t start,end; 
+vector<uint64_t> cycles(1000);
+
+for (int bla = 0; bla < 1000; ++bla)
+{
+  fprintf(stderr,"index[%d]\n",bla);
+  
+  start = rdtsc();
+
+
+  end = rdtsc();
+  cycles[bla] = end - start;
+}
+sort(cycles.begin(),cycles.end(),compare);
+for (int i = 0; i < 1000; ++i)
+{
+  fprintf(stderr,"%lu\n",cycles[i]); //<< "index[" << i << "] : "
+}
+fprintf(stderr,"middle: %lu",cycles[499]);

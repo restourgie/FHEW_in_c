@@ -8,6 +8,9 @@
 #include "fft/split_radix_fft.h"
 #include "fft/sr_precomp.h"
 #include "fft/sr_vector.h"
+#include "fft/fftw.h"
+
+
 
 /******************************************************************
 *
@@ -56,6 +59,30 @@ void init(){
   init_table_vctr();
   //PRECOMP TABLES FOR PRECOMP FFT
   init_table();
+  //PRECOMP FFTW
+  FFTsetup();
+}
+
+/******************************************************************
+*
+* FFTW MULTIPLICATION
+*
+******************************************************************/
+void fftw_mul(ring_t *r, const ring_t *x, const ring_t *y){
+  double complex cplx_x[CPLXDIM+1];
+  double complex cplx_y[CPLXDIM+1];
+  double complex cplx_res[CPLXDIM+1];
+
+  FFTWforward(cplx_x,x);
+  FFTWforward(cplx_y,y);
+
+  for (int i = 0; i < CPLXDIM+1; ++i)
+  {
+    cplx_res[i] = cplx_x[i] * cplx_y[i];
+  }
+
+  FFTWbackward(r,cplx_res);
+
 }
 
 /******************************************************************
@@ -73,47 +100,51 @@ void sr_vector_mul(ring_t *r, const ring_t *x, const ring_t *y){
   posix_memalign((void**)&cplx_res.real,32, CPLXDIM * sizeof(double));
   posix_memalign((void**)&cplx_res.imag,32, CPLXDIM * sizeof(double));
 
-  int j = CPLXDIM;
-  for (int i = 0; i < CPLXDIM; ++i)
+
+  fft_vector_forward(&cplx_x,x);
+  // print_cplx(&cplx_x,CPLXDIM);
+  fft_vector_forward(&cplx_y,y);
+  
+  __m256d real_x,imag_x,real_y,imag_y,imag_temp,real_temp;
+  // double a,b,c,d;
+  for (int i = 0; i < CPLXDIM; i+=4)
   {
-    cplx_x.real[i] = x->v[i];
-    cplx_y.real[i] = y->v[i];
-    cplx_x.imag[i] = x->v[j];
-    cplx_y.imag[i] = y->v[j];
-    ++j;
+    real_x = _mm256_load_pd(cplx_x.real+i);
+    imag_x = _mm256_load_pd(cplx_x.imag+i);
+    real_y = _mm256_load_pd(cplx_y.real+i);
+    imag_y = _mm256_load_pd(cplx_y.imag+i);
+
+    //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+    //real_temp = bd
+    real_temp = _mm256_mul_pd(imag_x,imag_y);
+    //imag_temp = ad
+    imag_temp = _mm256_mul_pd(real_x,imag_y);
+    //REPLACED FOR COMMENTED SECTION
+    //real_x = ac
+    real_x = _mm256_mul_pd(real_x,real_y);
+    //imag_x = bc
+    imag_x = _mm256_mul_pd(imag_x,real_y);
+    //real_x = ac - bd => real_x - real_temp
+    real_x = _mm256_sub_pd(real_x,real_temp);
+    //imag_x = ad + bc => imag_temp + imag_x
+    imag_x = _mm256_add_pd(imag_x,imag_temp);
+    //THESE ARE NOT WORKING 
+    // real_x = _mm256_fmsub_pd(real_x,real_tbl,real_temp);
+    // imag_x = _mm256_fmadd_pd(imag_x,real_tbl,imag_temp);
+    _mm256_store_pd(cplx_res.real+i,real_x);
+    _mm256_store_pd(cplx_res.imag+i,imag_x);
+
+    // a = cplx_x.real[i];
+    // b = cplx_x.imag[i]; 
+    // c = cplx_y.real[i];
+    // d = cplx_y.imag[i];
+    // //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+    // cplx_res.real[i] = ((a*c) - (b*d))/CPLXDIM;
+    // cplx_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
   }
-  vector_twist(&cplx_x,ROOTDIM,CPLXDIM,0);
-  sr_vector(&cplx_x,CPLXDIM,0);
-
-
-  vector_twist(&cplx_y,ROOTDIM,CPLXDIM,0);
-  sr_vector(&cplx_y,CPLXDIM,0);
-  // print_cplx(cplx_y,CPLXDIM);
-
-  double a,b,c,d;
-  for (int i = 0; i < CPLXDIM; ++i)
-  {
-      a = cplx_x.real[i];
-      b = cplx_x.imag[i]; 
-      c = cplx_y.real[i];
-      d = cplx_y.imag[i];
-      //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
-      cplx_res.real[i] = ((a*c) - (b*d))/CPLXDIM;
-      cplx_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
-  }
-  // // printf("\n\n**************STARTING INVERSE**************\n");
-  sr_vector_inverse(&cplx_res,CPLXDIM,0);
-  vector_untwist(&cplx_res,ROOTDIM,CPLXDIM,0);
-  // printf("\n\n**************MULT RES**************\n");
-  // print_cplx(cplx_res,CPLXDIM);
-
-  j = CPLXDIM;
-  for (int i = 0; i < CPLXDIM; ++i)
-  {
-    r->v[i] = cplx_res.real[i];
-    r->v[j] = cplx_res.imag[i];
-    ++j; 
-  }
+  // print_cplx(&cplx_res,CPLXDIM);
+  fft_vector_backward(&cplx_res,r);
+  
 }
 
 /******************************************************************
