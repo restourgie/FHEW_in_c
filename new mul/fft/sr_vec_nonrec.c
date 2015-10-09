@@ -5,8 +5,24 @@
 #include "../mul.h"
 
 #define NRLAYERS 8
-int layer_size[NRLAYERS];
-int **locations;
+int layer_size[NRLAYERS] = {1,1,3,5,11,21,43,85};
+
+int locations[NRLAYERS][85] = 
+{
+	{0},
+	{0},
+	{0, 256, 384},
+	{0, 128, 192, 256, 384},
+	{0,64, 96, 128, 192, 256, 320, 352, 384, 448, 480},
+	{0, 32, 48,64, 96, 128, 160, 176, 192, 224, 240,  256, 288, 304, 320, 352, 384, 416, 432, 448, 480},
+	{0, 16, 24, 32, 48,64, 80, 88, 96, 112, 120, 128, 144, 152, 160, 176, 192, 208, 216, 224, 240, 256, 
+	272, 280, 288, 304, 320, 336, 344, 352, 368, 376, 384, 400, 408, 416, 432, 448, 464, 472, 480, 496, 504},
+	{0, 8, 12, 16, 24, 32, 40, 44, 48, 56, 60, 64, 72, 76, 80, 88, 96, 104, 108, 112, 120, 128, 136, 140, 
+	144, 152, 160, 168, 172, 176, 184, 188, 192, 200, 204, 208, 216, 224, 232, 236, 240, 248, 252, 256, 264, 268, 272, 280, 
+	288, 296, 300, 304, 312, 316, 320, 328, 332, 336, 344, 352, 360, 364, 368, 376, 384, 392, 396, 400, 408, 416, 424, 428, 
+	432, 440, 444, 448, 456, 460, 464, 472, 480, 488, 492, 496, 504}
+};
+
 double **LUT1,**LUT2,**LUT3;
 
 /*
@@ -20,24 +36,6 @@ double **LUT1,**LUT2,**LUT3;
 */
 void init_vctr()
 {
-	layer_size = {1,1,3,5,11,21,43,85};
-	locations = malloc(sizeof *locations * NRLAYERS);
-	for (int i = 0; i < NRLAYERS; ++i)
-		locations[i] = malloc(sizeof(int) * layer_size[i]);
-
-	locations[0] = {0}; //512
-	locations[1] = {0}; //256
-	locations[2] = {0, 256, 384}; //128
-	locations[3] = {0, 128, 192, 256, 384}; //64
-	locations[4] = {0,64, 96, 128, 192, 256, 320, 352, 384, 448, 480};//32
-	locations[5] = {0, 32, 48,64, 96, 128, 160, 176, 192, 224, 240,  256, 288, 304, 320, 352, 384, 416, 432, 448, 480}; //16
-	locations[6] = {0, 16, 24, 32, 48,64, 80, 88, 96, 112, 120, 128, 144, 152, 160, 176, 192, 208, 216, 224, 240, 256, 
-		272, 280, 288, 304, 320, 336, 344, 352, 368, 376, 384, 400, 408, 416, 432, 448, 464, 472, 480, 496, 504};//8
-	locations[7] = {0, 8, 12, 16, 24, 32, 40, 44, 48, 56, 60, 64, 72, 76, 80, 88, 96, 104, 108, 112, 120, 128, 136, 140, 
-	144, 152, 160, 168, 172, 176, 184, 188, 192, 200, 204, 208, 216, 224, 232, 236, 240, 248, 252, 256, 264, 268, 272, 280, 
-	288, 296, 300, 304, 312, 316, 320, 328, 332, 336, 344, 352, 360, 364, 368, 376, 384, 392, 396, 400, 408, 416, 424, 428, 
-	432, 440, 444, 448, 456, 460, 464, 472, 480, 488, 492, 496, 504};//4
-
 	int size = 8, j=8;
 	LUT1 = malloc(sizeof *LUT1 * size);
 	LUT2 = malloc(sizeof *LUT2 * size);
@@ -72,7 +70,7 @@ void init_vctr()
 * LOOKUPTABLES FOR VECTOR TWIST
 *
 ******************************************************************/
-void vector_twist(cplx_ptr *cplx_x,int n,int m,int lo)
+void vec_twist(cplx_ptr *cplx_x,int n,int m,int lo)
 {
   __m256d real_x,imag_x,real_tbl,imag_tbl,imag_temp,real_temp;
   int j = 0, scale;
@@ -114,7 +112,7 @@ void vector_twist(cplx_ptr *cplx_x,int n,int m,int lo)
   }
 }
 
-void vector_untwist(cplx_ptr *cplx_x,int n,int m,int lo)
+void vec_untwist(cplx_ptr *cplx_x,int n,int m,int lo)
 {
   __m256d real_x,imag_x,real_tbl,imag_tbl,imag_temp,real_temp;
   int j = 0, scale;
@@ -218,8 +216,8 @@ void sr_vector_nonrec(cplx_ptr *x,int n)
 		      _mm256_store_pd(x->real+i+m,real_temp);
 		      _mm256_store_pd(x->imag+i+m,imag_temp);
 		    }
-		    vector_twist(x,new_n,m,lo);
-		    vector_untwist(x,new_n,m,lo+m);
+		    vec_twist(x,new_n,m,lo);
+		    vec_untwist(x,new_n,m,lo+m);
 		}
 		new_n = new_n>>1;
 	}
@@ -342,7 +340,7 @@ void sr_vector_nonrec(cplx_ptr *x,int n)
 	}
 }
 
-void fft_vector_forward(cplx_ptr *x){
-  vector_twist(x,ROOTDIM,CPLXDIM,0);
+void fft_vector_nonrec_forward(cplx_ptr *x){
+  vec_twist(x,ROOTDIM,CPLXDIM,0);
   sr_vector_nonrec(x,CPLXDIM);
 }
