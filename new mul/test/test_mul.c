@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #define NTESTS 1000
-#define NALGO 5
+#define NALGO 6
 #define THRESHOLD 2
 
 uint32_t myabs(uint32_t a)
@@ -44,13 +44,15 @@ void rand_test(){
       x.v[i] = fgetc(urandom);
       y.v[i] = fgetc(urandom);
     }
-    normal_fft_mul(&re,&x,&y);
+    // normal_fft_mul(&re,&x,&y);
     // split_radix_mul(&re,&x,&y);
     sr_vector_mul(&r,&x,&y);
+    sr_vector_nonrec_mul(&re,&x,&y);
     // fftw_mul(&re,&x,&y);
     // sr_precomp_mul(&re,&x,&y);
     // naive_complex_mul(&r,&x,&y);
     // naive_real_mul(&r,&x,&y);
+    // test(&re,&x,&y);
     bool error = false;
     
     for(i=0;i<REALDIM;i++)
@@ -114,6 +116,11 @@ void cycle_meassure(){
         fftw_mul(&r,&x,&y);
         end = rdtsc();
       }
+      else if(j == 5){
+        start = rdtsc();
+        sr_vector_nonrec_mul(&r,&x,&y);
+        end = rdtsc();
+      }
       cycles[n] = end - start;
     }
     qsort(cycles,sizeof(cycles)/sizeof(*cycles),sizeof(*cycles),compare);
@@ -127,6 +134,8 @@ void cycle_meassure(){
       printf("Median Split Radix VECTORIZED: %llu\n",cycles[499]);
     else if(j == 4)
       printf("Median FFTW: %llu\n",cycles[499]);
+    else if(j == 5)
+      printf("Median Split Radix VECTORIZED NON RECURSIVE: %llu\n",cycles[499]);
   }
 
   fclose(urandom); 

@@ -226,7 +226,7 @@ void sr_vector_nonrec(cplx_ptr *x,int n)
 	for (int count = 0; count < layer_size[6]; ++count)
 	{
 		lo = locations[6][count];
-		int m = 4;
+		m = 4;
 	    //Go from (x^8+1) to (x^4-1) and (x^4+1)
 	    //LOAD REAL,LOAD IMAG i AND LOAD REAL,LOAD IMAG i + m
 	    real_x = _mm256_load_pd(x->real+lo);
@@ -340,7 +340,218 @@ void sr_vector_nonrec(cplx_ptr *x,int n)
 	}
 }
 
+void sr_vector_nonrec_inverse(cplx_ptr *x)
+{
+	int new_n =16,lo,m;
+	double temp_real,temp_im;
+  __m256d real_x,imag_x,real_y,imag_y,imag_temp,real_temp;
+  __m128d real_x_small,imag_x_small,imag_y_small,real_y_small,imag_temp_small,real_temp_small;
+
+  // FIRST WE WILL DO ALL LAYERS OF 4
+  for (int count = 0; count < layer_size[7]; ++count)
+	{
+		lo = locations[7][count];
+		m = 2;
+	    //We will first do the LEFT branch
+	    temp_real = x->real[lo];
+	    temp_im = x->imag[lo];
+	    x->real[lo] = temp_real + x->real[lo+1];
+	    x->imag[lo] = temp_im + x->imag[lo+1];
+	    x->real[lo+1] = temp_real - x->real[lo+1];
+	    x->imag[lo+1] = temp_im - x->imag[lo+1];
+	    //Now we do the RIGHT branch
+	    lo = lo+m;
+	    temp_real = x->real[lo];
+	    temp_im = x->imag[lo];
+	    //x->real[lo] = a-d, x->imag[lo] = b+c, x->real[lo+1] = a+d, x->imag[lo+1] = b-c
+	    //2a = (a-d)+(a+d), 2b = (b+c)+(b-c), 2c = (b+c)-(b-c), 2d = (a+d)-(a-d) 
+	    x->real[lo]   = temp_real     + x->real[lo+1];
+	    x->imag[lo]   = temp_im       + x->imag[lo+1];
+	    temp_real     = x->real[lo+1] - temp_real;
+	    x->real[lo+1] = temp_im       - x->imag[lo+1];
+	    x->imag[lo+1] = temp_real;
+	    //NOW WE WILL TIE EVERYTHING TOGETHER WE WILL GO FROM (x^2-1) and (x^2+1) TO (x^4-1)
+	    lo = lo-m;
+	    real_x_small = _mm_load_pd(x->real+lo);
+	    imag_x_small = _mm_load_pd(x->imag+lo);
+	    real_y_small = _mm_load_pd(x->real+lo+m);
+	    imag_y_small = _mm_load_pd(x->imag+lo+m);
+
+	    real_temp_small = _mm_sub_pd(real_x_small,real_y_small);
+	    imag_temp_small = _mm_sub_pd(imag_x_small,imag_y_small);
+	    real_x_small = _mm_add_pd(real_x_small,real_y_small);
+	    imag_x_small = _mm_add_pd(imag_x_small,imag_y_small);
+
+	    _mm_store_pd(x->real+lo,real_x_small);
+	    _mm_store_pd(x->imag+lo,imag_x_small);
+	    _mm_store_pd(x->real+lo+m,real_temp_small);
+	    _mm_store_pd(x->imag+lo+m,imag_temp_small);
+	}
+	//NOW WE WILL DO ALL LAYERS OF 8
+	for (int count = 0; count < layer_size[6]; ++count)
+	{
+		lo = locations[6][count];
+		m   = 2;
+	    lo  = lo+4;
+	    int other_lo = lo+m; 
+	    //WE CAN NOW START THE FFT BY TIEING TOGETHER (x-1) and (x+1) to (x^2-1)
+	    //LEFT PART
+	    temp_real = x->real[lo];
+	    temp_im = x->imag[lo];
+	    x->real[lo] = temp_real + x->real[lo+1];
+	    x->imag[lo] = temp_im + x->imag[lo+1];
+	    x->real[lo+1] = temp_real - x->real[lo+1];
+	    x->imag[lo+1] = temp_im - x->imag[lo+1];
+	    //RIGHT PART
+	    temp_real = x->real[other_lo];
+	    temp_im = x->imag[other_lo];
+	    x->real[other_lo] = temp_real + x->real[other_lo+1];
+	    x->imag[other_lo] = temp_im + x->imag[other_lo+1];
+	    x->real[other_lo+1] = temp_real - x->real[other_lo+1];
+	    x->imag[other_lo+1] = temp_im - x->imag[other_lo+1];
+	    //NOW WE NEED TO DO A MANUAL TWIST TO GO FROM (x^2-1) to (x^2-i) and (x^2-1) to (x^2+i)
+	    //WE DO AN INVERSE TWIST ON THE LEFT PART TO GO FROM (x^2-1) to (x^2-i)
+	    temp_real = (x->real[lo+1] * LUT1[0][1]) - (x->imag[lo+1] * LUT3[0][1]);//ac -bd
+	    x->imag[lo+1] = (x->real[lo+1] * LUT3[0][1]) + (x->imag[lo+1] * LUT1[0][1]);
+	    x->real[lo+1] = temp_real;
+	    //WE DO AN FORWARD TWIST ON THE RIGHT PART TO GO FROM (x^2-1) to (x^2+i)
+	    temp_real = (x->real[other_lo+1] * LUT1[0][1]) - (x->imag[other_lo+1] * LUT2[0][1]);//ac -bd
+	    x->imag[other_lo+1] = (x->real[other_lo+1] * LUT2[0][1]) + (x->imag[other_lo+1] * LUT1[0][1]);
+	    x->real[other_lo+1] = temp_real;
+	    //WE NOW NEED TO TIE (x^2-i) and (x^2+i) TOGETHER TO FORM (X^4+1)
+	    //real_temp = a-d, imag_temp = b+c, real_y = a+d, imag_y = b-c
+	    //2a = (a-d)+(a+d), 2b = (b+c)+(b-c), 2c = (b+c)-(b-c), 2d = (a+d)-(a-d) 
+	    //LOAD REAL,LOAD IMAG i AND LOAD REAL,LOAD IMAG i + m
+	    real_temp_small = _mm_load_pd(x->real+lo);
+	    imag_temp_small = _mm_load_pd(x->imag+lo);
+	    real_y_small = _mm_load_pd(x->real+lo+m);
+	    imag_y_small = _mm_load_pd(x->imag+lo+m);   
+
+	    real_x_small = _mm_add_pd(real_temp_small,real_y_small);
+	    imag_x_small = _mm_add_pd(imag_temp_small,imag_y_small);
+
+	    real_temp_small = _mm_sub_pd(real_y_small,real_temp_small);
+	    real_y_small = _mm_sub_pd(imag_temp_small,imag_y_small);
+	    
+	    _mm_store_pd(x->real+lo,real_x_small);
+	    _mm_store_pd(x->imag+lo,imag_x_small);
+	    _mm_store_pd(x->real+lo+m,real_y_small);
+	    _mm_store_pd(x->imag+lo+m,real_temp_small);
+	    //NOW WE HAVE THE ENTIRE RIGHT BRANCH (x^4+1)
+	    //RECURSIVE CALL TO GET LEFT BRANCH (x^4-1)
+	    m = 4;
+	    lo = lo-m;
+	    //NOW WE NEED TO TIE TOGETHER (x^4-1) and (x^4+1) to form (x^8-1)
+	    //LOAD REAL,LOAD IMAG i AND LOAD REAL,LOAD IMAG i + m
+	    real_x = _mm256_load_pd(x->real+lo);
+	    imag_x = _mm256_load_pd(x->imag+lo);
+	    real_y = _mm256_load_pd(x->real+lo+m);
+	    imag_y = _mm256_load_pd(x->imag+lo+m);
+
+	    //TEMP IS X - Y 
+	    real_temp = _mm256_sub_pd(real_x,real_y);
+	    imag_temp = _mm256_sub_pd(imag_x,imag_y);
+
+	    //X = X+Y
+	    real_x = _mm256_add_pd(real_x,real_y);
+	    imag_x = _mm256_add_pd(imag_x,imag_y);
+
+	    _mm256_store_pd(x->real+lo,real_x);
+	    _mm256_store_pd(x->imag+lo,imag_x);
+	    _mm256_store_pd(x->real+lo+m,real_temp);
+	    _mm256_store_pd(x->imag+lo+m,imag_temp);
+	}
+
+	//NOW DO THE OTHER LAYERS
+	//DO LAYERS 512,256,128,64,32 and 16
+	for (int iter=NRLAYERS-3; iter>-1; --iter)
+	{	
+		//This forloop wil loop for every array location defined in the current layer.
+		for (int count = 0; count < layer_size[iter]; ++count)
+		{
+			lo = locations[iter][count];
+			//WHEN n > 8 we have the general problem, in order to get (x^(4n)-1) we need to collect
+		    //The left branch (x^(2n)-1) and the two right branches (x^n-1) and (x^n-1)
+		    //We need to twist the right branches to (x^n-i) and (x^n+i) in order to fold them back to (x^(2n)+1)
+		    //Afterwards we can fold (x^(2n)-1) and (x^(2n)+1) to get (x^4n-1)
+		    m = new_n/4;
+		    lo = lo+new_n/2;
+		    //Twist right branch to get (x^n+i)
+		    vec_twist(x,new_n,m,lo+m);
+		    //unTwist left branch to get (x^n-i)
+		    vec_untwist(x,new_n,m,lo);
+		    // printf("BEFORE STITCHING\n");
+		    // print_cplx(*x,CPLXDIM);
+		    //TIE (x^n-i) and (x^n+i) back to (x^(2n)+1)
+		    for (int i = lo; i < lo+m; i+=4)
+		    {
+		      //real_temp = a-d, imag_temp = b+c, real_y = a+d, imag_y = b-c
+		      //2a = (a-d)+(a+d), 2b = (b+c)+(b-c), 2c = (b+c)-(b-c), 2d = (a+d)-(a-d) 
+		      //LOAD REAL,LOAD IMAG i AND LOAD REAL,LOAD IMAG i + m
+		      real_temp = _mm256_load_pd(x->real+i);
+		      imag_temp = _mm256_load_pd(x->imag+i);
+		      real_y = _mm256_load_pd(x->real+i+m);
+		      imag_y = _mm256_load_pd(x->imag+i+m);   
+
+		      real_x = _mm256_add_pd(real_temp,real_y);
+		      imag_x = _mm256_add_pd(imag_temp,imag_y);
+
+		      real_temp = _mm256_sub_pd(real_y,real_temp);
+		      real_y = _mm256_sub_pd(imag_temp,imag_y);
+		      
+		      _mm256_store_pd(x->real+i,real_x);
+		      _mm256_store_pd(x->imag+i,imag_x);
+		      _mm256_store_pd(x->real+i+m,real_y);
+		      _mm256_store_pd(x->imag+i+m,real_temp);
+		    }
+		    // printf("AFTER STITCHING\n");
+		    // print_cplx(*x,CPLXDIM);
+		    m = m*2;
+		    lo = lo -m;
+		    //TIE (x^(2n)-1) and (x^(2n)+1) to get (x^4n-1)
+	    	for(int i=lo; i < lo+m;i+=4)
+	    	{
+		      //LOAD REAL,LOAD IMAG i AND LOAD REAL,LOAD IMAG i + m
+		      real_x = _mm256_load_pd(x->real+i);
+		      imag_x = _mm256_load_pd(x->imag+i);
+		      real_y = _mm256_load_pd(x->real+i+m);
+		      imag_y = _mm256_load_pd(x->imag+i+m);
+
+		      //TEMP IS X - Y 
+		      real_temp = _mm256_sub_pd(real_x,real_y);
+		      imag_temp = _mm256_sub_pd(imag_x,imag_y);
+
+		      //X = X+Y
+		      real_x = _mm256_add_pd(real_x,real_y);
+		      imag_x = _mm256_add_pd(imag_x,imag_y);
+
+		      _mm256_store_pd(x->real+i,real_x);
+		      _mm256_store_pd(x->imag+i,imag_x);
+		      _mm256_store_pd(x->real+i+m,real_temp);
+		      _mm256_store_pd(x->imag+i+m,imag_temp);
+		  	}
+
+		}
+		new_n = new_n<<1;
+	}
+
+}
+
 void fft_vector_nonrec_forward(cplx_ptr *x){
   vec_twist(x,ROOTDIM,CPLXDIM,0);
   sr_vector_nonrec(x,CPLXDIM);
+}
+
+void fft_vector_nonrec_backward(cplx_ptr *cplx_x,ring_t *res)
+{
+  sr_vector_nonrec_inverse(cplx_x);
+  vec_untwist(cplx_x,ROOTDIM,CPLXDIM,0);
+ 
+  int j = CPLXDIM;
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    res->v[i] = cplx_x->real[i]/CPLXDIM;
+    res->v[j] = cplx_x->imag[i]/CPLXDIM;
+    ++j; 
+  } 
 }

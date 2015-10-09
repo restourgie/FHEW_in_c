@@ -79,6 +79,19 @@ void init(){
   posix_memalign((void**)&vctr_res.imag,32, CPLXDIM * sizeof(double));
 }
 
+// void test(ring_t *r, const ring_t *x, const ring_t *y)
+// {
+//   sr_vector_nonrec_mul(r,x,y);
+//   sr_vector_mul(r,x,y);
+
+//   for (int i = 0; i < CPLXDIM; ++i)
+//   {
+//     printf("NEWVEC[%d] = %f + i %f\n",i,vctr_x.real[i],vctr_x.imag[i]);
+//     printf("NEWVEC[%d] = %f + i %f\n",i,vec_x.real[i],vec_x.imag[i]);
+//   }
+
+// }
+
 /******************************************************************
 *
 * FFTW MULTIPLICATION
@@ -96,9 +109,7 @@ void fftw_mul(ring_t *r, const ring_t *x, const ring_t *y){
   {
     cplx_res[i] = cplx_x[i] * cplx_y[i];
   }
-
   FFTWbackward(r,cplx_res);
-
 }
 /******************************************************************
 *
@@ -118,7 +129,45 @@ void sr_vector_nonrec_mul(ring_t *r, const ring_t *x, const ring_t *y){
   }
 
   fft_vector_nonrec_forward(&vctr_x);
+  fft_vector_nonrec_forward(&vctr_y);
+    __m256d real_x,imag_x,real_y,imag_y,imag_temp,real_temp;
+  // double a,b,c,d;
+  for (int i = 0; i < CPLXDIM; i+=4)
+  {
+    real_x = _mm256_load_pd(vctr_x.real+i);
+    imag_x = _mm256_load_pd(vctr_x.imag+i);
+    real_y = _mm256_load_pd(vctr_y.real+i);
+    imag_y = _mm256_load_pd(vctr_y.imag+i);
 
+    //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+    //real_temp = bd
+    real_temp = _mm256_mul_pd(imag_x,imag_y);
+    //imag_temp = ad
+    imag_temp = _mm256_mul_pd(real_x,imag_y);
+    //REPLACED FOR COMMENTED SECTION
+    //real_x = ac
+    real_x = _mm256_mul_pd(real_x,real_y);
+    //imag_x = bc
+    imag_x = _mm256_mul_pd(imag_x,real_y);
+    //real_x = ac - bd => real_x - real_temp
+    real_x = _mm256_sub_pd(real_x,real_temp);
+    //imag_x = ad + bc => imag_temp + imag_x
+    imag_x = _mm256_add_pd(imag_x,imag_temp);
+    //THESE ARE NOT WORKING 
+    // real_x = _mm256_fmsub_pd(real_x,real_y,real_temp);
+    // imag_x = _mm256_fmadd_pd(imag_x,real_y,imag_temp);
+    _mm256_store_pd(vctr_res.real+i,real_x);
+    _mm256_store_pd(vctr_res.imag+i,imag_x);
+
+    // a = vec_x.real[i];
+    // b = vec_x.imag[i]; 
+    // c = vec_y.real[i];
+    // d = vec_y.imag[i];
+    // //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+    // vec_res.real[i] = ((a*c) - (b*d))/CPLXDIM;
+    // vec_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
+  }
+  fft_vector_nonrec_backward(&vctr_res,r);
 }
 /******************************************************************
 *
@@ -180,6 +229,7 @@ void sr_vector_mul(ring_t *r, const ring_t *x, const ring_t *y){
   }
   // print_cplx(&vec_res,CPLXDIM);
   fft_vector_backward(&vec_res,r); 
+
 }
 
 /******************************************************************

@@ -39,6 +39,7 @@ void print_cplx(const cplx_ptr *x,int N);
 
 
 void init();
+// void test(ring_t *r, const ring_t *x, const ring_t *y);
 void fftw_mul(ring_t *r, const ring_t *x, const ring_t *y);
 void naive_real_mul(ring_t *r, const ring_t *x, const ring_t *y);
 void naive_complex_mul(ring_t *r, const ring_t *x, const ring_t *y);
