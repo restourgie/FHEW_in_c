@@ -9,8 +9,10 @@
 #include "fft/sr_precomp.h"
 #include "fft/sr_vector.h"
 #include "fft/fftw.h"
+#include "fft/sr_vec_nonrec.h"
 
 cplx_ptr vec_x,vec_y,vec_res;
+cplx_ptr vctr_x,vctr_y,vctr_res;
 
 /******************************************************************
 *
@@ -67,6 +69,14 @@ void init(){
   posix_memalign((void**)&vec_y.imag,32, CPLXDIM * sizeof(double));
   posix_memalign((void**)&vec_res.real,32, CPLXDIM * sizeof(double));
   posix_memalign((void**)&vec_res.imag,32, CPLXDIM * sizeof(double));
+
+  init_vctr();
+  posix_memalign((void**)&vctr_x.real,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vctr_x.imag,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vctr_y.real,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vctr_y.imag,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vctr_res.real,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vctr_res.imag,32, CPLXDIM * sizeof(double));
 }
 
 /******************************************************************
@@ -90,7 +100,26 @@ void fftw_mul(ring_t *r, const ring_t *x, const ring_t *y){
   FFTWbackward(r,cplx_res);
 
 }
+/******************************************************************
+*
+* SPLIT RADIX PRECOMPUTED AND VECTORIZED NON RECURSIVE FFT MULTIPLICATION
+*
+******************************************************************/
+void sr_vector_nonrec_mul(ring_t *r, const ring_t *x, const ring_t *y){
+  int j = CPLXDIM;
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    vctr_x.real[i] = x->v[i];
+    vctr_x.imag[i] = x->v[j];
+    
+    vctr_y.real[i] = y->v[i];
+    vctr_y.imag[i] = y->v[j]; 
+    ++j;
+  }
 
+  fft_vector_nonrec_forward(&vctr_x);
+
+}
 /******************************************************************
 *
 * SPLIT RADIX PRECOMPUTED AND VECTORIZED FFT MULTIPLICATION
@@ -136,8 +165,8 @@ void sr_vector_mul(ring_t *r, const ring_t *x, const ring_t *y){
     //imag_x = ad + bc => imag_temp + imag_x
     imag_x = _mm256_add_pd(imag_x,imag_temp);
     //THESE ARE NOT WORKING 
-    // real_x = _mm256_fmsub_pd(real_x,real_tbl,real_temp);
-    // imag_x = _mm256_fmadd_pd(imag_x,real_tbl,imag_temp);
+    // real_x = _mm256_fmsub_pd(real_x,real_y,real_temp);
+    // imag_x = _mm256_fmadd_pd(imag_x,real_y,imag_temp);
     _mm256_store_pd(vec_res.real+i,real_x);
     _mm256_store_pd(vec_res.imag+i,imag_x);
 

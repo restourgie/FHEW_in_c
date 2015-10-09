@@ -9,7 +9,6 @@
 * SMART COMPLEX MULTIPLICATION
 *
 ******************************************************************/
-
 void inverse_phi(double complex *x,int n,int lo,double complex root)
 {	
 	if(n > 1){
