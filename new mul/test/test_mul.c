@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #define NTESTS 1000
-#define NALGO 6
+#define NALGO 7
 #define THRESHOLD 2
 
 uint32_t myabs(uint32_t a)
@@ -44,11 +44,13 @@ void rand_test(){
       x.v[i] = fgetc(urandom);
       y.v[i] = fgetc(urandom);
     }
-    // normal_fft_mul(&re,&x,&y);
+    normal_fft_mul(&re,&x,&y);
     // split_radix_mul(&re,&x,&y);
-    sr_vector_mul(&r,&x,&y);
-    sr_vector_nonrec_mul(&re,&x,&y);
+    // sr_vector_mul(&r,&x,&y);
+    // sr_vector_nonrec_mul(&re,&x,&y);
     // fftw_mul(&re,&x,&y);
+    // twisted_mul(&r, &x, &y);
+    negacyc_lut_fft_mul(&r,&x,&y);
     // sr_precomp_mul(&re,&x,&y);
     // naive_complex_mul(&r,&x,&y);
     // naive_real_mul(&r,&x,&y);
@@ -98,25 +100,35 @@ void cycle_meassure(){
       }
       else if(j == 1){
         start = rdtsc();
-        split_radix_mul(&r,&x,&y);
+        twisted_mul(&r, &x, &y);
         end = rdtsc();
       }
       else if(j == 2){
         start = rdtsc();
-        sr_precomp_mul(&r,&x,&y);
+        split_radix_mul(&r,&x,&y);
         end = rdtsc();
       }
       else if(j == 3){
         start = rdtsc();
+        negacyc_lut_fft_mul(&r,&x,&y);
+        end = rdtsc(); 
+      }
+      else if(j == 4){
+        start = rdtsc();
+        sr_precomp_mul(&r,&x,&y);
+        end = rdtsc();
+      }
+      else if(j == 5){
+        start = rdtsc();
         sr_vector_mul(&r,&x,&y);
         end = rdtsc();
       }
-      else if(j == 4){
+      else if(j == 6){
         start = rdtsc();
         fftw_mul(&r,&x,&y);
         end = rdtsc();
       }
-      else if(j == 5){
+      else if(j == 7){
         start = rdtsc();
         sr_vector_nonrec_mul(&r,&x,&y);
         end = rdtsc();
@@ -125,17 +137,21 @@ void cycle_meassure(){
     }
     qsort(cycles,sizeof(cycles)/sizeof(*cycles),sizeof(*cycles),compare);
     if(j == 0)
-      printf("Median Normal FFT: %llu\n",cycles[499]);
+      printf("Median Normal FFT: %llu\n",cycles[NTESTS/2-1]);
     else if(j == 1)
-      printf("Median Split Radix FFT: %llu\n",cycles[499]);
+      printf("Median Twisted FFT: %llu\n",cycles[NTESTS/2-1]);
     else if(j == 2)
-      printf("Median Split Radix Precomputed: %llu\n",cycles[499]);
+      printf("Median Split Radix FFT: %llu\n",cycles[NTESTS/2-1]);
     else if(j == 3)
-      printf("Median Split Radix VECTORIZED: %llu\n",cycles[499]);
+      printf("Median Normal FFT Precomputed: %llu\n",cycles[NTESTS/2-1]);
     else if(j == 4)
-      printf("Median FFTW: %llu\n",cycles[499]);
+      printf("Median Split Radix Precomputed: %llu\n",cycles[NTESTS/2-1]);
     else if(j == 5)
-      printf("Median Split Radix VECTORIZED NON RECURSIVE: %llu\n",cycles[499]);
+      printf("Median Split Radix VECTORIZED: %llu\n",cycles[NTESTS/2-1]);
+    else if(j == 6)
+      printf("Median FFTW: %llu\n",cycles[NTESTS/2-1]);
+    else if(j == 7)
+      printf("Median Split Radix VECTORIZED NON RECURSIVE: %llu\n",cycles[NTESTS/2-1]);
   }
 
   fclose(urandom); 

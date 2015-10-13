@@ -19,6 +19,13 @@ void init_table(){
   }
 }
 
+void destruct_table(){
+  free(table[2]);
+  free(table[1]);
+  free(table[0]);
+  free(table);
+}
+
 /******************************************************************
 *
 * LOOKUPTABLE TWIST

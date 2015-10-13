@@ -44,6 +44,19 @@ void init_table_vctr(){
   }
 }
 
+void destruct_table_vctr()
+{
+  for (int i = 7; i >= 0; --i)
+  {
+    free(LUT1[i]);
+    free(LUT2[i]);
+    free(LUT3[i]);
+  }
+  free(LUT1);
+  free(LUT2);
+  free(LUT3);
+}
+
 /******************************************************************
 *
 * LOOKUPTABLES FOR VECTOR TWIST

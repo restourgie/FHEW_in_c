@@ -10,6 +10,8 @@
 #include "fft/sr_vector.h"
 #include "fft/fftw.h"
 #include "fft/sr_vec_nonrec.h"
+#include "fft/twisted_fft.h"
+#include "fft/fft_negacyc_lut.h"
 
 cplx_ptr vec_x,vec_y,vec_res;
 cplx_ptr vctr_x,vctr_y,vctr_res;
@@ -77,6 +79,9 @@ void init(){
   posix_memalign((void**)&vctr_y.imag,32, CPLXDIM * sizeof(double));
   posix_memalign((void**)&vctr_res.real,32, CPLXDIM * sizeof(double));
   posix_memalign((void**)&vctr_res.imag,32, CPLXDIM * sizeof(double));
+
+  //INIT LOOKUPTABLES NEGACYCLIC FFT
+  init_negacyc();
 }
 
 // void test(ring_t *r, const ring_t *x, const ring_t *y)
@@ -295,6 +300,61 @@ void split_radix_mul(ring_t *r, const ring_t *x, const ring_t *y)
 
 /******************************************************************
 *
+* SPLIT RADIX FFT NEGACYCLIC MULTIPLICATION
+*
+******************************************************************/
+void twisted_mul(ring_t *r, const ring_t *x, const ring_t *y)
+{ 
+  double complex cplx_x[CPLXDIM];
+  double complex cplx_y[CPLXDIM];
+  double complex cplx_res[CPLXDIM];
+
+  to_complex(x,cplx_x);
+  to_complex(y,cplx_y);
+
+  fft_twisted_forward(cplx_x);
+  fft_twisted_forward(cplx_y);
+
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    cplx_res[i] = (cplx_x[i] * cplx_y[i])/CPLXDIM;
+  }
+  fft_twisted_backward(cplx_res);
+
+  to_real(cplx_res,r);
+}
+
+/******************************************************************
+*
+* NEGACYCLIC FFT LOOK UP TABLE
+*
+******************************************************************/
+void negacyc_lut_fft_mul(ring_t *r, const ring_t *x, const ring_t *y)
+{
+  double complex cplx_x[CPLXDIM];
+  double complex cplx_y[CPLXDIM];
+  double complex cplx_res[CPLXDIM];
+
+  to_complex(x,cplx_x);
+  to_complex(y,cplx_y);
+  // printf("*****************START LUT FFT********************\n");
+  recursive_phi_lut(cplx_x,CPLXDIM,0,0);
+  // print_complex(cplx_x,CPLXDIM);
+  recursive_phi_lut(cplx_y,CPLXDIM,0,0);
+
+
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    cplx_res[i] = (cplx_x[i] * cplx_y[i])/CPLXDIM;
+  }
+
+  inverse_phi_lut(cplx_res,CPLXDIM,0,0);
+
+  to_real(cplx_res,r);
+}
+
+/******************************************************************
+*
 * SCHOOLBOOK NEGACYCLIC FFT
 *
 ******************************************************************/
@@ -309,8 +369,9 @@ void normal_fft_mul(ring_t *r, const ring_t *x, const ring_t *y)
 
   double complex root = I;
   root = csqrt(root);
-  
+  // print_complex(cplx_x,CPLXDIM);
   recursive_phi(cplx_x,CPLXDIM,0,root);
+  // print_complex(cplx_x,CPLXDIM);
   recursive_phi(cplx_y,CPLXDIM,0,root);
 
 

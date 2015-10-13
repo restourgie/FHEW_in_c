@@ -48,5 +48,7 @@ void normal_fft_mul(ring_t *r, const ring_t *x, const ring_t *y);
 void sr_precomp_mul(ring_t *r, const ring_t *x, const ring_t *y);
 void sr_vector_mul(ring_t *r, const ring_t *x, const ring_t *y);
 void sr_vector_nonrec_mul(ring_t *r, const ring_t *x, const ring_t *y);
+void twisted_mul(ring_t *r, const ring_t *x, const ring_t *y);
+void negacyc_lut_fft_mul(ring_t *r, const ring_t *x, const ring_t *y);
 
 #endif

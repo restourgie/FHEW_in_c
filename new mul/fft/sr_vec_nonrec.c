@@ -42,16 +42,16 @@ void init_vctr()
 	LUT3 = malloc(sizeof *LUT3 * size);
 	for (int i = 0; i < size-1; ++i)
 	{
-	posix_memalign((void**)&LUT1[i],32, j * sizeof(double));
-	posix_memalign((void**)&LUT2[i],32, j * sizeof(double));
-	posix_memalign((void**)&LUT3[i],32, j * sizeof(double));
-	for (int root = 0; root < j; ++root)
-	{
-	  LUT1[i][root] = calc_cos(j,root);
-	  LUT2[i][root] = calc_sin(j,root);
-	  LUT3[i][root] = -LUT2[i][root];
-	}
-	j = j<<1;
+		posix_memalign((void**)&LUT1[i],32, j * sizeof(double));
+		posix_memalign((void**)&LUT2[i],32, j * sizeof(double));
+		posix_memalign((void**)&LUT3[i],32, j * sizeof(double));
+		for (int root = 0; root < j; ++root)
+		{
+		  LUT1[i][root] = calc_cos(j,root);
+		  LUT2[i][root] = calc_sin(j,root);
+		  LUT3[i][root] = -LUT2[i][root];
+		}
+		j = j<<1;
 	}
 	posix_memalign((void**)&LUT1[7],32, 512 * sizeof(double));
 	posix_memalign((void**)&LUT2[7],32, 512 * sizeof(double));
@@ -63,6 +63,19 @@ void init_vctr()
 	  LUT2[7][i] = calc_sin(ROOTDIM,i);
 	  LUT3[7][i] = -LUT2[7][i]; 
 	}
+}
+
+void destruct_vctr()
+{
+	for (int i = 7; i >= 0; --i)
+	{
+		free(LUT1[i]);
+		free(LUT2[i]);
+		free(LUT3[i]);
+	}
+	free(LUT1);
+	free(LUT2);
+	free(LUT3);
 }
 
 /******************************************************************
