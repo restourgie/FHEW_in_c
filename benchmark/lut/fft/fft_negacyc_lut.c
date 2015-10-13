@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
-#include "fft_negacyc.h"
+#include "fft_negacyc_lut.h"
 #include "../mul.h"
 
 double complex **wortel;
