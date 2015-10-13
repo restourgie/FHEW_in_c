@@ -554,8 +554,8 @@ void fft_vector_backward(cplx_ptr *cplx_x,ring_t *res)
   int j = CPLXDIM;
   for (int i = 0; i < CPLXDIM; ++i)
   {
-    res->v[i] = cplx_x->real[i]/CPLXDIM;
-    res->v[j] = cplx_x->imag[i]/CPLXDIM;
+    res->v[i] = cplx_x->real[i];////CPLXDIM;
+    res->v[j] = cplx_x->imag[i];////CPLXDIM;
     ++j; 
   } 
 }

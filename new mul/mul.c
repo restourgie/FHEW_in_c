@@ -161,6 +161,11 @@ void sr_vector_nonrec_mul(ring_t *r, const ring_t *x, const ring_t *y){
     //THESE ARE NOT WORKING 
     // real_x = _mm256_fmsub_pd(real_x,real_y,real_temp);
     // imag_x = _mm256_fmadd_pd(imag_x,real_y,imag_temp);
+    //WE WANT TO DIVIDE EVERYTHING BY CPLXDIM
+    real_y = _mm256_setr_pd(CPLXDIM,CPLXDIM,CPLXDIM,CPLXDIM);
+    real_x = _mm256_div_pd(real_x,real_y);
+    imag_x = _mm256_div_pd(imag_x,real_y);
+
     _mm256_store_pd(vctr_res.real+i,real_x);
     _mm256_store_pd(vctr_res.imag+i,imag_x);
 
@@ -218,6 +223,11 @@ void sr_vector_mul(ring_t *r, const ring_t *x, const ring_t *y){
     real_x = _mm256_sub_pd(real_x,real_temp);
     //imag_x = ad + bc => imag_temp + imag_x
     imag_x = _mm256_add_pd(imag_x,imag_temp);
+
+    real_y = _mm256_setr_pd(CPLXDIM,CPLXDIM,CPLXDIM,CPLXDIM);
+    real_x = _mm256_div_pd(real_x,real_y);
+    imag_x = _mm256_div_pd(imag_x,real_y);
+
     //THESE ARE NOT WORKING 
     // real_x = _mm256_fmsub_pd(real_x,real_y,real_temp);
     // imag_x = _mm256_fmadd_pd(imag_x,real_y,imag_temp);

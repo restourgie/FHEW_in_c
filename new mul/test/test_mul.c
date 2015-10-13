@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #define NTESTS 1000
-#define NALGO 7
+#define NALGO 8
 #define THRESHOLD 2
 
 uint32_t myabs(uint32_t a)
@@ -44,9 +44,9 @@ void rand_test(){
       x.v[i] = fgetc(urandom);
       y.v[i] = fgetc(urandom);
     }
-    normal_fft_mul(&re,&x,&y);
+    // normal_fft_mul(&re,&x,&y);
     // split_radix_mul(&re,&x,&y);
-    // sr_vector_mul(&r,&x,&y);
+    sr_vector_mul(&re,&x,&y);
     // sr_vector_nonrec_mul(&re,&x,&y);
     // fftw_mul(&re,&x,&y);
     // twisted_mul(&r, &x, &y);
