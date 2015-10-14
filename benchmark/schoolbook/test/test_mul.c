@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #define NTESTS 1000
-#define NALGO 4
+#define NALGO 5
 #define THRESHOLD 2
 
 uint32_t myabs(uint32_t a)
@@ -43,8 +43,9 @@ void rand_test(){
       x.v[i] = fgetc(urandom);
       y.v[i] = fgetc(urandom);
     }
+    tangent_mul(&re,&x,&y);
     // normal_fft_mul(&re,&x,&y);
-    // split_radix_mul(&re,&x,&y);
+    //split_radix_mul(&re,&x,&y);
     // twisted_mul(&re, &x, &y);
     naive_real_mul(&r,&x,&y);
     bool error = false;
@@ -104,6 +105,11 @@ void cycle_meassure(){
         split_radix_mul(&r,&x,&y);
         end = rdtsc();
       }
+      else if(j == 4){
+        start = rdtsc();
+        tangent_mul(&r,&x,&y);
+        end = rdtsc();
+      }
       cycles[n] = end - start;
     }
     qsort(cycles,sizeof(cycles)/sizeof(*cycles),sizeof(*cycles),compare);
@@ -115,6 +121,8 @@ void cycle_meassure(){
       printf("Median Twisted FFT: %llu\n",cycles[NTESTS/2-1]);
     else if(j == 3)
       printf("Median Split Radix FFT: %llu\n",cycles[NTESTS/2-1]);
+    else if(j == 4)
+      printf("Median TANGENT FFT: %llu\n",cycles[NTESTS/2-1]);
   }
 
   fclose(urandom); 
@@ -122,8 +130,8 @@ void cycle_meassure(){
 
 int main()
 {
-  // rand_test();
-  cycle_meassure();
+  rand_test();
+  // cycle_meassure();
 
   return 0;
 }

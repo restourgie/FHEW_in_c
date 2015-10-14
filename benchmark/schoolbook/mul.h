@@ -20,6 +20,7 @@ typedef struct {
 
 void print_complex(const double complex *a, int N);
 
+void tangent_mul(ring_t *r, const ring_t *x, const ring_t *y);
 void naive_real_mul(ring_t *r, const ring_t *x, const ring_t *y);
 void split_radix_mul(ring_t *r, const ring_t *x, const ring_t *y);
 void normal_fft_mul(ring_t *r, const ring_t *x, const ring_t *y);

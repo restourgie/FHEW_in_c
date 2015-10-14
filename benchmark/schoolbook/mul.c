@@ -25,7 +25,7 @@ void print_complex(const double complex *a, int N){
 * TANGENT FFT NEGACYCLIC MULTIPLICATION
 *
 ******************************************************************/
-void split_radix_mul(ring_t *r, const ring_t *x, const ring_t *y)
+void tangent_mul(ring_t *r, const ring_t *x, const ring_t *y)
 { 
   double complex cplx_x[ZEROPAD];
   double complex cplx_y[ZEROPAD];
@@ -39,20 +39,19 @@ void split_radix_mul(ring_t *r, const ring_t *x, const ring_t *y)
     cplx_y[i+REALDIM] = 0.0;
   }
 
-  tangent_forward(cplx_x,ZEROPAD,0);
+  tangent_4(cplx_x,ZEROPAD,0);
+  tangent_4(cplx_y,ZEROPAD,0);
 
-  // tangent_4_forward(cplx_y,ZEROPAD,0);
+  for (int i = 0; i < ZEROPAD; ++i)
+  {
+    cplx_res[i] = (cplx_x[i] * cplx_y[i])/ZEROPAD;
+  }
+  tangent_4_inverse(cplx_res,ZEROPAD,0);
 
-  // for (int i = 0; i < ZEROPAD; ++i)
-  // {
-  //   cplx_res[i] = (cplx_x[i] * cplx_y[i])/ZEROPAD;
-  // }
-  // Tangent_inverse(cplx_res,ZEROPAD,0);
-
-  // for (int i = 0; i < REALDIM; ++i)
-  // {
-  //   r->v[i] = cplx_res[i] - cplx_res[i+REALDIM];
-  // }
+  for (int i = 0; i < REALDIM; ++i)
+  {
+    r->v[i] = cplx_res[i] - cplx_res[i+REALDIM];
+  }
 }
 
 /******************************************************************
