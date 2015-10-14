@@ -8,8 +8,8 @@ cmd/dec
 cmd/*.o
 new\ mul/test/test_mul
 ring/test_mul
-Benchmark/schoolbook/test/test
-Benchmark/trick/test/test
-Benchmark/vector/test/test
-Benchmark/lut/test/test
+Benchmark/schoolbook/test/test_mul
+Benchmark/trick/test/test_mul
+Benchmark/vector/test/test_mul
+Benchmark/lut/test/test_mul
 
