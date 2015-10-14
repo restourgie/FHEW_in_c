@@ -6,6 +6,7 @@
 #include "fft/fft_negacyc.h"
 #include "fft/split_radix_fft.h"
 #include "fft/twisted_fft.h"
+#include "fft/tangent_fft.h"
 
 
 /******************************************************************
@@ -39,11 +40,40 @@ void to_real(const double complex *cplx_x, ring_t *x)
 
 /******************************************************************
 *
+* TANGENT FFT NEGACYCLIC MULTIPLICATION
+*
+******************************************************************/
+void tangent_mul(ring_t *r, const ring_t *x, const ring_t *y)
+{
+// { printf("*********************STARTING TANGENT***********************\n");
+  double complex cplx_x[CPLXDIM];
+  double complex cplx_y[CPLXDIM];
+  double complex cplx_res[CPLXDIM];
+
+  to_complex(x,cplx_x);
+  to_complex(y,cplx_y);
+
+  tangent_forward(cplx_x);
+  // print_complex(cplx_x,CPLXDIM);
+  tangent_forward(cplx_y);
+
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    cplx_res[i] = (cplx_x[i] * cplx_y[i])/CPLXDIM;
+  }
+  tangent_backward(cplx_res);
+  // print_complex(cplx_res,CPLXDIM);
+  to_real(cplx_res,r);
+}
+
+/******************************************************************
+*
 * SPLIT RADIX FFT NEGACYCLIC MULTIPLICATION
 *
 ******************************************************************/
 void split_radix_mul(ring_t *r, const ring_t *x, const ring_t *y)
 {	
+  // printf("*********************STARTING SPLIT RADIX***********************\n");
   double complex cplx_x[CPLXDIM];
   double complex cplx_y[CPLXDIM];
   double complex cplx_res[CPLXDIM];
@@ -52,6 +82,7 @@ void split_radix_mul(ring_t *r, const ring_t *x, const ring_t *y)
   to_complex(y,cplx_y);
 
   fft_sr_forward(cplx_x);
+  // print_complex(cplx_x,CPLXDIM);
   fft_sr_forward(cplx_y);
 
   for (int i = 0; i < CPLXDIM; ++i)
@@ -59,7 +90,7 @@ void split_radix_mul(ring_t *r, const ring_t *x, const ring_t *y)
     cplx_res[i] = (cplx_x[i] * cplx_y[i])/CPLXDIM;
   }
   fft_sr_backward(cplx_res);
-
+  // print_complex(cplx_res,CPLXDIM);
   to_real(cplx_res,r);
 }
 
@@ -85,7 +116,6 @@ void twisted_mul(ring_t *r, const ring_t *x, const ring_t *y)
     cplx_res[i] = (cplx_x[i] * cplx_y[i])/CPLXDIM;
   }
   fft_twisted_backward(cplx_res);
-
   to_real(cplx_res,r);
 }
 
