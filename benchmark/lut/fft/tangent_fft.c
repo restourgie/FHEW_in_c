@@ -1,8 +1,12 @@
 #include <complex.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 #include "../mul.h"
 #include "tangent_fft.h"
+
+double complex **twidle;
+double **base;
 
 double s(int n, int k) 
 {
@@ -17,14 +21,38 @@ double s(int n, int k)
   return (s(n/4,k4) * sin(2.0f * M_PI * (double)k4 / (double)n));
 }
 
+void init_tangent()
+{
+  base = malloc(11*sizeof(*base));
+  int slide = 1;
+  for (int i = 1; i < 11; ++i)
+  {
+    // printf("i = %d \n", );
+    base[i] = malloc(CPLXDIM*sizeof(double));
+    for (int j = 0; j < CPLXDIM; ++j)
+    {
+      base[i][j] = s(slide,j);
+    }
+    slide = slide << 1;
+  }
+  twidle = malloc(2*sizeof(*twidle));
+  twidle[0] = malloc(ROOTDIM*sizeof(double complex));
+  twidle[1] = malloc(ROOTDIM*sizeof(double complex));
+  for (int i = 0; i < ROOTDIM; ++i)
+  {
+    twidle[0][i] = W(ROOTDIM,i);
+    twidle[1][i] = conj(twidle[0][i]);
+  }
+}
+
 void t_twist(double complex *cplx_x,int n,int m,int lo)
 {
   // printf("n = %d, m = %d, lo = %d\n",n,m,lo );
-  int j = 1;
+  int j = 1,scale = ROOTDIM/n;
   for (int i = lo+1; i < lo+m; ++i)
   {
     // printf("i = %d, j = %d\n",i,j);
-    cplx_x[i] = cplx_x[i] * W(n,j);
+    cplx_x[i] = cplx_x[i] * twidle[0][j*scale];
     ++j;
   }
 }
@@ -32,31 +60,32 @@ void t_twist(double complex *cplx_x,int n,int m,int lo)
 void t_untwist(double complex *cplx_x,int n,int m,int lo)
 {
   // printf("n = %d, m = %d, lo = %d\n",n,m,lo );
-  int j = 1;
+  int j = 1,scale = ROOTDIM/n;
   for (int i = lo+1; i < lo+m; ++i)
   {
     // printf("i = %d, j = %d\n",i,j);
-    cplx_x[i] = cplx_x[i] * conj(W(n,j));
+    cplx_x[i] = cplx_x[i] * twidle[1][j*scale];
     ++j;
   }
 }
 
 void base_change(double complex *x,int n,int n_new,int m,int lo)
-{ int j = 1;
+{ int j = 1,scale = log2(n)+1;
   if(n_new == -1)
   {
     for (int i = lo+1; i < lo+m; ++i)
     {
-      x[i] = x[i] * s(n,j);
+      x[i] = x[i] * base[scale][j];
       ++j;
     }
   }
   else
   {
+    int new_scale = log2(n_new)+1;
     double temp;
     for (int i = lo+1; i < lo+m; ++i)
     { 
-      temp = s(n_new,j)/s(n,j);
+      temp = base[new_scale][j]/base[scale][j];
       // printf("temp = %f, x[%d] = %f + I %f\n",temp,i,creal(x[i]),cimag(x[i]));
       x[i] = x[i] * temp;
       ++j;
@@ -65,57 +94,63 @@ void base_change(double complex *x,int n,int n_new,int m,int lo)
 }
 
 void cost_4_twist(double complex *cplx_x,int n,int m,int lo)
-{
-  int j = 1;
+{  
+  int j = 1,scale = ROOTDIM/n;
+  int new_slide = log2(m)+1,slide = log2(n)+1;
   double complex temp;
   // printf("lo = %d m = %d n = %d\n",lo,m,n);
   for (int i = lo+1; i < lo+m; ++i)
   {
-    temp = s(m,j)/s(n,j);
+    temp = base[new_slide][j]/base[slide][j];
     // printf("temp = %f + i %f\n",creal(temp),cimag(temp));
     // printf("W(%d,%d) = %f + i %f\n",n,j,creal(W(n,j)),cimag(W(n,j)));
     // printf("temp = %f + i %f, x[%d] = %f + I %f\n",creal(temp),cimag(temp),i,creal(cplx_x[i]),cimag(cplx_x[i]));
-    cplx_x[i] = cplx_x[i] * W(n,j) *temp;
+    cplx_x[i] = cplx_x[i] * twidle[0][scale*j] *temp;
     ++j;
   }
 }
 
 void cost_4_untwist(double complex *cplx_x,int n,int m,int lo)
 {
-  int j = 1;
+  int j = 1, scale = ROOTDIM/n;
+  int new_slide = log2(m)+1,slide = log2(n)+1;
   double complex temp;
   for (int i = lo+1; i < lo+m; ++i)
   {
-    temp = s(m,j)/s(n,j);
-    cplx_x[i] = cplx_x[i] * conj(W(n,j))*temp;
+    temp = base[new_slide][j]/base[slide][j];
+    cplx_x[i] = cplx_x[i] * twidle[1][scale*j]*temp;
     ++j;
   }
 }
 
 void cost_4_untwist_inverse(double complex *cplx_x,int n,int m,int lo)
 {
-  int j = 1;
+  int j = 1, scale = ROOTDIM/n;
+  int new_slide = log2(m)+1,slide = log2(n)+1;
   double complex temp;
   for (int i = lo+1; i < lo+m; ++i)
   {
-    temp = s(n,j)/s(m,j);
-    cplx_x[i] = cplx_x[i] * conj(W(n,j))*temp;
+    temp = base[slide][j]/base[new_slide][j];
+    // temp = s(n,j)/s(m,j);
+    cplx_x[i] = cplx_x[i] *  twidle[1][scale*j]*temp;
     ++j;
   }
 }
 
 void cost_4_twist_inverse(double complex *cplx_x,int n,int m,int lo)
 {
-  int j = 1;
+  int j = 1, scale = ROOTDIM/n;
+  int new_slide = log2(m)+1,slide = log2(n)+1;
   double complex temp;
   // printf("lo = %d m = %d n = %d\n",lo,m,n);
   for (int i = lo+1; i < lo+m; ++i)
   {
-    temp = s(n,j)/s(m,j);
+    temp = base[slide][j]/base[new_slide][j];
+    // temp = s(n,j)/s(m,j);
     // printf("temp = %f + i %f\n",creal(temp),cimag(temp));
     // printf("W(%d,%d) = %f + i %f\n",n,j,creal(W(n,j)),cimag(W(n,j)));
     // printf("temp = %f + i %f, x[%d] = %f + I %f\n",creal(temp),cimag(temp),i,creal(cplx_x[i]),cimag(cplx_x[i]));
-    cplx_x[i] = cplx_x[i] * W(n,j) *temp;
+    cplx_x[i] = cplx_x[i] * twidle[0][scale*j] *temp;
     ++j;
   }
 }
@@ -401,4 +436,16 @@ void tangent_4_inverse(double complex *x,int n, int lo)
         x[i+m] = temp - x[i+m];
       }
   }
+}
+
+void tangent_forward(double complex *x)
+{
+  t_twist(x,ROOTDIM,CPLXDIM,0);
+  tangent_4(x,CPLXDIM,0);
+}
+
+void tangent_backward(double complex *x)
+{
+  tangent_4_inverse(x,CPLXDIM,0);
+  t_untwist(x,ROOTDIM,CPLXDIM,0);
 }

@@ -5,6 +5,7 @@
 #include "mul.h"
 #include "fft/sr_precomp.h"
 #include "fft/fft_negacyc_lut.h"
+#include "fft/tangent_fft.h"
 
 /******************************************************************
 *
@@ -47,6 +48,36 @@ void init(){
   init_table();
   //INIT LOOKUPTABLES NEGACYCLIC FFT
   init_negacyc();
+  //INIT LOOKUPTABLES TANGENT FFT
+  init_tangent();
+}
+
+/******************************************************************
+*
+* TANGENT FFT NEGACYCLIC MULTIPLICATION
+*
+******************************************************************/
+void tangent_mul(ring_t *r, const ring_t *x, const ring_t *y)
+{
+// { printf("*********************STARTING TANGENT***********************\n");
+  double complex cplx_x[CPLXDIM];
+  double complex cplx_y[CPLXDIM];
+  double complex cplx_res[CPLXDIM];
+
+  to_complex(x,cplx_x);
+  to_complex(y,cplx_y);
+
+  tangent_forward(cplx_x);
+  // print_complex(cplx_x,CPLXDIM);
+  tangent_forward(cplx_y);
+
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    cplx_res[i] = (cplx_x[i] * cplx_y[i])/CPLXDIM;
+  }
+  tangent_backward(cplx_res);
+  // print_complex(cplx_res,CPLXDIM);
+  to_real(cplx_res,r);
 }
 
 /******************************************************************

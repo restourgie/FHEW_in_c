@@ -41,15 +41,26 @@ void t_untwist(double complex *cplx_x,int n,int m,int lo)
   }
 }
 
-void base_change(double complex *x,int lo,int m, int n,int n_new)
+void base_change(double complex *x,int n,int n_new,int m,int lo)
 { int j = 1;
-  double temp;
-  for (int i = lo+1; i < lo+m; ++i)
-  { 
-    temp = s(n_new,j)/s(n,j);
-    // printf("temp = %f, x[%d] = %f + I %f\n",temp,i,creal(x[i]),cimag(x[i]));
-    x[i] = x[i] * temp;
-    ++j;
+  if(n_new == -1)
+  {
+    for (int i = lo+1; i < lo+m; ++i)
+    {
+      x[i] = x[i] * s(n,j);
+      ++j;
+    }
+  }
+  else
+  {
+    double temp;
+    for (int i = lo+1; i < lo+m; ++i)
+    { 
+      temp = s(n_new,j)/s(n,j);
+      // printf("temp = %f, x[%d] = %f + I %f\n",temp,i,creal(x[i]),cimag(x[i]));
+      x[i] = x[i] * temp;
+      ++j;
+    }
   }
 }
 
@@ -60,35 +71,7 @@ void cost_4_twist(double complex *cplx_x,int n,int m,int lo)
   // printf("lo = %d m = %d n = %d\n",lo,m,n);
   for (int i = lo+1; i < lo+m; ++i)
   {
-    temp = s(n/4,j)/s(n,j);
-    // printf("temp = %f + i %f\n",creal(temp),cimag(temp));
-    // printf("W(%d,%d) = %f + i %f\n",n,j,creal(W(n,j)),cimag(W(n,j)));
-    // printf("temp = %f + i %f, x[%d] = %f + I %f\n",creal(temp),cimag(temp),i,creal(cplx_x[i]),cimag(cplx_x[i]));
-    cplx_x[i] = cplx_x[i] * W(n,j) *temp;
-    ++j;
-  }
-}
-
-void cost_4_untwist_inverse(double complex *cplx_x,int n,int m,int lo)
-{
-  int j = 1;
-  double complex temp;
-  for (int i = lo+1; i < lo+m; ++i)
-  {
-    temp = s(n,j)/s(n/4,j);
-    cplx_x[i] = cplx_x[i] * conj(W(n,j))*temp;
-    ++j;
-  }
-}
-
-void cost_4_twist_inverse(double complex *cplx_x,int n,int m,int lo)
-{
-  int j = 1;
-  double complex temp;
-  // printf("lo = %d m = %d n = %d\n",lo,m,n);
-  for (int i = lo+1; i < lo+m; ++i)
-  {
-    temp = s(n,j)/s(n/4,j);
+    temp = s(m,j)/s(n,j);
     // printf("temp = %f + i %f\n",creal(temp),cimag(temp));
     // printf("W(%d,%d) = %f + i %f\n",n,j,creal(W(n,j)),cimag(W(n,j)));
     // printf("temp = %f + i %f, x[%d] = %f + I %f\n",creal(temp),cimag(temp),i,creal(cplx_x[i]),cimag(cplx_x[i]));
@@ -103,8 +86,36 @@ void cost_4_untwist(double complex *cplx_x,int n,int m,int lo)
   double complex temp;
   for (int i = lo+1; i < lo+m; ++i)
   {
-    temp = s(n/4,j)/s(n,j);
+    temp = s(m,j)/s(n,j);
     cplx_x[i] = cplx_x[i] * conj(W(n,j))*temp;
+    ++j;
+  }
+}
+
+void cost_4_untwist_inverse(double complex *cplx_x,int n,int m,int lo)
+{
+  int j = 1;
+  double complex temp;
+  for (int i = lo+1; i < lo+m; ++i)
+  {
+    temp = s(n,j)/s(m,j);
+    cplx_x[i] = cplx_x[i] * conj(W(n,j))*temp;
+    ++j;
+  }
+}
+
+void cost_4_twist_inverse(double complex *cplx_x,int n,int m,int lo)
+{
+  int j = 1;
+  double complex temp;
+  // printf("lo = %d m = %d n = %d\n",lo,m,n);
+  for (int i = lo+1; i < lo+m; ++i)
+  {
+    temp = s(n,j)/s(m,j);
+    // printf("temp = %f + i %f\n",creal(temp),cimag(temp));
+    // printf("W(%d,%d) = %f + i %f\n",n,j,creal(W(n,j)),cimag(W(n,j)));
+    // printf("temp = %f + i %f, x[%d] = %f + I %f\n",creal(temp),cimag(temp),i,creal(cplx_x[i]),cimag(cplx_x[i]));
+    cplx_x[i] = cplx_x[i] * W(n,j) *temp;
     ++j;
   }
 }
@@ -171,14 +182,14 @@ void tangent_8(double complex *x,int n,int lo)
       tangent_8(x,m,right_lo+m);
       //BACK TO THE LEFT
       //NOW TO A BASE TWIST GO FROM X^2n-1 BASE S(8n,k) to X^2n-1 BASE S(2n,k)
-      base_change(x,lo,m,n,m);
+      base_change(x,n,m,m,lo);
       tangent_8(x,m,lo);
       lo = lo+m;
       //FINISH THE LEFT_RIGHT BRANCH
       //ALSO BASE CHANGE FOR MID GO FROM X^2n+1 BASE S(8n,k) to X^2n+1 BASE S(4n,k)
       // printf("BASECHANGE!!!\n");
       // print_complex(x,8);
-      base_change(x,lo,m,n,n/2);
+      base_change(x,n,n/2,m,lo);
       // printf("BASECHANGE!!!\n");
       // print_complex(x,8);
       m=m/2;
@@ -190,8 +201,12 @@ void tangent_8(double complex *x,int n,int lo)
         x[i] = temp + I * x[i+m];
         x[i+m] = temp - I * x[i+m];
       }
+      // base_change(x,lo,m,n/2,n/8);
+      // t_twist(x,n/2,m,lo);
       cost_4_twist(x,n/2,m,lo);
       tangent_8(x,m,lo);
+      // base_change(x,lo+m,m,n/2,n/8);
+      // t_untwist(x,n/2,m,lo+m);
       cost_4_untwist(x,n/2,m,lo+m);
       tangent_8(x,m,lo+m);
   }
@@ -246,14 +261,14 @@ void tangent_8_inverse(double complex *x,int n,int lo)
     //NOW WE NEED TO CHANGE FROM BASE S(4n,k) TO s(8n,k)
     // printf("BASECHANGE!!!\n");
     // print_complex(x,8);
-    base_change(x,lo,m,n/2,n);
+    base_change(x,n/2,n,m,lo);
     // printf("BASECHANGE!!!\n");
     // print_complex(x,8);
     lo = lo-m;
     //BACK TO THE LEFT WE FIRST NEED TO GET LEFT BRANCH (x^2n-1) BASE S(2n,k)
     tangent_8_inverse(x,m,lo);
     //NOW TO A BASE CHANGE GO FROM X^2n-1 BASE S(2n,k) to X^2n-1 BASE S(8n,k)
-    base_change(x,lo,m,n/4,n);
+    base_change(x,n/4,n,m,lo);
     //NOW GO BACK TO THE RIGHT PART
     //GET RIGHT (x^2n-1)
     tangent_8_inverse(x,m,right_lo+m);
@@ -287,17 +302,6 @@ void tangent_8_inverse(double complex *x,int n,int lo)
       x[i+m] = temp - x[i+m];
     }
 
-  }
-}
-
-
-void get_base(double complex *x,int lo,int m, int n)
-{
-  int j =1;
-  for (int i = lo+1; i < lo+m; ++i)
-  {
-    x[i] = x[i] * s(n,j);
-    ++j;
   }
 }
 
@@ -344,10 +348,10 @@ void tangent_4(double complex *x,int n, int lo)
         x[i+m] = temp - I * x[i+m];
       }
       t_twist(x,n,m,lo);
-      get_base(x,lo,m,m);
+      base_change(x,m,-1,m,lo);
       tangent_8(x,m,lo);
       t_untwist(x,n,m,lo+m);
-      get_base(x,lo+m,m,m);
+      base_change(x,m,-1,m,lo+m);
       // printf("AFTER UNTWISTING\n");
       // print_complex(x,CPLXDIM);
       tangent_8(x,m,lo+m);

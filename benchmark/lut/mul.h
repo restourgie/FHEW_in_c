@@ -33,5 +33,6 @@ void init();
 void naive_real_mul(ring_t *r, const ring_t *x, const ring_t *y);
 void sr_precomp_mul(ring_t *r, const ring_t *x, const ring_t *y);
 void negacyc_lut_fft_mul(ring_t *r, const ring_t *x, const ring_t *y);
+void tangent_mul(ring_t *r, const ring_t *x, const ring_t *y);
 
 #endif

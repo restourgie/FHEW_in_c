@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #define NTESTS 1000
-#define NALGO 3
+#define NALGO 4
 #define THRESHOLD 2
 
 uint32_t myabs(uint32_t a)
@@ -44,8 +44,9 @@ void rand_test(){
       x.v[i] = fgetc(urandom);
       y.v[i] = fgetc(urandom);
     }
+    tangent_mul(&re,&x,&y);
     // sr_precomp_mul(&re,&x,&y);
-    negacyc_lut_fft_mul(&re,&x,&y);
+    // negacyc_lut_fft_mul(&re,&x,&y);
     naive_real_mul(&r,&x,&y);
     bool error = false;
     
@@ -100,6 +101,11 @@ void cycle_meassure(){
         sr_precomp_mul(&r, &x, &y);
         end = rdtsc();
       }
+      else if(j == 3){
+        start = rdtsc();
+        tangent_mul(&r, &x, &y);
+        end = rdtsc();
+      }
       cycles[n] = end - start;
     }
     qsort(cycles,sizeof(cycles)/sizeof(*cycles),sizeof(*cycles),compare);
@@ -109,6 +115,8 @@ void cycle_meassure(){
       printf("Median Normal LUT FFT: %llu\n",cycles[NTESTS/2-1]);
     else if(j == 2)
       printf("Median Split Radix LUT FFT: %llu\n",cycles[NTESTS/2-1]);
+    else if(j == 3)
+      printf("Median Tangent LUT FFT: %llu\n",cycles[NTESTS/2-1]);
   }
 
   fclose(urandom); 
