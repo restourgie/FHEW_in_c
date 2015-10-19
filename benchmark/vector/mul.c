@@ -8,9 +8,7 @@
 #include "fft/fftw.h"
 #include "fft/sr_vec_nonrec.h"
 
-cplx_ptr vec_x,vec_y,vec_res;
-cplx_ptr vctr_x,vctr_y,vctr_res;
-
+ cplx_ptr vctr_x,vctr_y,vctr_res;
 /******************************************************************
 *
 * SUPPORT CODE
@@ -46,20 +44,21 @@ void init(){
   init_table_vctr();
   //PRECOMP FFTW
   FFTsetup();
-  posix_memalign((void**)&vec_x.real,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_x.imag,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_y.real,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_y.imag,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_res.real,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_res.imag,32, CPLXDIM * sizeof(double));
+
+  // posix_memalign((void**)&vec_x.real,32, CPLXDIM * sizeof(double));
+  // posix_memalign((void**)&vec_x.imag,32, CPLXDIM * sizeof(double));
+  // posix_memalign((void**)&vec_y.real,32, CPLXDIM * sizeof(double));
+  // posix_memalign((void**)&vec_y.imag,32, CPLXDIM * sizeof(double));
+  // posix_memalign((void**)&vec_res.real,32, CPLXDIM * sizeof(double));
+  // posix_memalign((void**)&vec_res.imag,32, CPLXDIM * sizeof(double));
 
   init_vctr();
-  posix_memalign((void**)&vctr_x.real,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vctr_x.imag,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vctr_y.real,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vctr_y.imag,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vctr_res.real,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vctr_res.imag,32, CPLXDIM * sizeof(double));
+  // posix_memalign((void**)&vctr_x.real,32, CPLXDIM * sizeof(double));
+  // posix_memalign((void**)&vctr_x.imag,32, CPLXDIM * sizeof(double));
+  // posix_memalign((void**)&vctr_y.real,32, CPLXDIM * sizeof(double));
+  // posix_memalign((void**)&vctr_y.imag,32, CPLXDIM * sizeof(double));
+  // posix_memalign((void**)&vctr_res.real,32, CPLXDIM * sizeof(double));
+  // posix_memalign((void**)&vctr_res.imag,32, CPLXDIM * sizeof(double));
 }
 
 /******************************************************************
@@ -87,6 +86,23 @@ void fftw_mul(ring_t *r, const ring_t *x, const ring_t *y){
 *
 ******************************************************************/
 void sr_vector_nonrec_mul(ring_t *r, const ring_t *x, const ring_t *y){
+ 
+
+  void *mema = malloc(CPLXDIM * sizeof(double)+31);
+  vctr_x.real = ((uintptr_t)mema+31) & ~ (uintptr_t)0xFF;
+  void *memb = malloc(CPLXDIM * sizeof(double)+31);
+  vctr_x.imag = ((uintptr_t)memb+31) & ~ (uintptr_t)0xFF;
+
+  void *memc = malloc(CPLXDIM * sizeof(double)+31);
+  vctr_y.real = ((uintptr_t)memc+31) & ~ (uintptr_t)0xFF;
+  void *memd = malloc(CPLXDIM * sizeof(double)+31);
+  vctr_y.imag = ((uintptr_t)memd+31) & ~ (uintptr_t)0xFF;
+
+  void *meme = malloc(CPLXDIM * sizeof(double)+31);
+  vctr_res.real = ((uintptr_t)meme+31) & ~ (uintptr_t)0xFF;
+  void *memf = malloc(CPLXDIM * sizeof(double)+31);
+  vctr_res.imag = ((uintptr_t)memf+31) & ~ (uintptr_t)0xFF;
+  
   int j = CPLXDIM;
   for (int i = 0; i < CPLXDIM; ++i)
   {
@@ -117,17 +133,18 @@ void sr_vector_nonrec_mul(ring_t *r, const ring_t *x, const ring_t *y){
     //REPLACED FOR COMMENTED SECTION
     //real_x = ac
     real_x = _mm256_mul_pd(real_x,real_y);
-    //imag_x = bc
-    imag_x = _mm256_mul_pd(imag_x,real_y);
-    //real_x = ac - bd => real_x - real_temp
+    // //imag_x = bc
+    // imag_x = _mm256_mul_pd(imag_x,real_y);
+    // //real_x = ac - bd => real_x - real_temp
     real_x = _mm256_sub_pd(real_x,real_temp);
-    //imag_x = ad + bc => imag_temp + imag_x
-    imag_x = _mm256_add_pd(imag_x,imag_temp);
+    // //imag_x = ad + bc => imag_temp + imag_x
+    // imag_x = _mm256_add_pd(imag_x,imag_temp);
     //THESE ARE NOT WORKING 
     // real_x = _mm256_fmsub_pd(real_x,real_y,real_temp);
-    // imag_x = _mm256_fmadd_pd(imag_x,real_y,imag_temp);
+    imag_x = _mm256_fmadd_pd(imag_x,real_y,imag_temp);
     //WE WANT TO DIVIDE EVERYTHING BY CPLXDIM
     real_y = _mm256_setr_pd(CPLXDIM,CPLXDIM,CPLXDIM,CPLXDIM);
+    
     real_x = _mm256_div_pd(real_x,real_y);
     imag_x = _mm256_div_pd(imag_x,real_y);
 
@@ -143,6 +160,7 @@ void sr_vector_nonrec_mul(ring_t *r, const ring_t *x, const ring_t *y){
     // vec_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
   }
   fft_vector_nonrec_backward(&vctr_res,r);
+  // free(mema);
 }
 /******************************************************************
 *
@@ -151,6 +169,13 @@ void sr_vector_nonrec_mul(ring_t *r, const ring_t *x, const ring_t *y){
 ******************************************************************/
 void sr_vector_mul(ring_t *r, const ring_t *x, const ring_t *y){
   // printf("\n\n**************split-radix FAST**************\n");
+  cplx_ptr vec_x,vec_y,vec_res;
+  posix_memalign((void**)&vec_x.real,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vec_x.imag,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vec_y.real,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vec_y.imag,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vec_res.real,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vec_res.imag,32, CPLXDIM * sizeof(double));
   int j = CPLXDIM;
   for (int i = 0; i < CPLXDIM; ++i)
   {

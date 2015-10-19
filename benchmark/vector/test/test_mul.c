@@ -45,8 +45,8 @@ void rand_test(){
       y.v[i] = fgetc(urandom);
     }
     // fftw_mul(&re,&x,&y);
-    // sr_vector_nonrec_mul(&re,&x,&y);
-    sr_vector_mul(&re, &x, &y);
+    sr_vector_nonrec_mul(&re,&x,&y);
+    // sr_vector_mul(&re, &x, &y);
     naive_real_mul(&r,&x,&y);
     bool error = false;
     

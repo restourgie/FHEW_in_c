@@ -109,16 +109,16 @@ void vec_twist(cplx_ptr *cplx_x,int n,int m,int lo)
     imag_temp = _mm256_mul_pd(real_x,imag_tbl);
     //REPLACED FOR COMMENTED SECTION
     //real_x = ac
-    real_x = _mm256_mul_pd(real_x,real_tbl);
+    // real_x = _mm256_mul_pd(real_x,real_tbl);
     //imag_x = bc
-    imag_x = _mm256_mul_pd(imag_x,real_tbl);
+    // imag_x = _mm256_mul_pd(imag_x,real_tbl);
     //real_x = ac - bd => real_x - real_temp
-    real_x = _mm256_sub_pd(real_x,real_temp);
+    // real_x = _mm256_sub_pd(real_x,real_temp);
     //imag_x = ad + bc => imag_temp + imag_x
-    imag_x = _mm256_add_pd(imag_x,imag_temp);
+    // imag_x = _mm256_add_pd(imag_x,imag_temp);
     //THESE ARE NOT WORKING 
-    // real_x = _mm256_fmsub_pd(real_x,real_tbl,real_temp);
-    // imag_x = _mm256_fmadd_pd(imag_x,real_tbl,imag_temp);
+    real_x = _mm256_fmsub_pd(real_x,real_tbl,real_temp);
+    imag_x = _mm256_fmadd_pd(imag_x,real_tbl,imag_temp);
     _mm256_store_pd(cplx_x->real+i,real_x);
     _mm256_store_pd(cplx_x->imag+i,imag_x);
     j+=4;
@@ -151,17 +151,17 @@ void vec_untwist(cplx_ptr *cplx_x,int n,int m,int lo)
     imag_temp = _mm256_mul_pd(real_x,imag_tbl);
     //REPLACED FOR COMMENTED SECTION
     //real_x = ac
-    real_x = _mm256_mul_pd(real_x,real_tbl);
+    // real_x = _mm256_mul_pd(real_x,real_tbl);
     //imag_x = bc
-    imag_x = _mm256_mul_pd(imag_x,real_tbl);
+    // imag_x = _mm256_mul_pd(imag_x,real_tbl);
 
     //real_x = ac - bd => real_x - real_temp
-    real_x = _mm256_sub_pd(real_x,real_temp);
+    // real_x = _mm256_sub_pd(real_x,real_temp);
     //imag_x = ad + bc => imag_temp + imag_x
-    imag_x = _mm256_add_pd(imag_x,imag_temp);
+    // imag_x = _mm256_add_pd(imag_x,imag_temp);
     //THESE ARE NOT WORKING 
-    // real_x = _mm256_fmsub_pd(real_x,real_tbl,real_temp);
-    // imag_x = _mm256_fmadd_pd(imag_x,real_tbl,imag_temp);
+    real_x = _mm256_fmsub_pd(real_x,real_tbl,real_temp);
+    imag_x = _mm256_fmadd_pd(imag_x,real_tbl,imag_temp);
     _mm256_store_pd(cplx_x->real+i,real_x);
     _mm256_store_pd(cplx_x->imag+i,imag_x);
     j+=4;
