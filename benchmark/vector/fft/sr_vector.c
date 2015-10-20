@@ -539,7 +539,14 @@ void sr_vector_inverse(cplx_ptr *x,int n,int lo){
   }
 }
 
-void fft_vector_forward(cplx_ptr *x){
+void fft_vector_forward(cplx_ptr *x,const ring_t *ring){
+  int j = CPLXDIM;
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    x->real[i] = ring->v[i];
+    x->imag[i] = ring->v[j];
+    ++j;
+  }
   vector_twist(x,ROOTDIM,CPLXDIM,0);
   sr_vector(x,CPLXDIM,0);
 }

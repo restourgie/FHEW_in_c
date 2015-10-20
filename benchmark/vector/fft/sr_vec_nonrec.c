@@ -550,7 +550,14 @@ void sr_vector_nonrec_inverse(cplx_ptr *x)
 
 }
 
-void fft_vector_nonrec_forward(cplx_ptr *x){
+void fft_vector_nonrec_forward(cplx_ptr *x,const ring_t *ring){
+   int j = CPLXDIM;
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    x->real[i] = ring->v[i];
+    x->imag[i] = ring->v[j];
+    ++j;
+  }
   vec_twist(x,ROOTDIM,CPLXDIM,0);
   sr_vector_nonrec(x,CPLXDIM);
 }

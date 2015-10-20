@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #define NTESTS 1000
-#define NALGO 4
+#define NALGO 5
 #define THRESHOLD 2
 
 uint32_t myabs(uint32_t a)
@@ -45,7 +45,8 @@ void rand_test(){
       y.v[i] = fgetc(urandom);
     }
     // fftw_mul(&re,&x,&y);
-    sr_vector_nonrec_mul(&re,&x,&y);
+    // sr_vector_nonrec_mul(&re,&x,&y);
+    negacyc_mul(&re,&x,&y);
     // sr_vector_mul(&re, &x, &y);
     naive_real_mul(&r,&x,&y);
     bool error = false;
@@ -93,15 +94,20 @@ void cycle_meassure(){
       }
       else if(j == 1){
         start = rdtsc();
-        sr_vector_mul(&r,&x,&y);
+        negacyc_mul(&r,&x,&y);
         end = rdtsc();
       }
       else if(j == 2){
         start = rdtsc();
-        sr_vector_nonrec_mul(&r, &x, &y);
+        sr_vector_mul(&r,&x,&y);
         end = rdtsc();
       }
       else if(j == 3){
+        start = rdtsc();
+        sr_vector_nonrec_mul(&r, &x, &y);
+        end = rdtsc();
+      }
+      else if(j == 4){
         start = rdtsc();
         fftw_mul(&r,&x,&y);
         end = rdtsc();
@@ -112,10 +118,12 @@ void cycle_meassure(){
     if(j == 0)
       printf("Naive real mul: %llu\n",cycles[NTESTS/2-1]);
     else if(j == 1)
-      printf("Median Vectorized SplitRadix: %llu\n",cycles[NTESTS/2-1]);
+      printf("Median Vectorized normal FFT: %llu\n",cycles[NTESTS/2-1]);
     else if(j == 2)
-      printf("Median Vectorized Non recursive SR: %llu\n",cycles[NTESTS/2-1]);
+      printf("Median Vectorized SplitRadix: %llu\n",cycles[NTESTS/2-1]);
     else if(j == 3)
+      printf("Median Vectorized Non recursive SR: %llu\n",cycles[NTESTS/2-1]);
+    else if(j == 4)
       printf("Median FFTW: %llu\n",cycles[NTESTS/2-1]);
   }
 
@@ -124,8 +132,8 @@ void cycle_meassure(){
 
 int main()
 {
-  // rand_test();
-  cycle_meassure();
+  rand_test();
+  // cycle_meassure();
 
   return 0;
 }
