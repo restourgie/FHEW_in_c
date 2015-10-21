@@ -3,7 +3,7 @@
 #include "../mul.h"
 #include <stdbool.h>
 
-#define NTESTS 1
+#define NTESTS 1000
 #define NALGO 5
 #define THRESHOLD 2
 
@@ -132,8 +132,8 @@ void cycle_meassure(){
 
 int main()
 {
-  rand_test();
-  // cycle_meassure();
+  // rand_test();
+  cycle_meassure();
 
   return 0;
 }
