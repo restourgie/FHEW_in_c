@@ -213,34 +213,33 @@ void recursive_phi(cplx_ptr *x,int n,int lo,int level)
 	sub_real = _mm256_permute2f128_pd(real_x,real_y,0x20);
 	//abef  
 	//cdgh-
-	real_x = _mm256_sub_pd(sub_real,temp_real);
+	sub_imag = _mm256_sub_pd(sub_real,temp_real);
 	//abef
 	//cdgh+
-	real_y = _mm256_add_pd(sub_real,temp_real);
-    // printf("starting add sub part first real_x and y\n");
+	sub_real = _mm256_add_pd(sub_real,temp_real);
 
-	sub_real = _mm256_permute2f128_pd(real_x,real_y,0x02);
-	sub_imag = _mm256_permute2f128_pd(real_x,real_y,0x13);
-	real_x = _mm256_permute4x64_pd(sub_real,0xd8);
-	real_y = _mm256_permute4x64_pd(sub_imag,0xd8);
-
+	// //NEEDED TO COMPLETE LAYER 4
+	real_x = _mm256_permute2f128_pd(sub_imag,sub_real,0x02);
+	real_y = _mm256_permute2f128_pd(sub_imag,sub_real,0x13);
 	//PREPARE REALS FOR LAYER 2
 	//STORE ALL FACTORS THAT NEED TO BE MULT WITH ROOTS OF UNITY IN REAL_X
+	// real_x = _mm256_unpackhi_pd(sub_imag,sub_real);
+	// real_y = _mm256_unpacklo_pd(sub_imag,sub_real);
 
 	//IMAG PART
 	//get ai bi ei fi
 	sub_real = _mm256_permute2f128_pd(imag_x,imag_y,0x20);
 	//abef  
 	//cdgh-
-	imag_x = _mm256_sub_pd(sub_real,temp_imag);
+	sub_imag = _mm256_sub_pd(sub_real,temp_imag);
 	//abef
 	//cdgh+
-	imag_y = _mm256_add_pd(sub_real,temp_imag);
+	sub_real = _mm256_add_pd(sub_real,temp_imag);
 
-	sub_real = _mm256_permute2f128_pd(imag_x,imag_y,0x02);
-	sub_imag = _mm256_permute2f128_pd(imag_x,imag_y,0x13);
-	imag_x = _mm256_permute4x64_pd(sub_real,0xd8);
-	imag_y = _mm256_permute4x64_pd(sub_imag,0xd8);
+	//NEEDED TO COMPLETE LAYER 4
+	imag_x = _mm256_permute2f128_pd(sub_imag,sub_real,0x02);
+	imag_y = _mm256_permute2f128_pd(sub_imag,sub_real,0x13);
+
 
 	//PREPARE IMAGS FOR LAYER 2
 	//STORE ALL FACTORS THAT NEED TO BE MULT WITH ROOTS OF UNITY IN IMAG_X
@@ -272,10 +271,10 @@ void recursive_phi(cplx_ptr *x,int n,int lo,int level)
 	// imag_y = _mm256_permute2f128_pd(sub_real,sub_imag,0x13);
 	// imag_y = _mm256_permute4x64_pd(imag_y,0xd8);
 
-	// _mm256_store_pd(x->real+lo,real_x);
-	// _mm256_store_pd(x->imag+lo,imag_x);
-	// _mm256_store_pd(x->real+lo+m,real_y);
-	// _mm256_store_pd(x->imag+lo+m,imag_y);
+	_mm256_store_pd(x->real+lo,real_x);
+	_mm256_store_pd(x->imag+lo,imag_x);
+	_mm256_store_pd(x->real+lo+m,real_y);
+	_mm256_store_pd(x->imag+lo+m,imag_y);
 	
 	++level;
     recursive_phi(x,2,lo,level);
