@@ -3,7 +3,7 @@
 #include "../mul.h"
 #include <stdbool.h>
 
-#define NTESTS 1000
+#define NTESTS 1
 #define NALGO 5
 #define THRESHOLD 2
 
@@ -55,9 +55,9 @@ void rand_test(){
     {
 
       if(myabs(r.v[i] - re.v[i]) > THRESHOLD){
-        printf("school: %u \n", re.v[i]);
-        printf("mine: %u \n",r.v[i]);
-        printf("difference: %u\n\n",myabs(r.v[i] - re.v[i]));
+        // printf("school: %u \n", re.v[i]);
+        // printf("mine: %u \n",r.v[i]);
+        // printf("difference: %u\n\n",myabs(r.v[i] - re.v[i]));
         error = true;
       }
       

@@ -3,7 +3,7 @@
 #include "../mul.h"
 #include <stdbool.h>
 
-#define NTESTS 1000
+#define NTESTS 1
 #define NALGO 8
 #define THRESHOLD 2
 
@@ -44,17 +44,12 @@ void rand_test(){
       x.v[i] = fgetc(urandom);
       y.v[i] = fgetc(urandom);
     }
-    // normal_fft_mul(&re,&x,&y);
-    // split_radix_mul(&re,&x,&y);
-    sr_vector_mul(&re,&x,&y);
+    // sr_vector_mul(&re,&x,&y);
     // sr_vector_nonrec_mul(&re,&x,&y);
     // fftw_mul(&re,&x,&y);
     // twisted_mul(&r, &x, &y);
-    negacyc_lut_fft_mul(&r,&x,&y);
-    // sr_precomp_mul(&re,&x,&y);
-    // naive_complex_mul(&r,&x,&y);
-    // naive_real_mul(&r,&x,&y);
-    // test(&re,&x,&y);
+    negacyc_lut_fft_mul(&re,&x,&y);
+    naive_real_mul(&r,&x,&y);
     bool error = false;
     
     for(i=0;i<REALDIM;i++)

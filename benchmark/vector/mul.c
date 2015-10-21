@@ -81,16 +81,7 @@ void negacyc_mul(ring_t *r, const ring_t *x, const ring_t *y)
     real_temp = _mm256_mul_pd(imag_x,imag_y);
     //imag_temp = ad
     imag_temp = _mm256_mul_pd(real_x,imag_y);
-    //REPLACED FOR COMMENTED SECTION
-    // //real_x = ac
-    // real_x = _mm256_mul_pd(real_x,real_y);
-    // //imag_x = bc
-    // imag_x = _mm256_mul_pd(imag_x,real_y);
-    // //real_x = ac - bd => real_x - real_temp
-    // real_x = _mm256_sub_pd(real_x,real_temp);
-    // //imag_x = ad + bc => imag_temp + imag_x
-    // imag_x = _mm256_add_pd(imag_x,imag_temp);
-    //THESE ARE NOT WORKING 
+ 
     real_x = _mm256_fmsub_pd(real_x,real_y,real_temp);
     imag_x = _mm256_fmadd_pd(imag_x,real_y,imag_temp);
 

@@ -119,11 +119,17 @@ void inverse_phi(cplx_ptr *x,int n,int lo,int level)
 	}
 }
 
+void print256_num(__m256d var) 
+{
+    double *v64val = (double*) &var;
+    printf("%.16llf %.16llf %.16llf %.16llf\n", v64val[0], v64val[1],v64val[2],v64val[3]);
+}
+
 void recursive_phi(cplx_ptr *x,int n,int lo,int level)
 {	
-  if(n > 4)
+  int m = n/2;	
+  if(n > 8)
   {
-    int m = n/2;
     __m256d real_x,imag_x,real_y,imag_y,imag_twid,real_twid,temp_real,temp_imag;
     real_twid = _mm256_set1_pd(wortel[0][level][lo/n]);
     imag_twid = _mm256_set1_pd(wortel[1][level][lo/n]);
@@ -159,32 +165,142 @@ void recursive_phi(cplx_ptr *x,int n,int lo,int level)
     recursive_phi(x,m,lo,level);
     recursive_phi(x,m,lo + m,level);
   }
-  else if(n > 1)
+  else if(n == 8)
+  {
+    __m256d real_x,imag_x,real_y,imag_y,imag_twid,real_twid,temp_real,temp_imag,sub_real,sub_imag;
+    real_twid = _mm256_set1_pd(wortel[0][level][lo/n]);
+    imag_twid = _mm256_set1_pd(wortel[1][level][lo/n]);
+
+	//(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+	real_x = _mm256_load_pd(x->real+lo);
+	imag_x = _mm256_load_pd(x->imag+lo);
+	real_y = _mm256_load_pd(x->real+lo+m);
+	imag_y = _mm256_load_pd(x->imag+lo+m);
+	//TEMP_real = bd
+	temp_real = _mm256_mul_pd(imag_y,imag_twid);
+	//TEMP_imag = bc
+	temp_imag = _mm256_mul_pd(imag_y,real_twid);
+
+	//TEMP_real = ac - bd
+	temp_real = _mm256_fmsub_pd(real_y,real_twid,temp_real);
+	//TEMP_imag = ad + bc
+	temp_imag = _mm256_fmadd_pd(real_y,imag_twid,temp_imag);
+
+	real_y = _mm256_sub_pd(real_x,temp_real);
+	imag_y = _mm256_sub_pd(imag_x,temp_imag);
+
+	real_x = _mm256_add_pd(real_x,temp_real);
+	imag_x = _mm256_add_pd(imag_x,temp_imag);
+
+	//START LAYER 4
+	//We know that real_x = |a|b|c|d| imag_x = |ai|bi|ci|di| real_y = |e|f|g|h| imag_y = |ei|fi|gi|hi| 
+	//We need to twidle (c+ci),(d+di) and (g+gi),(h+hi)
+	++level;
+
+	sub_real = _mm256_permute2f128_pd(real_x,real_y,0x31);
+	sub_imag = _mm256_permute2f128_pd(imag_x,imag_y,0x31);
+	real_twid = _mm256_setr_pd(wortel[0][level][lo/4],wortel[0][level][lo/4],wortel[0][level][(lo+m)/4],wortel[0][level][(lo+m)/4]);
+    imag_twid = _mm256_setr_pd(wortel[1][level][lo/4],wortel[1][level][lo/4],wortel[1][level][(lo+m)/4],wortel[1][level][(lo+m)/4]);
+
+    temp_real = _mm256_mul_pd(sub_imag,imag_twid);
+    temp_imag = _mm256_mul_pd(sub_imag,real_twid);
+	//TEMP_real = ac - bd
+	temp_real = _mm256_fmsub_pd(sub_real,real_twid,temp_real);
+	//TEMP_imag = ad + bc
+	temp_imag = _mm256_fmadd_pd(sub_real,imag_twid,temp_imag);
+	//REAL PART
+	//get abef
+	sub_real = _mm256_permute2f128_pd(real_x,real_y,0x20);
+	//abef  
+	//cdgh-
+	real_x = _mm256_sub_pd(sub_real,temp_real);
+	//abef
+	//cdgh+
+	real_y = _mm256_add_pd(sub_real,temp_real);
+    // printf("starting add sub part first real_x and y\n");
+
+	sub_real = _mm256_permute2f128_pd(real_x,real_y,0x02);
+	sub_imag = _mm256_permute2f128_pd(real_x,real_y,0x13);
+	real_x = _mm256_permute4x64_pd(sub_real,0xd8);
+	real_y = _mm256_permute4x64_pd(sub_imag,0xd8);
+
+	//PREPARE REALS FOR LAYER 2
+	//STORE ALL FACTORS THAT NEED TO BE MULT WITH ROOTS OF UNITY IN REAL_X
+
+	//IMAG PART
+	//get ai bi ei fi
+	sub_real = _mm256_permute2f128_pd(imag_x,imag_y,0x20);
+	//abef  
+	//cdgh-
+	imag_x = _mm256_sub_pd(sub_real,temp_imag);
+	//abef
+	//cdgh+
+	imag_y = _mm256_add_pd(sub_real,temp_imag);
+
+	sub_real = _mm256_permute2f128_pd(imag_x,imag_y,0x02);
+	sub_imag = _mm256_permute2f128_pd(imag_x,imag_y,0x13);
+	imag_x = _mm256_permute4x64_pd(sub_real,0xd8);
+	imag_y = _mm256_permute4x64_pd(sub_imag,0xd8);
+
+	//PREPARE IMAGS FOR LAYER 2
+	//STORE ALL FACTORS THAT NEED TO BE MULT WITH ROOTS OF UNITY IN IMAG_X
+	//STORE ALL NON TWIDLE IMAGS IN IMAG_Y  
+
+	// //START LAYER 2!!
+	// real_twid = _mm256_setr_pd(wortel[0][level][(lo+m)/2],wortel[0][level][(lo+m+2)/2],wortel[0][level][lo/2],wortel[0][level][(lo+2)/2]);
+ //    imag_twid = _mm256_setr_pd(wortel[1][level][(lo+m)/2],wortel[1][level][(lo+m+2)/2],wortel[1][level][lo/2],wortel[1][level][(lo+2)/2]);
+
+ //    temp_real = _mm256_mul_pd(imag_x,imag_twid);
+ //    temp_imag = _mm256_mul_pd(imag_x,real_twid);
+
+	// //TEMP_real = ac - bd
+	// temp_real = _mm256_fmsub_pd(real_x,real_twid,temp_real);
+	// //TEMP_imag = ad + bc
+	// temp_imag = _mm256_fmadd_pd(real_x,imag_twid,temp_imag);
+
+	// sub_real = _mm256_sub_pd(real_y,temp_real);
+	// sub_imag = _mm256_add_pd(real_y,temp_real); 
+	// real_x = _mm256_permute2f128_pd(sub_real,sub_imag,0x02);
+	// real_x = _mm256_permute4x64_pd(real_x,0xd8);
+	// real_y = _mm256_permute2f128_pd(sub_real,sub_imag,0x13);
+	// real_y = _mm256_permute4x64_pd(real_y,0xd8);
+
+	// sub_real = _mm256_sub_pd(imag_y,temp_imag);
+	// sub_imag = _mm256_add_pd(imag_y,temp_imag); 
+	// imag_x = _mm256_permute2f128_pd(sub_real,sub_imag,0x02);
+	// imag_x = _mm256_permute4x64_pd(imag_x,0xd8);
+	// imag_y = _mm256_permute2f128_pd(sub_real,sub_imag,0x13);
+	// imag_y = _mm256_permute4x64_pd(imag_y,0xd8);
+
+	// _mm256_store_pd(x->real+lo,real_x);
+	// _mm256_store_pd(x->imag+lo,imag_x);
+	// _mm256_store_pd(x->real+lo+m,real_y);
+	// _mm256_store_pd(x->imag+lo+m,imag_y);
+	
+	++level;
+    recursive_phi(x,2,lo,level);
+    recursive_phi(x,2,(lo+2),level);
+    recursive_phi(x,2,(lo + m),level);
+    recursive_phi(x,2,(lo+m+2),level);
+  }
+  else if(n == 2)
   {
     double temp_real,temp_imag;
-    int m = n/2;
     double a,b,c,d;
-    // printf("LEVEL = %d, lo = %d n = %d\n",level,lo,n);    
-    // printf("Root: ( %f + I * %f)\n",creal(wortel[level][lo/n]),cimag(wortel[level][lo/n]));
-	    for(int i=lo; i < lo+m;++i){
-	      //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
-	      a = x->real[i+m];
-	      b = x->imag[i+m];
-	      c = wortel[0][level][lo/n];
-	      d = wortel[1][level][lo/n];
 
-	      temp_real = (a*c) - (b*d);
-	      temp_imag = (a*d) + (b*c);
-		      //phiprime
-	      x->real[i+m] = x->real[i] - temp_real;
-	      x->imag[i+m] = x->imag[i] - temp_imag;
-		      //phi
-	      x->real[i] = x->real[i] + temp_real;
-	      x->imag[i] = x->imag[i] + temp_imag;
-	    }
-	++level;
-    recursive_phi(x,m,lo,level);
-    recursive_phi(x,m,lo + m,level);
+	a = x->real[lo+1];
+	b = x->imag[lo+1];
+	c = wortel[0][level][lo/n];
+	d = wortel[1][level][lo/n];
+
+	temp_real = (a*c) - (b*d);
+	temp_imag = (a*d) + (b*c);
+	      //phiprime
+	x->real[lo+1] = x->real[lo] - temp_real;
+	x->imag[lo+1] = x->imag[lo] - temp_imag;
+	      //phi
+	x->real[lo] = x->real[lo] + temp_real;
+	x->imag[lo] = x->imag[lo] + temp_imag;
   }
 }
 
