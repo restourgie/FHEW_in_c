@@ -44,6 +44,7 @@ void rand_test(){
       x.v[i] = fgetc(urandom);
       y.v[i] = fgetc(urandom);
     }
+
     // fftw_mul(&re,&x,&y);
     // sr_vector_nonrec_mul(&re,&x,&y);
     negacyc_mul(&re,&x,&y);
@@ -132,8 +133,8 @@ void cycle_meassure(){
 
 int main()
 {
-  rand_test();
-  // cycle_meassure();
+  // rand_test();
+  cycle_meassure();
 
   return 0;
 }
