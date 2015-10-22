@@ -52,18 +52,52 @@ void init_negacyc()
 * SMART COMPLEX MULTIPLICATION
 *
 ******************************************************************/
-void inverse_phi(cplx_ptr *x)
-{	
-	int amount = log2(CPLXDIM)-3;
-  	int lo =0;
-  	int n = 8;
-  	int m=n/2;
-  	int level;
-	
-	for(;lo < CPLXDIM;lo +=n)
-  	{
-  		level = 8;
-  		 __m256d real_x,imag_x,real_y,imag_y,imag_twid,real_twid,temp_real,temp_imag,sub_real,sub_imag;
+void inverse_phi(cplx_ptr *x,int n,int lo,int level)
+{	int m = n/2;
+	if(n > 8)
+	{
+		inverse_phi(x,m,lo,level+1);
+		inverse_phi(x,m,lo+m,level+1);
+	    __m256d real_x,imag_x,real_y,imag_y,imag_twid,real_twid,temp_real,temp_imag;
+    	real_twid = _mm256_set1_pd(wortel[0][level][lo/n]);
+    	imag_twid = _mm256_set1_pd(wortel[2][level][lo/n]);
+		for(int i=lo;i<m+lo;i+=4)
+		{	
+			real_x = _mm256_load_pd(x->real+i);
+		    imag_x = _mm256_load_pd(x->imag+i);
+		    real_y = _mm256_load_pd(x->real+i+m);
+		    imag_y = _mm256_load_pd(x->imag+i+m);
+
+		    temp_real = real_x;
+		    temp_imag = imag_x;
+
+		    real_x = _mm256_add_pd(temp_real,real_y);
+	  		imag_x = _mm256_add_pd(temp_imag,imag_y);
+
+	  		real_y = _mm256_sub_pd(temp_real,real_y);
+	  		imag_y = _mm256_sub_pd(temp_imag,imag_y);
+
+	  		//TEMP_real = bd
+		    temp_real = _mm256_mul_pd(imag_y,imag_twid);
+		    //TEMP_imag = bc
+		    temp_imag = _mm256_mul_pd(imag_y,real_twid);
+
+		    //imag_y = ad + bc
+			imag_y = _mm256_fmadd_pd(real_y,imag_twid,temp_imag);
+		    //real_y = ac - bd
+		    real_y = _mm256_fmsub_pd(real_y,real_twid,temp_real);
+			
+
+			_mm256_store_pd(x->real+i,real_x);
+		    _mm256_store_pd(x->imag+i,imag_x);
+		    _mm256_store_pd(x->real+i+m,real_y);
+		    _mm256_store_pd(x->imag+i+m,imag_y);
+		}
+	}
+	else if(n == 8)
+	{	
+		level +=2;
+	    __m256d real_x,imag_x,real_y,imag_y,imag_twid,real_twid,temp_real,temp_imag,sub_real,sub_imag;
 		real_x = _mm256_load_pd(x->real+lo);
 		imag_x = _mm256_load_pd(x->imag+lo);
 		real_y = _mm256_load_pd(x->real+lo+m);
@@ -153,114 +187,55 @@ void inverse_phi(cplx_ptr *x)
 		_mm256_store_pd(x->imag+lo,imag_x);
 		_mm256_store_pd(x->real+lo+m,real_y);
 		_mm256_store_pd(x->imag+lo+m,imag_y);
-
-  	}	
-  	n = n<<1;
-	m = m<<1;
-	lo = 0;
-	--level;
-	for(int count = 0;count < amount;++count)
-	{
-	  	for(;lo < CPLXDIM;lo +=n)
-	  	{
-		    __m256d real_x,imag_x,real_y,imag_y,imag_twid,real_twid,temp_real,temp_imag;
-	    	real_twid = _mm256_set1_pd(wortel[0][level][lo/n]);
-	    	imag_twid = _mm256_set1_pd(wortel[2][level][lo/n]);
-			for(int i=lo;i<m+lo;i+=4)
-			{	
-				real_x = _mm256_load_pd(x->real+i);
-			    imag_x = _mm256_load_pd(x->imag+i);
-			    real_y = _mm256_load_pd(x->real+i+m);
-			    imag_y = _mm256_load_pd(x->imag+i+m);
-
-			    temp_real = real_x;
-			    temp_imag = imag_x;
-
-			    real_x = _mm256_add_pd(temp_real,real_y);
-		  		imag_x = _mm256_add_pd(temp_imag,imag_y);
-
-		  		real_y = _mm256_sub_pd(temp_real,real_y);
-		  		imag_y = _mm256_sub_pd(temp_imag,imag_y);
-
-		  		//TEMP_real = bd
-			    temp_real = _mm256_mul_pd(imag_y,imag_twid);
-			    //TEMP_imag = bc
-			    temp_imag = _mm256_mul_pd(imag_y,real_twid);
-
-			    //imag_y = ad + bc
-				imag_y = _mm256_fmadd_pd(real_y,imag_twid,temp_imag);
-			    //real_y = ac - bd
-			    real_y = _mm256_fmsub_pd(real_y,real_twid,temp_real);
-				
-
-				_mm256_store_pd(x->real+i,real_x);
-			    _mm256_store_pd(x->imag+i,imag_x);
-			    _mm256_store_pd(x->real+i+m,real_y);
-			    _mm256_store_pd(x->imag+i+m,imag_y);
-			}
-		}
-	  	lo = 0;
-	  	n = n<<1;
-	  	m = m<<1;
-	  	--level;
 	}
 }
 
-void iterative_phi(cplx_ptr *x)
-{
-  int amount = log2(CPLXDIM)-3;
-  int lo =0;
-  int n = CPLXDIM;
-  int m=n/2;
-  int level =0;
-
-  for(int count = 0;count < amount;++count)
+void recursive_phi(cplx_ptr *x,int n,int lo,int level)
+{	
+  int m = n/2;	
+  if(n > 8)
   {
-  	for(;lo < CPLXDIM;lo +=n)
-  	{
-  		__m256d real_x,imag_x,real_y,imag_y,imag_twid,real_twid,temp_real,temp_imag;
-	    real_twid = _mm256_set1_pd(wortel[0][level][lo/n]);
-	    imag_twid = _mm256_set1_pd(wortel[1][level][lo/n]);
-	    for(int i=lo; i < lo+m;i+=4)
-	    {
-		  //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
-		  real_x = _mm256_load_pd(x->real+i);
-	      imag_x = _mm256_load_pd(x->imag+i);
-	      real_y = _mm256_load_pd(x->real+i+m);
-	      imag_y = _mm256_load_pd(x->imag+i+m);
-	      //TEMP_real = bd
-	      temp_real = _mm256_mul_pd(imag_y,imag_twid);
-	      //TEMP_imag = bc
-	      temp_imag = _mm256_mul_pd(imag_y,real_twid);
+    __m256d real_x,imag_x,real_y,imag_y,imag_twid,real_twid,temp_real,temp_imag;
+    real_twid = _mm256_set1_pd(wortel[0][level][lo/n]);
+    imag_twid = _mm256_set1_pd(wortel[1][level][lo/n]);
+    for(int i=lo; i < lo+m;i+=4)
+    {
+	  //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
+	  real_x = _mm256_load_pd(x->real+i);
+      imag_x = _mm256_load_pd(x->imag+i);
+      real_y = _mm256_load_pd(x->real+i+m);
+      imag_y = _mm256_load_pd(x->imag+i+m);
+      //TEMP_real = bd
+      temp_real = _mm256_mul_pd(imag_y,imag_twid);
+      //TEMP_imag = bc
+      temp_imag = _mm256_mul_pd(imag_y,real_twid);
 
-	      //TEMP_real = ac - bd
-	      temp_real = _mm256_fmsub_pd(real_y,real_twid,temp_real);
-		  //TEMP_imag = ad + bc
-		  temp_imag = _mm256_fmadd_pd(real_y,imag_twid,temp_imag);
+      //TEMP_real = ac - bd
+      temp_real = _mm256_fmsub_pd(real_y,real_twid,temp_real);
+	  //TEMP_imag = ad + bc
+	  temp_imag = _mm256_fmadd_pd(real_y,imag_twid,temp_imag);
 
-		  real_y = _mm256_sub_pd(real_x,temp_real);
-		  imag_y = _mm256_sub_pd(imag_x,temp_imag);
+	  real_y = _mm256_sub_pd(real_x,temp_real);
+	  imag_y = _mm256_sub_pd(imag_x,temp_imag);
 
-		  real_x = _mm256_add_pd(real_x,temp_real);
-		  imag_x = _mm256_add_pd(imag_x,temp_imag);
+	  real_x = _mm256_add_pd(real_x,temp_real);
+	  imag_x = _mm256_add_pd(imag_x,temp_imag);
 
-		  _mm256_store_pd(x->real+i,real_x);
-	      _mm256_store_pd(x->imag+i,imag_x);
-	      _mm256_store_pd(x->real+i+m,real_y);
-	      _mm256_store_pd(x->imag+i+m,imag_y);
-		}
-  	}
-  	lo = 0;
-  	n = n>>1;
-  	m = m>>1;
-  	++level;
+	  _mm256_store_pd(x->real+i,real_x);
+      _mm256_store_pd(x->imag+i,imag_x);
+      _mm256_store_pd(x->real+i+m,real_y);
+      _mm256_store_pd(x->imag+i+m,imag_y);
+	}
+	++level;
+    recursive_phi(x,m,lo,level);
+    recursive_phi(x,m,lo + m,level);
   }
-  for(;lo < CPLXDIM;lo +=n)
-  {	
-  	level = 6;
+  else if(n == 8)
+  {
     __m256d real_x,imag_x,real_y,imag_y,imag_twid,real_twid,temp_real,temp_imag,sub_real,sub_imag;
     real_twid = _mm256_set1_pd(wortel[0][level][lo/n]);
     imag_twid = _mm256_set1_pd(wortel[1][level][lo/n]);
+
 	//(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
 	real_x = _mm256_load_pd(x->real+lo);
 	imag_x = _mm256_load_pd(x->imag+lo);
@@ -384,12 +359,12 @@ void phi_forward(cplx_ptr *x,const ring_t *ring)
     x->imag[i] = ring->v[j];
     ++j;
   }
-  iterative_phi(x);
+  recursive_phi(x, CPLXDIM,0,0);
 }
 
 void phi_backward(cplx_ptr *x, ring_t *ring)
 {
-  inverse_phi(x);
+  inverse_phi(x, CPLXDIM,0,0);
 
   int j = CPLXDIM;
   for (int i = 0; i < CPLXDIM; ++i)
