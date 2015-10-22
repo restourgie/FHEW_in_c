@@ -132,8 +132,8 @@ void cycle_meassure(){
 
 int main()
 {
-  // rand_test();
-  cycle_meassure();
+  rand_test();
+  // cycle_meassure();
 
   return 0;
 }
