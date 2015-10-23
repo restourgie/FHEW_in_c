@@ -100,6 +100,7 @@ void negacyc_mul(ring_t *r, const ring_t *x, const ring_t *y)
      // vec_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
   }
   phi_backward(&vec_res,r);
+  // print_cplx(&vec_res,CPLXDIM);
 }
 
 /******************************************************************
