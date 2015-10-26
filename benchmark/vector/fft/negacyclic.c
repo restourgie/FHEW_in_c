@@ -156,10 +156,29 @@ void inverse_phi(cplx_ptr *x)
   	}
   
 	__m256d v0_r,v8_r,v16_r,v24_r,v32_r,v40_r,v48_r,v56_r,v0_i,v8_i,v16_i,v24_i,v32_i,v40_i,v48_i,v56_i;
-	__m256d real_twiddle,imag_twiddle;
+    __m256d real_twid_L1,imag_twid_L1,real_twid_L2_1,imag_twid_L2_1,real_twid_L2_2,
+		imag_twid_L2_2,real_twid_L3_1,imag_twid_L3_1,real_twid_L3_2,imag_twid_L3_2,
+		real_twid_L3_3,imag_twid_L3_3,real_twid_L3_4,imag_twid_L3_4;
 	//Make sure n = 64
 	for(lo = 0;lo < CPLXDIM;lo +=64)
 	{	
+		//init twiddle for 64
+		real_twid_L1 = _mm256_set1_pd(wortel[0][5][lo/64]);
+		imag_twid_L1 = _mm256_set1_pd(wortel[2][5][lo/64]);
+		//init twiddle for 32
+		real_twid_L2_1 = _mm256_set1_pd(wortel[0][4][lo/32]);
+		imag_twid_L2_1 = _mm256_set1_pd(wortel[2][4][lo/32]);
+		real_twid_L2_2 = _mm256_set1_pd(wortel[0][4][(lo+32)/32]);
+		imag_twid_L2_2 = _mm256_set1_pd(wortel[2][4][(lo+32)/32]);
+		//init twiddle for 16
+		real_twid_L3_1 = _mm256_set1_pd(wortel[0][3][lo/16]);
+		imag_twid_L3_1 = _mm256_set1_pd(wortel[2][3][lo/16]);
+		real_twid_L3_2 = _mm256_set1_pd(wortel[0][3][(lo+16)/16]);
+		imag_twid_L3_2 = _mm256_set1_pd(wortel[2][3][(lo+16)/16]);
+		real_twid_L3_3 = _mm256_set1_pd(wortel[0][3][(lo+32)/16]);
+		imag_twid_L3_3 = _mm256_set1_pd(wortel[2][3][(lo+32)/16]);
+		real_twid_L3_4 = _mm256_set1_pd(wortel[0][3][(lo+48)/16]);
+		imag_twid_L3_4 = _mm256_set1_pd(wortel[2][3][(lo+48)/16]);
 
 		for(int offset = 0; offset < 8; offset+=4)
 		{	
@@ -186,8 +205,6 @@ void inverse_phi(cplx_ptr *x)
 		  	v56_i = _mm256_load_pd(x->imag+lo+offset+56);
 
 		  	//WE START WITH LAYER 2
-  		  	real_twiddle = _mm256_set1_pd(wortel[0][3][(lo)/16]);
-			imag_twiddle = _mm256_set1_pd(wortel[2][3][(lo)/16]);
 		  	//TWIDDLE 0 - 8
 		    temp_real = _mm256_sub_pd(v0_r,v8_r);
 	  		temp_imag = _mm256_sub_pd(v0_i,v8_i);
@@ -195,14 +212,12 @@ void inverse_phi(cplx_ptr *x)
 		    v0_r = _mm256_add_pd(v0_r,v8_r);
 	  		v0_i = _mm256_add_pd(v0_i,v8_i);
 
-		    sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		    temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		    sub_real = _mm256_mul_pd(temp_imag,imag_twid_L3_1);
+		    temp_imag = _mm256_mul_pd(temp_imag,real_twid_L3_1);
 
-			v8_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		    v8_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+			v8_i = _mm256_fmadd_pd(temp_real,imag_twid_L3_1,temp_imag);
+		    v8_r = _mm256_fmsub_pd(temp_real,real_twid_L3_1,sub_real);
 
-  		  	real_twiddle = _mm256_set1_pd(wortel[0][3][(lo+16)/16]);
-			imag_twiddle = _mm256_set1_pd(wortel[2][3][(lo+16)/16]);
 		  	//TWIDDLE 16 - 24
 		    temp_real = _mm256_sub_pd(v16_r,v24_r);
 	  		temp_imag = _mm256_sub_pd(v16_i,v24_i);
@@ -210,14 +225,12 @@ void inverse_phi(cplx_ptr *x)
 		    v16_r = _mm256_add_pd(v16_r,v24_r);
 	  		v16_i = _mm256_add_pd(v16_i,v24_i);
 
-		    sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		    temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		    sub_real = _mm256_mul_pd(temp_imag,imag_twid_L3_2);
+		    temp_imag = _mm256_mul_pd(temp_imag,real_twid_L3_2);
 
-			v24_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		    v24_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+			v24_i = _mm256_fmadd_pd(temp_real,imag_twid_L3_2,temp_imag);
+		    v24_r = _mm256_fmsub_pd(temp_real,real_twid_L3_2,sub_real);
 
-  		  	real_twiddle = _mm256_set1_pd(wortel[0][3][(lo+32)/16]);
-			imag_twiddle = _mm256_set1_pd(wortel[2][3][(lo+32)/16]);
 		  	//TWIDDLE 32 - 40
 		    temp_real = _mm256_sub_pd(v32_r,v40_r);
 	  		temp_imag = _mm256_sub_pd(v32_i,v40_i);
@@ -225,15 +238,12 @@ void inverse_phi(cplx_ptr *x)
 		    v32_r = _mm256_add_pd(v32_r,v40_r);
 	  		v32_i = _mm256_add_pd(v32_i,v40_i);
 
-		    sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		    temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		    sub_real = _mm256_mul_pd(temp_imag,imag_twid_L3_3);
+		    temp_imag = _mm256_mul_pd(temp_imag,real_twid_L3_3);
 
-			v40_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		    v40_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+			v40_i = _mm256_fmadd_pd(temp_real,imag_twid_L3_3,temp_imag);
+		    v40_r = _mm256_fmsub_pd(temp_real,real_twid_L3_3,sub_real);
 
-  		  	
-  		  	real_twiddle = _mm256_set1_pd(wortel[0][3][(lo+48)/16]);
-			imag_twiddle = _mm256_set1_pd(wortel[2][3][(lo+48)/16]);
 		  	//TWIDDLE 48 - 56
 		    temp_real = _mm256_sub_pd(v48_r,v56_r);
 	  		temp_imag = _mm256_sub_pd(v48_i,v56_i);
@@ -241,16 +251,14 @@ void inverse_phi(cplx_ptr *x)
 		    v48_r = _mm256_add_pd(v48_r,v56_r);
 	  		v48_i = _mm256_add_pd(v48_i,v56_i);
 
-		    sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		    temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		    sub_real = _mm256_mul_pd(temp_imag,imag_twid_L3_4);
+		    temp_imag = _mm256_mul_pd(temp_imag,real_twid_L3_4);
 
-			v56_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		    v56_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+			v56_i = _mm256_fmadd_pd(temp_real,imag_twid_L3_4,temp_imag);
+		    v56_r = _mm256_fmsub_pd(temp_real,real_twid_L3_4,sub_real);
 
 		    //START WITH LAYER 32
 		    //LEFT SIDE
-  		  	real_twiddle = _mm256_set1_pd(wortel[0][4][(lo)/32]);
-			imag_twiddle = _mm256_set1_pd(wortel[2][4][(lo)/32]);
 		  	//TWIDDLE 0 - 16
 		    temp_real = _mm256_sub_pd(v0_r,v16_r);
 	  		temp_imag = _mm256_sub_pd(v0_i,v16_i);
@@ -258,11 +266,11 @@ void inverse_phi(cplx_ptr *x)
 		    v0_r = _mm256_add_pd(v0_r,v16_r);
 	  		v0_i = _mm256_add_pd(v0_i,v16_i);
 
-		    sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		    temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		    sub_real = _mm256_mul_pd(temp_imag,imag_twid_L2_1);
+		    temp_imag = _mm256_mul_pd(temp_imag,real_twid_L2_1);
 
-			v16_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		    v16_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+			v16_i = _mm256_fmadd_pd(temp_real,imag_twid_L2_1,temp_imag);
+		    v16_r = _mm256_fmsub_pd(temp_real,real_twid_L2_1,sub_real);
 		  	//TWIDDLE 8 - 24
 		    temp_real = _mm256_sub_pd(v8_r,v24_r);
 	  		temp_imag = _mm256_sub_pd(v8_i,v24_i);
@@ -270,15 +278,13 @@ void inverse_phi(cplx_ptr *x)
 		    v8_r = _mm256_add_pd(v8_r,v24_r);
 	  		v8_i = _mm256_add_pd(v8_i,v24_i);
 
-		    sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		    temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		    sub_real = _mm256_mul_pd(temp_imag,imag_twid_L2_1);
+		    temp_imag = _mm256_mul_pd(temp_imag,real_twid_L2_1);
 
-			v24_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		    v24_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+			v24_i = _mm256_fmadd_pd(temp_real,imag_twid_L2_1,temp_imag);
+		    v24_r = _mm256_fmsub_pd(temp_real,real_twid_L2_1,sub_real);
 
 		    //RIGHT SIDE
-  		  	real_twiddle = _mm256_set1_pd(wortel[0][4][(lo+32)/32]);
-			imag_twiddle = _mm256_set1_pd(wortel[2][4][(lo+32)/32]);
 		  	//TWIDDLE 32 - 48
 		    temp_real = _mm256_sub_pd(v32_r,v48_r);
 	  		temp_imag = _mm256_sub_pd(v32_i,v48_i);
@@ -286,11 +292,11 @@ void inverse_phi(cplx_ptr *x)
 		    v32_r = _mm256_add_pd(v32_r,v48_r);
 	  		v32_i = _mm256_add_pd(v32_i,v48_i);
 
-		    sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		    temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		    sub_real = _mm256_mul_pd(temp_imag,imag_twid_L2_2);
+		    temp_imag = _mm256_mul_pd(temp_imag,real_twid_L2_2);
 
-			v48_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		    v48_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+			v48_i = _mm256_fmadd_pd(temp_real,imag_twid_L2_2,temp_imag);
+		    v48_r = _mm256_fmsub_pd(temp_real,real_twid_L2_2,sub_real);
 		  	//TWIDDLE 40 - 56
 		    temp_real = _mm256_sub_pd(v40_r,v56_r);
 	  		temp_imag = _mm256_sub_pd(v40_i,v56_i);
@@ -298,15 +304,13 @@ void inverse_phi(cplx_ptr *x)
 		    v40_r = _mm256_add_pd(v40_r,v56_r);
 	  		v40_i = _mm256_add_pd(v40_i,v56_i);
 
-		    sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		    temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		    sub_real = _mm256_mul_pd(temp_imag,imag_twid_L2_2);
+		    temp_imag = _mm256_mul_pd(temp_imag,real_twid_L2_2);
 
-			v56_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		    v56_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+			v56_i = _mm256_fmadd_pd(temp_real,imag_twid_L2_2,temp_imag);
+		    v56_r = _mm256_fmsub_pd(temp_real,real_twid_L2_2,sub_real);
 
 		    //START WITH LAYER 64
-  		  	real_twiddle = _mm256_set1_pd(wortel[0][5][(lo)/64]);
-			imag_twiddle = _mm256_set1_pd(wortel[2][5][(lo)/64]);
 		  	//TWIDDLE 0 - 32
 		    temp_real = _mm256_sub_pd(v0_r,v32_r);
 	  		temp_imag = _mm256_sub_pd(v0_i,v32_i);
@@ -314,11 +318,11 @@ void inverse_phi(cplx_ptr *x)
 		    v0_r = _mm256_add_pd(v0_r,v32_r);
 	  		v0_i = _mm256_add_pd(v0_i,v32_i);
 
-		    sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		    temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		    sub_real = _mm256_mul_pd(temp_imag,imag_twid_L1);
+		    temp_imag = _mm256_mul_pd(temp_imag,real_twid_L1);
 
-			v32_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		    v32_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+			v32_i = _mm256_fmadd_pd(temp_real,imag_twid_L1,temp_imag);
+		    v32_r = _mm256_fmsub_pd(temp_real,real_twid_L1,sub_real);
 		  	//TWIDDLE 8 - 40
 		    temp_real = _mm256_sub_pd(v8_r,v40_r);
 	  		temp_imag = _mm256_sub_pd(v8_i,v40_i);
@@ -326,11 +330,11 @@ void inverse_phi(cplx_ptr *x)
 		    v8_r = _mm256_add_pd(v8_r,v40_r);
 	  		v8_i = _mm256_add_pd(v8_i,v40_i);
 
-		    sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		    temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		    sub_real = _mm256_mul_pd(temp_imag,imag_twid_L1);
+		    temp_imag = _mm256_mul_pd(temp_imag,real_twid_L1);
 
-			v40_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		    v40_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+			v40_i = _mm256_fmadd_pd(temp_real,imag_twid_L1,temp_imag);
+		    v40_r = _mm256_fmsub_pd(temp_real,real_twid_L1,sub_real);
 		  	//TWIDDLE 16 - 48
 		    temp_real = _mm256_sub_pd(v16_r,v48_r);
 	  		temp_imag = _mm256_sub_pd(v16_i,v48_i);
@@ -338,11 +342,11 @@ void inverse_phi(cplx_ptr *x)
 		    v16_r = _mm256_add_pd(v16_r,v48_r);
 	  		v16_i = _mm256_add_pd(v16_i,v48_i);
 
-		    sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		    temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		    sub_real = _mm256_mul_pd(temp_imag,imag_twid_L1);
+		    temp_imag = _mm256_mul_pd(temp_imag,real_twid_L1);
 
-			v48_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		    v48_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+			v48_i = _mm256_fmadd_pd(temp_real,imag_twid_L1,temp_imag);
+		    v48_r = _mm256_fmsub_pd(temp_real,real_twid_L1,sub_real);
 		  	//TWIDDLE 24 - 56
 		    temp_real = _mm256_sub_pd(v24_r,v56_r);
 	  		temp_imag = _mm256_sub_pd(v24_i,v56_i);
@@ -350,11 +354,11 @@ void inverse_phi(cplx_ptr *x)
 		    v24_r = _mm256_add_pd(v24_r,v56_r);
 	  		v24_i = _mm256_add_pd(v24_i,v56_i);
 
-		    sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		    temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		    sub_real = _mm256_mul_pd(temp_imag,imag_twid_L1);
+		    temp_imag = _mm256_mul_pd(temp_imag,real_twid_L1);
 
-			v56_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		    v56_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+			v56_i = _mm256_fmadd_pd(temp_real,imag_twid_L1,temp_imag);
+		    v56_r = _mm256_fmsub_pd(temp_real,real_twid_L1,sub_real);
 
 			//STORE ALL RESULTS
 			_mm256_store_pd(x->real+lo+offset,v0_r);
@@ -378,8 +382,23 @@ void inverse_phi(cplx_ptr *x)
 	}
 
 	//init twiddle for 512
-	real_twid = _mm256_set1_pd(wortel[0][8][0]);
-	imag_twid = _mm256_set1_pd(wortel[2][8][0]);
+	real_twid_L1 = _mm256_set1_pd(wortel[0][8][0]);
+	imag_twid_L1 = _mm256_set1_pd(wortel[2][8][0]);
+	//init twiddle for 256
+	real_twid_L2_1 = _mm256_set1_pd(wortel[0][7][0]);
+	imag_twid_L2_1 = _mm256_set1_pd(wortel[2][7][0]);
+	real_twid_L2_2 = _mm256_set1_pd(wortel[0][7][1]);
+	imag_twid_L2_2 = _mm256_set1_pd(wortel[2][7][1]);
+	//init twiddle for 128
+	real_twid_L3_1 = _mm256_set1_pd(wortel[0][6][0]);
+	imag_twid_L3_1 = _mm256_set1_pd(wortel[2][6][0]);
+	real_twid_L3_2 = _mm256_set1_pd(wortel[0][6][1]);
+	imag_twid_L3_2 = _mm256_set1_pd(wortel[2][6][1]);
+	real_twid_L3_3 = _mm256_set1_pd(wortel[0][6][2]);
+	imag_twid_L3_3 = _mm256_set1_pd(wortel[2][6][2]);
+	real_twid_L3_4 = _mm256_set1_pd(wortel[0][6][3]);
+	imag_twid_L3_4 = _mm256_set1_pd(wortel[2][6][3]);
+
 	lo =0;
 	//FUSING 512-256-128
   	for(int offset = 0; offset < 64; offset+=4)
@@ -408,8 +427,6 @@ void inverse_phi(cplx_ptr *x)
 	  	v56_i = _mm256_load_pd(x->imag+offset+448);
 
 		//WE START WITH LAYER 128
-		real_twiddle = _mm256_set1_pd(wortel[0][6][0]);
-		imag_twiddle = _mm256_set1_pd(wortel[2][6][0]);
 		//TWIDDLE 0 - 64
 		temp_real = _mm256_sub_pd(v0_r,v8_r);
 		temp_imag = _mm256_sub_pd(v0_i,v8_i);
@@ -417,14 +434,12 @@ void inverse_phi(cplx_ptr *x)
 		v0_r = _mm256_add_pd(v0_r,v8_r);
 		v0_i = _mm256_add_pd(v0_i,v8_i);
 
-		sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		sub_real = _mm256_mul_pd(temp_imag,imag_twid_L3_1);
+		temp_imag = _mm256_mul_pd(temp_imag,real_twid_L3_1);
 
-		v8_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		v8_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+		v8_i = _mm256_fmadd_pd(temp_real,imag_twid_L3_1,temp_imag);
+		v8_r = _mm256_fmsub_pd(temp_real,real_twid_L3_1,sub_real);
 
-		real_twiddle = _mm256_set1_pd(wortel[0][6][1]);
-		imag_twiddle = _mm256_set1_pd(wortel[2][6][1]);
 		//TWIDDLE 128 - 192
 		temp_real = _mm256_sub_pd(v16_r,v24_r);
 		temp_imag = _mm256_sub_pd(v16_i,v24_i);
@@ -432,14 +447,12 @@ void inverse_phi(cplx_ptr *x)
 		v16_r = _mm256_add_pd(v16_r,v24_r);
 		v16_i = _mm256_add_pd(v16_i,v24_i);
 
-		sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		sub_real = _mm256_mul_pd(temp_imag,imag_twid_L3_2);
+		temp_imag = _mm256_mul_pd(temp_imag,real_twid_L3_2);
 
-		v24_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		v24_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+		v24_i = _mm256_fmadd_pd(temp_real,imag_twid_L3_2,temp_imag);
+		v24_r = _mm256_fmsub_pd(temp_real,real_twid_L3_2,sub_real);
 
-		real_twiddle = _mm256_set1_pd(wortel[0][6][2]);
-		imag_twiddle = _mm256_set1_pd(wortel[2][6][2]);
 		//TWIDDLE 256 - 320
 		temp_real = _mm256_sub_pd(v32_r,v40_r);
 		temp_imag = _mm256_sub_pd(v32_i,v40_i);
@@ -447,15 +460,12 @@ void inverse_phi(cplx_ptr *x)
 		v32_r = _mm256_add_pd(v32_r,v40_r);
 		v32_i = _mm256_add_pd(v32_i,v40_i);
 
-		sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		sub_real = _mm256_mul_pd(temp_imag,imag_twid_L3_3);
+		temp_imag = _mm256_mul_pd(temp_imag,real_twid_L3_3);
 
-		v40_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		v40_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+		v40_i = _mm256_fmadd_pd(temp_real,imag_twid_L3_3,temp_imag);
+		v40_r = _mm256_fmsub_pd(temp_real,real_twid_L3_3,sub_real);
 
-
-		real_twiddle = _mm256_set1_pd(wortel[0][6][3]);
-		imag_twiddle = _mm256_set1_pd(wortel[2][6][3]);
 		//TWIDDLE 384 - 448
 		temp_real = _mm256_sub_pd(v48_r,v56_r);
 		temp_imag = _mm256_sub_pd(v48_i,v56_i);
@@ -463,16 +473,14 @@ void inverse_phi(cplx_ptr *x)
 		v48_r = _mm256_add_pd(v48_r,v56_r);
 		v48_i = _mm256_add_pd(v48_i,v56_i);
 
-		sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		sub_real = _mm256_mul_pd(temp_imag,imag_twid_L3_4);
+		temp_imag = _mm256_mul_pd(temp_imag,real_twid_L3_4);
 
-		v56_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		v56_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+		v56_i = _mm256_fmadd_pd(temp_real,imag_twid_L3_4,temp_imag);
+		v56_r = _mm256_fmsub_pd(temp_real,real_twid_L3_4,sub_real);
 
 		//START WITH LAYER 256
 		//LEFT SIDE
-		real_twiddle = _mm256_set1_pd(wortel[0][7][0]);
-		imag_twiddle = _mm256_set1_pd(wortel[2][7][0]);
 		//TWIDDLE 0 - 128
 		temp_real = _mm256_sub_pd(v0_r,v16_r);
 		temp_imag = _mm256_sub_pd(v0_i,v16_i);
@@ -480,11 +488,11 @@ void inverse_phi(cplx_ptr *x)
 		v0_r = _mm256_add_pd(v0_r,v16_r);
 		v0_i = _mm256_add_pd(v0_i,v16_i);
 
-		sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		sub_real = _mm256_mul_pd(temp_imag,imag_twid_L2_1);
+		temp_imag = _mm256_mul_pd(temp_imag,real_twid_L2_1);
 
-		v16_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		v16_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+		v16_i = _mm256_fmadd_pd(temp_real,imag_twid_L2_1,temp_imag);
+		v16_r = _mm256_fmsub_pd(temp_real,real_twid_L2_1,sub_real);
 		//TWIDDLE 64 - 192
 		temp_real = _mm256_sub_pd(v8_r,v24_r);
 		temp_imag = _mm256_sub_pd(v8_i,v24_i);
@@ -492,15 +500,13 @@ void inverse_phi(cplx_ptr *x)
 		v8_r = _mm256_add_pd(v8_r,v24_r);
 		v8_i = _mm256_add_pd(v8_i,v24_i);
 
-		sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		sub_real = _mm256_mul_pd(temp_imag,imag_twid_L2_1);
+		temp_imag = _mm256_mul_pd(temp_imag,real_twid_L2_1);
 
-		v24_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		v24_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+		v24_i = _mm256_fmadd_pd(temp_real,imag_twid_L2_1,temp_imag);
+		v24_r = _mm256_fmsub_pd(temp_real,real_twid_L2_1,sub_real);
 
 		//RIGHT SIDE
-		real_twiddle = _mm256_set1_pd(wortel[0][7][1]);
-		imag_twiddle = _mm256_set1_pd(wortel[2][7][1]);
 		//TWIDDLE 256 - 384
 		temp_real = _mm256_sub_pd(v32_r,v48_r);
 		temp_imag = _mm256_sub_pd(v32_i,v48_i);
@@ -508,11 +514,11 @@ void inverse_phi(cplx_ptr *x)
 		v32_r = _mm256_add_pd(v32_r,v48_r);
 		v32_i = _mm256_add_pd(v32_i,v48_i);
 
-		sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		sub_real = _mm256_mul_pd(temp_imag,imag_twid_L2_2);
+		temp_imag = _mm256_mul_pd(temp_imag,real_twid_L2_2);
 
-		v48_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		v48_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+		v48_i = _mm256_fmadd_pd(temp_real,imag_twid_L2_2,temp_imag);
+		v48_r = _mm256_fmsub_pd(temp_real,real_twid_L2_2,sub_real);
 		//TWIDDLE 320 - 448
 		temp_real = _mm256_sub_pd(v40_r,v56_r);
 		temp_imag = _mm256_sub_pd(v40_i,v56_i);
@@ -520,11 +526,11 @@ void inverse_phi(cplx_ptr *x)
 		v40_r = _mm256_add_pd(v40_r,v56_r);
 		v40_i = _mm256_add_pd(v40_i,v56_i);
 
-		sub_real = _mm256_mul_pd(temp_imag,imag_twiddle);
-		temp_imag = _mm256_mul_pd(temp_imag,real_twiddle);
+		sub_real = _mm256_mul_pd(temp_imag,imag_twid_L2_2);
+		temp_imag = _mm256_mul_pd(temp_imag,real_twid_L2_2);
 
-		v56_i = _mm256_fmadd_pd(temp_real,imag_twiddle,temp_imag);
-		v56_r = _mm256_fmsub_pd(temp_real,real_twiddle,sub_real);
+		v56_i = _mm256_fmadd_pd(temp_real,imag_twid_L2_2,temp_imag);
+		v56_r = _mm256_fmsub_pd(temp_real,real_twid_L2_2,sub_real);
 
 
 		//START 512
@@ -535,11 +541,11 @@ void inverse_phi(cplx_ptr *x)
 		v0_r = _mm256_add_pd(v0_r,v32_r);
 		v0_i = _mm256_add_pd(v0_i,v32_i);
 
-		sub_real = _mm256_mul_pd(temp_imag,imag_twid);
-		temp_imag = _mm256_mul_pd(temp_imag,real_twid);
+		sub_real = _mm256_mul_pd(temp_imag,imag_twid_L1);
+		temp_imag = _mm256_mul_pd(temp_imag,real_twid_L1);
 
-		v32_i = _mm256_fmadd_pd(temp_real,imag_twid,temp_imag);
-		v32_r = _mm256_fmsub_pd(temp_real,real_twid,sub_real);
+		v32_i = _mm256_fmadd_pd(temp_real,imag_twid_L1,temp_imag);
+		v32_r = _mm256_fmsub_pd(temp_real,real_twid_L1,sub_real);
 		//TWIDDLE 64 - 320
 		temp_real = _mm256_sub_pd(v8_r,v40_r);
 		temp_imag = _mm256_sub_pd(v8_i,v40_i);
@@ -547,11 +553,11 @@ void inverse_phi(cplx_ptr *x)
 		v8_r = _mm256_add_pd(v8_r,v40_r);
 		v8_i = _mm256_add_pd(v8_i,v40_i);
 
-		sub_real = _mm256_mul_pd(temp_imag,imag_twid);
-		temp_imag = _mm256_mul_pd(temp_imag,real_twid);
+		sub_real = _mm256_mul_pd(temp_imag,imag_twid_L1);
+		temp_imag = _mm256_mul_pd(temp_imag,real_twid_L1);
 
-		v40_i = _mm256_fmadd_pd(temp_real,imag_twid,temp_imag);
-		v40_r = _mm256_fmsub_pd(temp_real,real_twid,sub_real);
+		v40_i = _mm256_fmadd_pd(temp_real,imag_twid_L1,temp_imag);
+		v40_r = _mm256_fmsub_pd(temp_real,real_twid_L1,sub_real);
 		//TWIDDLE 128 - 384
 		temp_real = _mm256_sub_pd(v16_r,v48_r);
 		temp_imag = _mm256_sub_pd(v16_i,v48_i);
@@ -559,11 +565,11 @@ void inverse_phi(cplx_ptr *x)
 		v16_r = _mm256_add_pd(v16_r,v48_r);
 		v16_i = _mm256_add_pd(v16_i,v48_i);
 
-		sub_real = _mm256_mul_pd(temp_imag,imag_twid);
-		temp_imag = _mm256_mul_pd(temp_imag,real_twid);
+		sub_real = _mm256_mul_pd(temp_imag,imag_twid_L1);
+		temp_imag = _mm256_mul_pd(temp_imag,real_twid_L1);
 
-		v48_i = _mm256_fmadd_pd(temp_real,imag_twid,temp_imag);
-		v48_r = _mm256_fmsub_pd(temp_real,real_twid,sub_real);
+		v48_i = _mm256_fmadd_pd(temp_real,imag_twid_L1,temp_imag);
+		v48_r = _mm256_fmsub_pd(temp_real,real_twid_L1,sub_real);
 		//TWIDDLE 192 - 448
 		temp_real = _mm256_sub_pd(v24_r,v56_r);
 		temp_imag = _mm256_sub_pd(v24_i,v56_i);
@@ -571,11 +577,11 @@ void inverse_phi(cplx_ptr *x)
 		v24_r = _mm256_add_pd(v24_r,v56_r);
 		v24_i = _mm256_add_pd(v24_i,v56_i);
 
-		sub_real = _mm256_mul_pd(temp_imag,imag_twid);
-		temp_imag = _mm256_mul_pd(temp_imag,real_twid);
+		sub_real = _mm256_mul_pd(temp_imag,imag_twid_L1);
+		temp_imag = _mm256_mul_pd(temp_imag,real_twid_L1);
 
-		v56_i = _mm256_fmadd_pd(temp_real,imag_twid,temp_imag);
-		v56_r = _mm256_fmsub_pd(temp_real,real_twid,sub_real);
+		v56_i = _mm256_fmadd_pd(temp_real,imag_twid_L1,temp_imag);
+		v56_r = _mm256_fmsub_pd(temp_real,real_twid_L1,sub_real);
 
 	  		//STORE ALL RESULTS
 		_mm256_store_pd(x->real+offset,v0_r);
@@ -601,13 +607,32 @@ void inverse_phi(cplx_ptr *x)
 
 void iterative_phi(cplx_ptr *x)
 {
-  __m256d imag_twid,real_twid,temp_real,temp_imag,sub_real,sub_imag;
-  __m256d real_twiddle,imag_twiddle;
+  __m256d temp_real,temp_imag,sub_real,sub_imag;
+  __m256d real_twid_L1,imag_twid_L1,real_twid_L2_1,imag_twid_L2_1,real_twid_L2_2,
+  		imag_twid_L2_2,real_twid_L3_1,imag_twid_L3_1,real_twid_L3_2,imag_twid_L3_2,
+  		real_twid_L3_3,imag_twid_L3_3,real_twid_L3_4,imag_twid_L3_4;
+  __m256d real_twid,imag_twid;
   int lo =0;
   __m256d v0_r,v8_r,v16_r,v24_r,v32_r,v40_r,v48_r,v56_r,v0_i,v8_i,v16_i,v24_i,v32_i,v40_i,v48_i,v56_i;
   //init twiddle for 512
-  real_twid = _mm256_set1_pd(wortel[0][8][0]);
-  imag_twid = _mm256_set1_pd(wortel[1][8][0]);
+  //ONLY init 1 because REAL = IMAG
+  // real_twid_L1 = _mm256_set1_pd(wortel[0][8][0]);
+  imag_twid_L1 = _mm256_set1_pd(wortel[1][8][0]);
+  //init twiddle for 256
+  real_twid_L2_1 = _mm256_set1_pd(wortel[0][7][0]);
+  imag_twid_L2_1 = _mm256_set1_pd(wortel[1][7][0]);
+  real_twid_L2_2 = _mm256_set1_pd(wortel[0][7][1]);
+  imag_twid_L2_2 = _mm256_set1_pd(wortel[1][7][1]);
+  //init twiddle for 128
+  real_twid_L3_1 = _mm256_set1_pd(wortel[0][6][0]);
+  imag_twid_L3_1 = _mm256_set1_pd(wortel[1][6][0]);
+  real_twid_L3_2 = _mm256_set1_pd(wortel[0][6][1]);
+  imag_twid_L3_2 = _mm256_set1_pd(wortel[1][6][1]);
+  real_twid_L3_3 = _mm256_set1_pd(wortel[0][6][2]);
+  imag_twid_L3_3 = _mm256_set1_pd(wortel[1][6][2]);
+  real_twid_L3_4 = _mm256_set1_pd(wortel[0][6][3]);
+  imag_twid_L3_4 = _mm256_set1_pd(wortel[1][6][3]);
+
   //FUSING 512-256-128
   for(int offset = 0; offset < 64; offset+=4)
   {	
@@ -637,8 +662,8 @@ void iterative_phi(cplx_ptr *x)
   	//START TWIDDLE
   	//WE ARE NOW IN 512 SO EVERYTHING BETWEEN 256 and 512 needs to be multiplied by root of unity
   	//TWIDDLE 0 - 256
-	temp_imag = _mm256_mul_pd(v32_i,imag_twid);	
-	temp_real = _mm256_mul_pd(v32_r,imag_twid);
+	temp_imag = _mm256_mul_pd(v32_i,imag_twid_L1);	
+	temp_real = _mm256_mul_pd(v32_r,imag_twid_L1);
 
 	sub_real = _mm256_sub_pd(temp_real,temp_imag);
 	temp_imag = _mm256_add_pd(temp_real,temp_imag);
@@ -649,8 +674,8 @@ void iterative_phi(cplx_ptr *x)
 	v0_r = _mm256_add_pd(v0_r,sub_real);
 	v0_i = _mm256_add_pd(v0_i,temp_imag);
 	//TWIDDLE 64-320
-	temp_imag = _mm256_mul_pd(v40_i,imag_twid);	
-	temp_real = _mm256_mul_pd(v40_r,imag_twid);
+	temp_imag = _mm256_mul_pd(v40_i,imag_twid_L1);	
+	temp_real = _mm256_mul_pd(v40_r,imag_twid_L1);
 
 	sub_real = _mm256_sub_pd(temp_real,temp_imag);
 	temp_imag = _mm256_add_pd(temp_real,temp_imag);
@@ -661,8 +686,8 @@ void iterative_phi(cplx_ptr *x)
 	v8_r = _mm256_add_pd(v8_r,sub_real);
 	v8_i = _mm256_add_pd(v8_i,temp_imag);
 	//TWIDDLE 128-384
-	temp_imag = _mm256_mul_pd(v48_i,imag_twid);	
-	temp_real = _mm256_mul_pd(v48_r,imag_twid);
+	temp_imag = _mm256_mul_pd(v48_i,imag_twid_L1);	
+	temp_real = _mm256_mul_pd(v48_r,imag_twid_L1);
 
 	sub_real = _mm256_sub_pd(temp_real,temp_imag);
 	temp_imag = _mm256_add_pd(temp_real,temp_imag);
@@ -673,8 +698,8 @@ void iterative_phi(cplx_ptr *x)
 	v16_r = _mm256_add_pd(v16_r,sub_real);
 	v16_i = _mm256_add_pd(v16_i,temp_imag);
 	//TWIDDLE 192-448
-	temp_imag = _mm256_mul_pd(v56_i,imag_twid);	
-	temp_real = _mm256_mul_pd(v56_r,imag_twid);
+	temp_imag = _mm256_mul_pd(v56_i,imag_twid_L1);	
+	temp_real = _mm256_mul_pd(v56_r,imag_twid_L1);
 
 	sub_real = _mm256_sub_pd(temp_real,temp_imag);
 	temp_imag = _mm256_add_pd(temp_real,temp_imag);
@@ -687,14 +712,13 @@ void iterative_phi(cplx_ptr *x)
 
 	//NOW WE START WITH 256
 	//FIRST LEFT SIDE
-  	real_twiddle = _mm256_set1_pd(wortel[0][7][0]);
-	imag_twiddle = _mm256_set1_pd(wortel[1][7][0]);
-	//TWIDDLE 0 - 128
-	temp_real = _mm256_mul_pd(v16_i,imag_twiddle);
-	temp_imag = _mm256_mul_pd(v16_i,real_twiddle);
 
-	temp_real = _mm256_fmsub_pd(v16_r,real_twiddle,temp_real);
-	temp_imag = _mm256_fmadd_pd(v16_r,imag_twiddle,temp_imag);
+	//TWIDDLE 0 - 128
+	temp_real = _mm256_mul_pd(v16_i,imag_twid_L2_1);
+	temp_imag = _mm256_mul_pd(v16_i,real_twid_L2_1);
+
+	temp_real = _mm256_fmsub_pd(v16_r,real_twid_L2_1,temp_real);
+	temp_imag = _mm256_fmadd_pd(v16_r,imag_twid_L2_1,temp_imag);
 
 	v16_r = _mm256_sub_pd(v0_r,temp_real);
 	v16_i = _mm256_sub_pd(v0_i,temp_imag);
@@ -702,11 +726,11 @@ void iterative_phi(cplx_ptr *x)
 	v0_r = _mm256_add_pd(v0_r,temp_real);
 	v0_i = _mm256_add_pd(v0_i,temp_imag);
 	//TWIDDLE 64 - 192
-	temp_real = _mm256_mul_pd(v24_i,imag_twiddle);
-	temp_imag = _mm256_mul_pd(v24_i,real_twiddle);
+	temp_real = _mm256_mul_pd(v24_i,imag_twid_L2_1);
+	temp_imag = _mm256_mul_pd(v24_i,real_twid_L2_1);
 
-	temp_real = _mm256_fmsub_pd(v24_r,real_twiddle,temp_real);
-	temp_imag = _mm256_fmadd_pd(v24_r,imag_twiddle,temp_imag);
+	temp_real = _mm256_fmsub_pd(v24_r,real_twid_L2_1,temp_real);
+	temp_imag = _mm256_fmadd_pd(v24_r,imag_twid_L2_1,temp_imag);
 
 	v24_r = _mm256_sub_pd(v8_r,temp_real);
 	v24_i = _mm256_sub_pd(v8_i,temp_imag);
@@ -714,14 +738,12 @@ void iterative_phi(cplx_ptr *x)
 	v8_r = _mm256_add_pd(v8_r,temp_real);
 	v8_i = _mm256_add_pd(v8_i,temp_imag);
 	//NOW WE DO THE RIGHT SIDE
-  	real_twiddle = _mm256_set1_pd(wortel[0][7][1]);
-	imag_twiddle = _mm256_set1_pd(wortel[1][7][1]);
 	//TWIDDLE 256 - 384
-	temp_real = _mm256_mul_pd(v48_i,imag_twiddle);
-	temp_imag = _mm256_mul_pd(v48_i,real_twiddle);
+	temp_real = _mm256_mul_pd(v48_i,imag_twid_L2_2);
+	temp_imag = _mm256_mul_pd(v48_i,real_twid_L2_2);
 
-	temp_real = _mm256_fmsub_pd(v48_r,real_twiddle,temp_real);
-	temp_imag = _mm256_fmadd_pd(v48_r,imag_twiddle,temp_imag);
+	temp_real = _mm256_fmsub_pd(v48_r,real_twid_L2_2,temp_real);
+	temp_imag = _mm256_fmadd_pd(v48_r,imag_twid_L2_2,temp_imag);
 
 	v48_r = _mm256_sub_pd(v32_r,temp_real);
 	v48_i = _mm256_sub_pd(v32_i,temp_imag);
@@ -729,11 +751,11 @@ void iterative_phi(cplx_ptr *x)
 	v32_r = _mm256_add_pd(v32_r,temp_real);
 	v32_i = _mm256_add_pd(v32_i,temp_imag);
 	//TWIDDLE 320 - 448
-	temp_real = _mm256_mul_pd(v56_i,imag_twiddle);
-	temp_imag = _mm256_mul_pd(v56_i,real_twiddle);
+	temp_real = _mm256_mul_pd(v56_i,imag_twid_L2_2);
+	temp_imag = _mm256_mul_pd(v56_i,real_twid_L2_2);
 
-	temp_real = _mm256_fmsub_pd(v56_r,real_twiddle,temp_real);
-	temp_imag = _mm256_fmadd_pd(v56_r,imag_twiddle,temp_imag);
+	temp_real = _mm256_fmsub_pd(v56_r,real_twid_L2_2,temp_real);
+	temp_imag = _mm256_fmadd_pd(v56_r,imag_twid_L2_2,temp_imag);
 
 	v56_r = _mm256_sub_pd(v40_r,temp_real);
 	v56_i = _mm256_sub_pd(v40_i,temp_imag);
@@ -742,15 +764,12 @@ void iterative_phi(cplx_ptr *x)
 	v40_i = _mm256_add_pd(v40_i,temp_imag);
 
 	//START LAYER 128
-	//WE NEED TO LOAD INDIVIDUAL TWIDDLES PER TWIDDLE
-  	real_twiddle = _mm256_set1_pd(wortel[0][6][0]);
-	imag_twiddle = _mm256_set1_pd(wortel[1][6][0]);
 	//TWIDDLE 0 - 64
-	temp_real = _mm256_mul_pd(v8_i,imag_twiddle);
-	temp_imag = _mm256_mul_pd(v8_i,real_twiddle);
+	temp_real = _mm256_mul_pd(v8_i,imag_twid_L3_1);
+	temp_imag = _mm256_mul_pd(v8_i,real_twid_L3_1);
 
-	temp_real = _mm256_fmsub_pd(v8_r,real_twiddle,temp_real);
-	temp_imag = _mm256_fmadd_pd(v8_r,imag_twiddle,temp_imag);
+	temp_real = _mm256_fmsub_pd(v8_r,real_twid_L3_1,temp_real);
+	temp_imag = _mm256_fmadd_pd(v8_r,imag_twid_L3_1,temp_imag);
 
 	v8_r = _mm256_sub_pd(v0_r,temp_real);
 	v8_i = _mm256_sub_pd(v0_i,temp_imag);
@@ -758,14 +777,12 @@ void iterative_phi(cplx_ptr *x)
 	v0_r = _mm256_add_pd(v0_r,temp_real);
 	v0_i = _mm256_add_pd(v0_i,temp_imag);
 	//WE NEED TO LOAD INDIVIDUAL TWIDDLES PER TWIDDLE
-  	real_twiddle = _mm256_set1_pd(wortel[0][6][1]);
-	imag_twiddle = _mm256_set1_pd(wortel[1][6][1]);
 	//TWIDDLE 128 - 192
-	temp_real = _mm256_mul_pd(v24_i,imag_twiddle);
-	temp_imag = _mm256_mul_pd(v24_i,real_twiddle);
+	temp_real = _mm256_mul_pd(v24_i,imag_twid_L3_2);
+	temp_imag = _mm256_mul_pd(v24_i,real_twid_L3_2);
 
-	temp_real = _mm256_fmsub_pd(v24_r,real_twiddle,temp_real);
-	temp_imag = _mm256_fmadd_pd(v24_r,imag_twiddle,temp_imag);
+	temp_real = _mm256_fmsub_pd(v24_r,real_twid_L3_2,temp_real);
+	temp_imag = _mm256_fmadd_pd(v24_r,imag_twid_L3_2,temp_imag);
 
 	v24_r = _mm256_sub_pd(v16_r,temp_real);
 	v24_i = _mm256_sub_pd(v16_i,temp_imag);
@@ -773,14 +790,12 @@ void iterative_phi(cplx_ptr *x)
 	v16_r = _mm256_add_pd(v16_r,temp_real);
 	v16_i = _mm256_add_pd(v16_i,temp_imag);
 	//WE NEED TO LOAD INDIVIDUAL TWIDDLES PER TWIDDLE
-  	real_twiddle = _mm256_set1_pd(wortel[0][6][2]);
-	imag_twiddle = _mm256_set1_pd(wortel[1][6][2]);
 	//TWIDDLE 256 - 320
-	temp_real = _mm256_mul_pd(v40_i,imag_twiddle);
-	temp_imag = _mm256_mul_pd(v40_i,real_twiddle);
+	temp_real = _mm256_mul_pd(v40_i,imag_twid_L3_3);
+	temp_imag = _mm256_mul_pd(v40_i,real_twid_L3_3);
 
-	temp_real = _mm256_fmsub_pd(v40_r,real_twiddle,temp_real);
-	temp_imag = _mm256_fmadd_pd(v40_r,imag_twiddle,temp_imag);
+	temp_real = _mm256_fmsub_pd(v40_r,real_twid_L3_3,temp_real);
+	temp_imag = _mm256_fmadd_pd(v40_r,imag_twid_L3_3,temp_imag);
 
 	v40_r = _mm256_sub_pd(v32_r,temp_real);
 	v40_i = _mm256_sub_pd(v32_i,temp_imag);
@@ -788,14 +803,12 @@ void iterative_phi(cplx_ptr *x)
 	v32_r = _mm256_add_pd(v32_r,temp_real);
 	v32_i = _mm256_add_pd(v32_i,temp_imag);
 	//WE NEED TO LOAD INDIVIDUAL TWIDDLES PER TWIDDLE
-  	real_twiddle = _mm256_set1_pd(wortel[0][6][3]);
-	imag_twiddle = _mm256_set1_pd(wortel[1][6][3]);
 	//TWIDDLE 384 - 448
-	temp_real = _mm256_mul_pd(v56_i,imag_twiddle);
-	temp_imag = _mm256_mul_pd(v56_i,real_twiddle);
+	temp_real = _mm256_mul_pd(v56_i,imag_twid_L3_4);
+	temp_imag = _mm256_mul_pd(v56_i,real_twid_L3_4);
 
-	temp_real = _mm256_fmsub_pd(v56_r,real_twiddle,temp_real);
-	temp_imag = _mm256_fmadd_pd(v56_r,imag_twiddle,temp_imag);
+	temp_real = _mm256_fmsub_pd(v56_r,real_twid_L3_4,temp_real);
+	temp_imag = _mm256_fmadd_pd(v56_r,imag_twid_L3_4,temp_imag);
 
 	v56_r = _mm256_sub_pd(v48_r,temp_real);
 	v56_i = _mm256_sub_pd(v48_i,temp_imag);
@@ -826,8 +839,24 @@ void iterative_phi(cplx_ptr *x)
   //Make sure n = 64
   for(lo = 0;lo < CPLXDIM;lo +=64)
   {	
-  	real_twid = _mm256_set1_pd(wortel[0][5][lo/64]);
-	imag_twid = _mm256_set1_pd(wortel[1][5][lo/64]);
+	//init twiddle for 64
+	real_twid_L1 = _mm256_set1_pd(wortel[0][5][lo/64]);
+	imag_twid_L1 = _mm256_set1_pd(wortel[1][5][lo/64]);
+	//init twiddle for 32
+	real_twid_L2_1 = _mm256_set1_pd(wortel[0][4][lo/32]);
+	imag_twid_L2_1 = _mm256_set1_pd(wortel[1][4][lo/32]);
+	real_twid_L2_2 = _mm256_set1_pd(wortel[0][4][(lo+32)/32]);
+	imag_twid_L2_2 = _mm256_set1_pd(wortel[1][4][(lo+32)/32]);
+	//init twiddle for 16
+	real_twid_L3_1 = _mm256_set1_pd(wortel[0][3][lo/16]);
+	imag_twid_L3_1 = _mm256_set1_pd(wortel[1][3][lo/16]);
+	real_twid_L3_2 = _mm256_set1_pd(wortel[0][3][(lo+16)/16]);
+	imag_twid_L3_2 = _mm256_set1_pd(wortel[1][3][(lo+16)/16]);
+	real_twid_L3_3 = _mm256_set1_pd(wortel[0][3][(lo+32)/16]);
+	imag_twid_L3_3 = _mm256_set1_pd(wortel[1][3][(lo+32)/16]);
+	real_twid_L3_4 = _mm256_set1_pd(wortel[0][3][(lo+48)/16]);
+	imag_twid_L3_4 = _mm256_set1_pd(wortel[1][3][(lo+48)/16]);
+
   	for(int offset = 0; offset < 8; offset+=4)
   	{	
   		//LOAD A LOT of STUF
@@ -856,11 +885,11 @@ void iterative_phi(cplx_ptr *x)
 	  	//START TWIDDLE
 	  	//WE ARE NOW IN 64 SO EVERYTHING BETWEEN 32 and 64 needs to be multiplied by root of unity
 	  	//TWIDDLE 0 - 32
-		temp_real = _mm256_mul_pd(v32_i,imag_twid);
-		temp_imag = _mm256_mul_pd(v32_i,real_twid);
+		temp_real = _mm256_mul_pd(v32_i,imag_twid_L1);
+		temp_imag = _mm256_mul_pd(v32_i,real_twid_L1);
 
-		temp_real = _mm256_fmsub_pd(v32_r,real_twid,temp_real);
-		temp_imag = _mm256_fmadd_pd(v32_r,imag_twid,temp_imag);
+		temp_real = _mm256_fmsub_pd(v32_r,real_twid_L1,temp_real);
+		temp_imag = _mm256_fmadd_pd(v32_r,imag_twid_L1,temp_imag);
 
 		v32_r = _mm256_sub_pd(v0_r,temp_real);
 		v32_i = _mm256_sub_pd(v0_i,temp_imag);
@@ -868,11 +897,11 @@ void iterative_phi(cplx_ptr *x)
 		v0_r = _mm256_add_pd(v0_r,temp_real);
 		v0_i = _mm256_add_pd(v0_i,temp_imag);
 		//TWIDDLE 8-40
-		temp_real = _mm256_mul_pd(v40_i,imag_twid);
-		temp_imag = _mm256_mul_pd(v40_i,real_twid);
+		temp_real = _mm256_mul_pd(v40_i,imag_twid_L1);
+		temp_imag = _mm256_mul_pd(v40_i,real_twid_L1);
 
-		temp_real = _mm256_fmsub_pd(v40_r,real_twid,temp_real);
-		temp_imag = _mm256_fmadd_pd(v40_r,imag_twid,temp_imag);
+		temp_real = _mm256_fmsub_pd(v40_r,real_twid_L1,temp_real);
+		temp_imag = _mm256_fmadd_pd(v40_r,imag_twid_L1,temp_imag);
 
 		v40_r = _mm256_sub_pd(v8_r,temp_real);
 		v40_i = _mm256_sub_pd(v8_i,temp_imag);
@@ -880,11 +909,11 @@ void iterative_phi(cplx_ptr *x)
 		v8_r = _mm256_add_pd(v8_r,temp_real);
 		v8_i = _mm256_add_pd(v8_i,temp_imag);
 		//TWIDDLE 16-48
-		temp_real = _mm256_mul_pd(v48_i,imag_twid);
-		temp_imag = _mm256_mul_pd(v48_i,real_twid);
+		temp_real = _mm256_mul_pd(v48_i,imag_twid_L1);
+		temp_imag = _mm256_mul_pd(v48_i,real_twid_L1);
 
-		temp_real = _mm256_fmsub_pd(v48_r,real_twid,temp_real);
-		temp_imag = _mm256_fmadd_pd(v48_r,imag_twid,temp_imag);
+		temp_real = _mm256_fmsub_pd(v48_r,real_twid_L1,temp_real);
+		temp_imag = _mm256_fmadd_pd(v48_r,imag_twid_L1,temp_imag);
 
 		v48_r = _mm256_sub_pd(v16_r,temp_real);
 		v48_i = _mm256_sub_pd(v16_i,temp_imag);
@@ -892,11 +921,11 @@ void iterative_phi(cplx_ptr *x)
 		v16_r = _mm256_add_pd(v16_r,temp_real);
 		v16_i = _mm256_add_pd(v16_i,temp_imag);
 		//TWIDDLE 24-56
-		temp_real = _mm256_mul_pd(v56_i,imag_twid);
-		temp_imag = _mm256_mul_pd(v56_i,real_twid);
+		temp_real = _mm256_mul_pd(v56_i,imag_twid_L1);
+		temp_imag = _mm256_mul_pd(v56_i,real_twid_L1);
 
-		temp_real = _mm256_fmsub_pd(v56_r,real_twid,temp_real);
-		temp_imag = _mm256_fmadd_pd(v56_r,imag_twid,temp_imag);
+		temp_real = _mm256_fmsub_pd(v56_r,real_twid_L1,temp_real);
+		temp_imag = _mm256_fmadd_pd(v56_r,imag_twid_L1,temp_imag);
 
 		v56_r = _mm256_sub_pd(v24_r,temp_real);
 		v56_i = _mm256_sub_pd(v24_i,temp_imag);
@@ -906,14 +935,12 @@ void iterative_phi(cplx_ptr *x)
 
 		//NOW WE START WITH 32
 		//FIRST LEFT SIDE
-	  	real_twiddle = _mm256_set1_pd(wortel[0][4][lo/32]);
-		imag_twiddle = _mm256_set1_pd(wortel[1][4][lo/32]);
 		//TWIDDLE 0 - 16
-		temp_real = _mm256_mul_pd(v16_i,imag_twiddle);
-		temp_imag = _mm256_mul_pd(v16_i,real_twiddle);
+		temp_real = _mm256_mul_pd(v16_i,imag_twid_L2_1);
+		temp_imag = _mm256_mul_pd(v16_i,real_twid_L2_1);
 
-		temp_real = _mm256_fmsub_pd(v16_r,real_twiddle,temp_real);
-		temp_imag = _mm256_fmadd_pd(v16_r,imag_twiddle,temp_imag);
+		temp_real = _mm256_fmsub_pd(v16_r,real_twid_L2_1,temp_real);
+		temp_imag = _mm256_fmadd_pd(v16_r,imag_twid_L2_1,temp_imag);
 
 		v16_r = _mm256_sub_pd(v0_r,temp_real);
 		v16_i = _mm256_sub_pd(v0_i,temp_imag);
@@ -921,11 +948,11 @@ void iterative_phi(cplx_ptr *x)
 		v0_r = _mm256_add_pd(v0_r,temp_real);
 		v0_i = _mm256_add_pd(v0_i,temp_imag);
 		//TWIDDLE 8 - 24
-		temp_real = _mm256_mul_pd(v24_i,imag_twiddle);
-		temp_imag = _mm256_mul_pd(v24_i,real_twiddle);
+		temp_real = _mm256_mul_pd(v24_i,imag_twid_L2_1);
+		temp_imag = _mm256_mul_pd(v24_i,real_twid_L2_1);
 
-		temp_real = _mm256_fmsub_pd(v24_r,real_twiddle,temp_real);
-		temp_imag = _mm256_fmadd_pd(v24_r,imag_twiddle,temp_imag);
+		temp_real = _mm256_fmsub_pd(v24_r,real_twid_L2_1,temp_real);
+		temp_imag = _mm256_fmadd_pd(v24_r,imag_twid_L2_1,temp_imag);
 
 		v24_r = _mm256_sub_pd(v8_r,temp_real);
 		v24_i = _mm256_sub_pd(v8_i,temp_imag);
@@ -933,14 +960,12 @@ void iterative_phi(cplx_ptr *x)
 		v8_r = _mm256_add_pd(v8_r,temp_real);
 		v8_i = _mm256_add_pd(v8_i,temp_imag);
 		//NOW WE DO THE RIGHT SIDE
-	  	real_twiddle = _mm256_set1_pd(wortel[0][4][(lo+32)/32]);
-		imag_twiddle = _mm256_set1_pd(wortel[1][4][(lo+32)/32]);
 		//TWIDDLE 32 - 48
-		temp_real = _mm256_mul_pd(v48_i,imag_twiddle);
-		temp_imag = _mm256_mul_pd(v48_i,real_twiddle);
+		temp_real = _mm256_mul_pd(v48_i,imag_twid_L2_2);
+		temp_imag = _mm256_mul_pd(v48_i,real_twid_L2_2);
 
-		temp_real = _mm256_fmsub_pd(v48_r,real_twiddle,temp_real);
-		temp_imag = _mm256_fmadd_pd(v48_r,imag_twiddle,temp_imag);
+		temp_real = _mm256_fmsub_pd(v48_r,real_twid_L2_2,temp_real);
+		temp_imag = _mm256_fmadd_pd(v48_r,imag_twid_L2_2,temp_imag);
 
 		v48_r = _mm256_sub_pd(v32_r,temp_real);
 		v48_i = _mm256_sub_pd(v32_i,temp_imag);
@@ -948,11 +973,11 @@ void iterative_phi(cplx_ptr *x)
 		v32_r = _mm256_add_pd(v32_r,temp_real);
 		v32_i = _mm256_add_pd(v32_i,temp_imag);
 		//TWIDDLE 40 - 56
-		temp_real = _mm256_mul_pd(v56_i,imag_twiddle);
-		temp_imag = _mm256_mul_pd(v56_i,real_twiddle);
+		temp_real = _mm256_mul_pd(v56_i,imag_twid_L2_2);
+		temp_imag = _mm256_mul_pd(v56_i,real_twid_L2_2);
 
-		temp_real = _mm256_fmsub_pd(v56_r,real_twiddle,temp_real);
-		temp_imag = _mm256_fmadd_pd(v56_r,imag_twiddle,temp_imag);
+		temp_real = _mm256_fmsub_pd(v56_r,real_twid_L2_2,temp_real);
+		temp_imag = _mm256_fmadd_pd(v56_r,imag_twid_L2_2,temp_imag);
 
 		v56_r = _mm256_sub_pd(v40_r,temp_real);
 		v56_i = _mm256_sub_pd(v40_i,temp_imag);
@@ -962,14 +987,12 @@ void iterative_phi(cplx_ptr *x)
 
 		//START LAYER 16
 		//WE NEED TO LOAD INDIVIDUAL TWIDDLES PER TWIDDLE
-	  	real_twiddle = _mm256_set1_pd(wortel[0][3][(lo)/16]);
-		imag_twiddle = _mm256_set1_pd(wortel[1][3][(lo)/16]);
 		//TWIDDLE 0 - 8
-		temp_real = _mm256_mul_pd(v8_i,imag_twiddle);
-		temp_imag = _mm256_mul_pd(v8_i,real_twiddle);
+		temp_real = _mm256_mul_pd(v8_i,imag_twid_L3_1);
+		temp_imag = _mm256_mul_pd(v8_i,real_twid_L3_1);
 
-		temp_real = _mm256_fmsub_pd(v8_r,real_twiddle,temp_real);
-		temp_imag = _mm256_fmadd_pd(v8_r,imag_twiddle,temp_imag);
+		temp_real = _mm256_fmsub_pd(v8_r,real_twid_L3_1,temp_real);
+		temp_imag = _mm256_fmadd_pd(v8_r,imag_twid_L3_1,temp_imag);
 
 		v8_r = _mm256_sub_pd(v0_r,temp_real);
 		v8_i = _mm256_sub_pd(v0_i,temp_imag);
@@ -977,14 +1000,12 @@ void iterative_phi(cplx_ptr *x)
 		v0_r = _mm256_add_pd(v0_r,temp_real);
 		v0_i = _mm256_add_pd(v0_i,temp_imag);
 		//WE NEED TO LOAD INDIVIDUAL TWIDDLES PER TWIDDLE
-	  	real_twiddle = _mm256_set1_pd(wortel[0][3][(lo+16)/16]);
-		imag_twiddle = _mm256_set1_pd(wortel[1][3][(lo+16)/16]);
 		//TWIDDLE 16 - 24
-		temp_real = _mm256_mul_pd(v24_i,imag_twiddle);
-		temp_imag = _mm256_mul_pd(v24_i,real_twiddle);
+		temp_real = _mm256_mul_pd(v24_i,imag_twid_L3_2);
+		temp_imag = _mm256_mul_pd(v24_i,real_twid_L3_2);
 
-		temp_real = _mm256_fmsub_pd(v24_r,real_twiddle,temp_real);
-		temp_imag = _mm256_fmadd_pd(v24_r,imag_twiddle,temp_imag);
+		temp_real = _mm256_fmsub_pd(v24_r,real_twid_L3_2,temp_real);
+		temp_imag = _mm256_fmadd_pd(v24_r,imag_twid_L3_2,temp_imag);
 
 		v24_r = _mm256_sub_pd(v16_r,temp_real);
 		v24_i = _mm256_sub_pd(v16_i,temp_imag);
@@ -992,14 +1013,12 @@ void iterative_phi(cplx_ptr *x)
 		v16_r = _mm256_add_pd(v16_r,temp_real);
 		v16_i = _mm256_add_pd(v16_i,temp_imag);
 		//WE NEED TO LOAD INDIVIDUAL TWIDDLES PER TWIDDLE
-	  	real_twiddle = _mm256_set1_pd(wortel[0][3][(lo+32)/16]);
-		imag_twiddle = _mm256_set1_pd(wortel[1][3][(lo+32)/16]);
 		//TWIDDLE 32 - 40
-		temp_real = _mm256_mul_pd(v40_i,imag_twiddle);
-		temp_imag = _mm256_mul_pd(v40_i,real_twiddle);
+		temp_real = _mm256_mul_pd(v40_i,imag_twid_L3_3);
+		temp_imag = _mm256_mul_pd(v40_i,real_twid_L3_3);
 
-		temp_real = _mm256_fmsub_pd(v40_r,real_twiddle,temp_real);
-		temp_imag = _mm256_fmadd_pd(v40_r,imag_twiddle,temp_imag);
+		temp_real = _mm256_fmsub_pd(v40_r,real_twid_L3_3,temp_real);
+		temp_imag = _mm256_fmadd_pd(v40_r,imag_twid_L3_3,temp_imag);
 
 		v40_r = _mm256_sub_pd(v32_r,temp_real);
 		v40_i = _mm256_sub_pd(v32_i,temp_imag);
@@ -1007,14 +1026,12 @@ void iterative_phi(cplx_ptr *x)
 		v32_r = _mm256_add_pd(v32_r,temp_real);
 		v32_i = _mm256_add_pd(v32_i,temp_imag);
 		//WE NEED TO LOAD INDIVIDUAL TWIDDLES PER TWIDDLE
-	  	real_twiddle = _mm256_set1_pd(wortel[0][3][(lo+48)/16]);
-		imag_twiddle = _mm256_set1_pd(wortel[1][3][(lo+48)/16]);
 		//TWIDDLE 48 - 56
-		temp_real = _mm256_mul_pd(v56_i,imag_twiddle);
-		temp_imag = _mm256_mul_pd(v56_i,real_twiddle);
+		temp_real = _mm256_mul_pd(v56_i,imag_twid_L3_4);
+		temp_imag = _mm256_mul_pd(v56_i,real_twid_L3_4);
 
-		temp_real = _mm256_fmsub_pd(v56_r,real_twiddle,temp_real);
-		temp_imag = _mm256_fmadd_pd(v56_r,imag_twiddle,temp_imag);
+		temp_real = _mm256_fmsub_pd(v56_r,real_twid_L3_4,temp_real);
+		temp_imag = _mm256_fmadd_pd(v56_r,imag_twid_L3_4,temp_imag);
 
 		v56_r = _mm256_sub_pd(v48_r,temp_real);
 		v56_i = _mm256_sub_pd(v48_i,temp_imag);
@@ -1042,6 +1059,8 @@ void iterative_phi(cplx_ptr *x)
 		_mm256_store_pd(x->imag+lo+offset+56,v56_i);
   	}
   }
+
+  //Do layer 8-4-2
   for(lo=0;lo < CPLXDIM;lo +=8)
   {	
     __m256d real_x,imag_x,real_y,imag_y;
