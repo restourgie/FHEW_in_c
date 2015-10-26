@@ -45,9 +45,12 @@ void init_negacyc()
 	int j = CPLXDIM/2;
 	for (int i = 0; i < loga; ++i)
 	{
-		wortel[0][i] = malloc(j*sizeof(double));
-		wortel[1][i] = malloc(j*sizeof(double));
-		wortel[2][i] = malloc(j*sizeof(double));
+		posix_memalign((void**)&wortel[0][i],32,j*sizeof(double));
+		posix_memalign((void**)&wortel[1][i],32,j*sizeof(double));
+		posix_memalign((void**)&wortel[2][i],32,j*sizeof(double));
+		// wortel[0][i] = malloc(j*sizeof(double));
+		// wortel[1][i] = malloc(j*sizeof(double));
+		// wortel[2][i] = malloc(j*sizeof(double));
 		// printf("i = %d j = %d\n",i,j);
 		j = j>>1;
 	}
