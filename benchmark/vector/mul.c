@@ -86,7 +86,8 @@ void negacyc_mul(ring_t *r, const ring_t *x, const ring_t *y)
   phi_forward(&vector_x,x);
   phi_forward(&vector_y,y);
 
-  __m256d real_x,imag_x,real_y,imag_y,imag_temp,real_temp;
+  __m256d real_x,imag_x,real_y,imag_y,imag_temp,real_temp,dim;
+  dim = _mm256_set1_pd(CPLXDIM);
   // double a,b,c,d;
   for (int i = 0; i < CPLXDIM; i+=4)
   {
@@ -104,9 +105,9 @@ void negacyc_mul(ring_t *r, const ring_t *x, const ring_t *y)
     real_x = _mm256_fmsub_pd(real_x,real_y,real_temp);
     imag_x = _mm256_fmadd_pd(imag_x,real_y,imag_temp);
 
-    real_y = _mm256_set1_pd(CPLXDIM);
-    real_x = _mm256_div_pd(real_x,real_y);
-    imag_x = _mm256_div_pd(imag_x,real_y);
+    
+    real_x = _mm256_div_pd(real_x,dim);
+    imag_x = _mm256_div_pd(imag_x,dim);
 
     _mm256_store_pd(vector_res.real+i,real_x);
     _mm256_store_pd(vector_res.imag+i,imag_x);

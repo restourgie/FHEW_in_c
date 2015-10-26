@@ -81,8 +81,8 @@ void rand_test(){
 
     // fftw_mul(&re,&x,&y);
     // sr_vector_nonrec_mul(&re,&x,&y);
-    fftw_nega_mul(&re,&x,&y);
-    // negacyc_mul(&re,&x,&y);
+    // fftw_nega_mul(&re,&x,&y);
+    negacyc_mul(&re,&x,&y);
     // sr_vector_mul(&re, &x, &y);
     naive_real_mul(&r,&x,&y);
     bool error = false;
