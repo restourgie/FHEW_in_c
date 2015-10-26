@@ -3,7 +3,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <immintrin.h>
-#include "../mul.h"
+#include "mul.h"
 #include "negacyclic.h"
 
 

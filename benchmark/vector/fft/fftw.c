@@ -87,7 +87,7 @@ void FFTW_nega_backward(ring_t *res, const double complex *val){
   fftw_execute(plan_fft_nega_back);
   table_untwist();
   for (int k = 0; k < CPLXDIM; ++k){  
-    res->v[k] = (long int) round(creal(in[k]));
-    res->v[k+CPLXDIM] = (long int) round(cimag(in[k]));
+    res->v[k] = (long int) round(creal(nega_in[k]));
+    res->v[k+CPLXDIM] = (long int) round(cimag(nega_in[k]));
   }
 }

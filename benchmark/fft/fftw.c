@@ -1,7 +1,7 @@
 #include <complex.h>
 #include <fftw3.h>
 #include <math.h>
-#include "../mul.h"
+#include "mul.h"
 #include "fftw.h"
 
 fftw_complex *nega_in,*nega_out;
@@ -16,7 +16,7 @@ void FFTsetup() {
 }
 
   
-void FFTW_nega_forward(double complex *res, const ring_t *val) {
+void FFTWforward(double complex *res, const ring_t *val) {
   for (int k = 0; k < CPLXDIM; ++k)
     nega_in[k] = val->v[k] + I* val->v[CPLXDIM+k];  
   fftw_execute(plan_fft_nega_forw); 
@@ -24,13 +24,13 @@ void FFTW_nega_forward(double complex *res, const ring_t *val) {
     res[k] = (double complex) nega_out[k];       
 }
 
-void FFTW_nega_backward(ring_t *res, const double complex *val){
+void FFTWbackward(ring_t *res, const double complex *val){
   for (int k = 0; k < CPLXDIM; ++k) {
     nega_out[k] = val[k];
   }
   fftw_execute(plan_fft_nega_back);
   for (int k = 0; k < CPLXDIM; ++k){  
-    res->v[k] = (long int) round(creal(in[k]));
-    res->v[k+CPLXDIM] = (long int) round(cimag(in[k]));
+    res->v[k] = (long int) round(creal(nega_in[k]));
+    res->v[k+CPLXDIM] = (long int) round(cimag(nega_in[k]));
   }
 }
