@@ -8,7 +8,7 @@
 #include "fft/fftw.h"
 #include "fft/sr_vec_nonrec.h"
 #include "fft/negacyclic.h"
-
+cplx_ptr vector_x,vector_y,vector_res;
 /******************************************************************
 *
 * SUPPORT CODE
@@ -27,6 +27,13 @@ void init(){
   FFTsetup();
   init_vctr();
   init_negacyc();
+
+  posix_memalign((void**)&vector_x.real,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vector_x.imag,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vector_y.real,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vector_y.imag,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vector_res.real,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vector_res.imag,32, CPLXDIM * sizeof(double));
 }
 
 /******************************************************************
@@ -76,25 +83,17 @@ void fftw_nega_mul(ring_t *r, const ring_t *x, const ring_t *y){
 ******************************************************************/
 void negacyc_mul(ring_t *r, const ring_t *x, const ring_t *y)
 {
-  cplx_ptr vec_x,vec_y,vec_res;
-  posix_memalign((void**)&vec_x.real,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_x.imag,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_y.real,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_y.imag,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_res.real,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_res.imag,32, CPLXDIM * sizeof(double));
-
-  phi_forward(&vec_x,x);
-  phi_forward(&vec_y,y);
+  phi_forward(&vector_x,x);
+  phi_forward(&vector_y,y);
 
   __m256d real_x,imag_x,real_y,imag_y,imag_temp,real_temp;
   // double a,b,c,d;
   for (int i = 0; i < CPLXDIM; i+=4)
   {
-    real_x = _mm256_load_pd(vec_x.real+i);
-    imag_x = _mm256_load_pd(vec_x.imag+i);
-    real_y = _mm256_load_pd(vec_y.real+i);
-    imag_y = _mm256_load_pd(vec_y.imag+i);
+    real_x = _mm256_load_pd(vector_x.real+i);
+    imag_x = _mm256_load_pd(vector_x.imag+i);
+    real_y = _mm256_load_pd(vector_y.real+i);
+    imag_y = _mm256_load_pd(vector_y.imag+i);
 
     //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
     //real_temp = bd
@@ -109,17 +108,10 @@ void negacyc_mul(ring_t *r, const ring_t *x, const ring_t *y)
     real_x = _mm256_div_pd(real_x,real_y);
     imag_x = _mm256_div_pd(imag_x,real_y);
 
-    _mm256_store_pd(vec_res.real+i,real_x);
-    _mm256_store_pd(vec_res.imag+i,imag_x);
-     // a = vec_x.real[i];
-     // b = vec_x.imag[i];
-     // c = vec_y.real[i];
-     // d = vec_y.imag[i];
-
-     // vec_res.real[i] = ((a*c) - (b*d))/CPLXDIM;
-     // vec_res.imag[i] = ((a*d) + (b*c))/CPLXDIM;
+    _mm256_store_pd(vector_res.real+i,real_x);
+    _mm256_store_pd(vector_res.imag+i,imag_x);
   }
-  phi_backward(&vec_res,r);
+  phi_backward(&vector_res,r);
   // print_cplx(&vec_res,CPLXDIM);
 }
 
