@@ -9,6 +9,9 @@
 #include "fft/sr_vec_nonrec.h"
 #include "fft/negacyclic.h"
 cplx_ptr vector_x,vector_y,vector_res;
+cplx_ptr vec_x,vec_y,vec_res;
+cplx_ptr vctr_x,vctr_y,vctr_res;
+
 /******************************************************************
 *
 * SUPPORT CODE
@@ -34,6 +37,20 @@ void init(){
   posix_memalign((void**)&vector_y.imag,32, CPLXDIM * sizeof(double));
   posix_memalign((void**)&vector_res.real,32, CPLXDIM * sizeof(double));
   posix_memalign((void**)&vector_res.imag,32, CPLXDIM * sizeof(double));
+
+  posix_memalign((void**)&vec_x.real,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vec_x.imag,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vec_y.real,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vec_y.imag,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vec_res.real,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vec_res.imag,32, CPLXDIM * sizeof(double));
+
+  posix_memalign((void**)&vctr_x.real,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vctr_x.imag,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vctr_y.real,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vctr_y.imag,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vctr_res.real,32, CPLXDIM * sizeof(double));
+  posix_memalign((void**)&vctr_res.imag,32, CPLXDIM * sizeof(double));
 }
 
 /******************************************************************
@@ -122,14 +139,6 @@ void negacyc_mul(ring_t *r, const ring_t *x, const ring_t *y)
 *
 ******************************************************************/
 void sr_vector_nonrec_mul(ring_t *r, const ring_t *x, const ring_t *y){
-  cplx_ptr vec_x,vec_y,vec_res;
-  posix_memalign((void**)&vec_x.real,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_x.imag,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_y.real,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_y.imag,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_res.real,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_res.imag,32, CPLXDIM * sizeof(double));
-
   fft_vector_nonrec_forward(&vec_x,x);
   fft_vector_nonrec_forward(&vec_y,y);
   __m256d real_x,imag_x,real_y,imag_y,imag_temp,real_temp;
@@ -176,25 +185,18 @@ void sr_vector_nonrec_mul(ring_t *r, const ring_t *x, const ring_t *y){
 ******************************************************************/
 void sr_vector_mul(ring_t *r, const ring_t *x, const ring_t *y){
   // printf("\n\n**************split-radix FAST**************\n");
-  cplx_ptr vec_x,vec_y,vec_res;
-  posix_memalign((void**)&vec_x.real,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_x.imag,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_y.real,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_y.imag,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_res.real,32, CPLXDIM * sizeof(double));
-  posix_memalign((void**)&vec_res.imag,32, CPLXDIM * sizeof(double));
 
-  fft_vector_forward(&vec_x,x);
-  fft_vector_forward(&vec_y,y);
+  fft_vector_forward(&vctr_x,x);
+  fft_vector_forward(&vctr_y,y);
   
   __m256d real_x,imag_x,real_y,imag_y,imag_temp,real_temp;
   // double a,b,c,d;
   for (int i = 0; i < CPLXDIM; i+=4)
   {
-    real_x = _mm256_load_pd(vec_x.real+i);
-    imag_x = _mm256_load_pd(vec_x.imag+i);
-    real_y = _mm256_load_pd(vec_y.real+i);
-    imag_y = _mm256_load_pd(vec_y.imag+i);
+    real_x = _mm256_load_pd(vctr_x.real+i);
+    imag_x = _mm256_load_pd(vctr_x.imag+i);
+    real_y = _mm256_load_pd(vctr_y.real+i);
+    imag_y = _mm256_load_pd(vctr_y.imag+i);
 
     //(a + ib) * (c + id) = (ac - bd) + i(ad+bc)
     //real_temp = bd
@@ -209,10 +211,10 @@ void sr_vector_mul(ring_t *r, const ring_t *x, const ring_t *y){
     real_x = _mm256_div_pd(real_x,real_y);
     imag_x = _mm256_div_pd(imag_x,real_y);
 
-    _mm256_store_pd(vec_res.real+i,real_x);
-    _mm256_store_pd(vec_res.imag+i,imag_x);
+    _mm256_store_pd(vctr_res.real+i,real_x);
+    _mm256_store_pd(vctr_res.imag+i,imag_x);
   }
-  fft_vector_backward(&vec_res,r);
+  fft_vector_backward(&vctr_res,r);
 }
 
 
