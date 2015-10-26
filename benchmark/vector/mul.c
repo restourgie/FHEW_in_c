@@ -8,7 +8,6 @@
 #include "fft/fftw.h"
 #include "fft/sr_vec_nonrec.h"
 #include "fft/negacyclic.h"
-#include "fft/fftw_nega.h"  
 
 /******************************************************************
 *
@@ -28,7 +27,6 @@ void init(){
   FFTsetup();
   init_vctr();
   init_negacyc();
-  FFTW_nega_setup();
 }
 
 /******************************************************************
