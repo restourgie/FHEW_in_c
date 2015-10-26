@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 #define NTESTS 1000
-#define NALGO 5
+#define NALGO 6
 #define THRESHOLD 2
 
 uint32_t myabs(uint32_t a)
@@ -81,7 +81,8 @@ void rand_test(){
 
     // fftw_mul(&re,&x,&y);
     // sr_vector_nonrec_mul(&re,&x,&y);
-    negacyc_mul(&re,&x,&y);
+    fftw_nega_mul(&re,&x,&y);
+    // negacyc_mul(&re,&x,&y);
     // sr_vector_mul(&re, &x, &y);
     naive_real_mul(&r,&x,&y);
     bool error = false;
@@ -90,8 +91,8 @@ void rand_test(){
     {
 
       if(myabs(r.v[i] - re.v[i]) > THRESHOLD){
-        // printf("school: %u \n", re.v[i]);
-        // printf("mine: %u \n",r.v[i]);
+        // printf("school: %u \n", r.v[i]);
+        // printf("mine: %u \n",re.v[i]);
         // printf("difference: %u\n\n",myabs(r.v[i] - re.v[i]));
         error = true;
       }
@@ -147,6 +148,11 @@ void cycle_meassure(){
         fftw_mul(&r,&x,&y);
         end = rdtsc();
       }
+      else if(j == 5){
+        start = rdtsc();
+        fftw_nega_mul(&r,&x,&y);
+        end = rdtsc();
+      }
       cycles[n] = end - start;
     }
     qsort(cycles,sizeof(cycles)/sizeof(*cycles),sizeof(*cycles),compare);
@@ -160,6 +166,8 @@ void cycle_meassure(){
       printf("Median Vectorized Non recursive SR: %llu\n",cycles[NTESTS/2-1]);
     else if(j == 4)
       printf("Median FFTW: %llu\n",cycles[NTESTS/2-1]);
+    else if(j == 5)
+      printf("Median FFTW Dan's trick: %llu\n",cycles[NTESTS/2-1]);
   }
 
   fclose(urandom); 

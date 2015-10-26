@@ -7,7 +7,8 @@
 #include "fft/sr_vector.h"
 #include "fft/fftw.h"
 #include "fft/sr_vec_nonrec.h"
-#include "fft/negacyclic.h"   
+#include "fft/negacyclic.h"
+#include "fft/fftw_nega.h"  
 
 /******************************************************************
 *
@@ -27,6 +28,7 @@ void init(){
   FFTsetup();
   init_vctr();
   init_negacyc();
+  FFTW_nega_setup();
 }
 
 /******************************************************************
@@ -47,6 +49,26 @@ void fftw_mul(ring_t *r, const ring_t *x, const ring_t *y){
     cplx_res[i] = cplx_x[i] * cplx_y[i];
   }
   FFTWbackward(r,cplx_res);
+}
+
+/******************************************************************
+*
+* FFTW DAN's TRICK MULTIPLICATION
+*
+******************************************************************/
+void fftw_nega_mul(ring_t *r, const ring_t *x, const ring_t *y){
+  double complex cplx_x[CPLXDIM];
+  double complex cplx_y[CPLXDIM];
+  double complex cplx_res[CPLXDIM];
+
+  FFTW_nega_forward(cplx_x,x);
+  FFTW_nega_forward(cplx_y,y);
+
+  for (int i = 0; i < CPLXDIM; ++i)
+  {
+    cplx_res[i] = (cplx_x[i] * cplx_y[i])/CPLXDIM;
+  }
+  FFTW_nega_backward(r,cplx_res);
 }
 
 /******************************************************************

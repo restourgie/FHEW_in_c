@@ -1,8 +1,8 @@
 #include <complex.h>
 #include <fftw3.h>
 #include <math.h>
-#include "fftw.h"
 #include "../mul.h"
+#include "fftw.h"
 
 double *in;
 fftw_complex *out;

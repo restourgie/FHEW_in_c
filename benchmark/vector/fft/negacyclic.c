@@ -48,10 +48,6 @@ void init_negacyc()
 		posix_memalign((void**)&wortel[0][i],32,j*sizeof(double));
 		posix_memalign((void**)&wortel[1][i],32,j*sizeof(double));
 		posix_memalign((void**)&wortel[2][i],32,j*sizeof(double));
-		// wortel[0][i] = malloc(j*sizeof(double));
-		// wortel[1][i] = malloc(j*sizeof(double));
-		// wortel[2][i] = malloc(j*sizeof(double));
-		// printf("i = %d j = %d\n",i,j);
 		j = j>>1;
 	}
 	init_wortel(CPLXDIM,0,(loga-1),csqrt(I));
