@@ -810,9 +810,9 @@ void iterative_phi(cplx_ptr *x)
 	v256_i = _mm256_unpacklo_pd(sub_real,sub_imag);
 
 	// // //START LAYER 2!!
-	real_twid_L1 = _mm256_setr_pd(wortel[0][0][lo/2],wortel[0][0][(lo+2)/2],wortel[0][0][(lo+4)/2],wortel[0][0][(lo+6)/2]);
-    imag_twid_L1 = _mm256_setr_pd(wortel[1][0][lo/2],wortel[1][0][(lo+2)/2],wortel[1][0][(lo+4)/2],wortel[1][0][(lo+6)/2]);
-
+	real_twid_L1 = _mm256_load_pd(&wortel[0][0][lo/2]);
+	imag_twid_L1 = _mm256_load_pd(&wortel[1][0][lo/2]);
+	
     temp_real = _mm256_mul_pd(v0_i,imag_twid_L1);
     temp_imag = _mm256_mul_pd(v0_i,real_twid_L1);
 
