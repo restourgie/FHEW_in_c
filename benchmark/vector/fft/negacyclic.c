@@ -407,11 +407,11 @@ void inverse_phi(cplx_ptr *x)
 	v0_r = _mm256_add_pd(v0_r,v256_r);
 	v0_i = _mm256_add_pd(v0_i,v256_i);
 
-	sub_real = _mm256_mul_pd(temp_imag,imag_twid_L1);
-	temp_imag = _mm256_mul_pd(temp_imag,real_twid_L1);
+	sub_real  = _mm256_mul_pd(temp_imag,real_twid_L1);
+	temp_imag = _mm256_mul_pd(temp_real,real_twid_L1);
 
-	v256_i = _mm256_fmadd_pd(temp_real,imag_twid_L1,temp_imag);
-	v256_r = _mm256_fmsub_pd(temp_real,real_twid_L1,sub_real);
+	v256_i = _mm256_sub_pd(sub_real,temp_imag);
+	v256_r = _mm256_add_pd(sub_real,temp_imag);
   	//TWIDDLE 128 - 384
 	temp_real = _mm256_sub_pd(v128_r,v384_r);
 	temp_imag = _mm256_sub_pd(v128_i,v384_i);
@@ -419,12 +419,12 @@ void inverse_phi(cplx_ptr *x)
 	v128_r = _mm256_add_pd(v128_r,v384_r);
 	v128_i = _mm256_add_pd(v128_i,v384_i);
 
-	sub_real = _mm256_mul_pd(temp_imag,imag_twid_L1);
-	temp_imag = _mm256_mul_pd(temp_imag,real_twid_L1);
+	sub_real  = _mm256_mul_pd(temp_imag,real_twid_L1);
+	temp_imag = _mm256_mul_pd(temp_real,real_twid_L1);
 
-	v384_i = _mm256_fmadd_pd(temp_real,imag_twid_L1,temp_imag);
-	v384_r = _mm256_fmsub_pd(temp_real,real_twid_L1,sub_real);
-
+	v384_i = _mm256_sub_pd(sub_real,temp_imag);
+	v384_r = _mm256_add_pd(sub_real,temp_imag);
+	
 	//STORE ALL RESULTS
 	_mm256_store_pd(x->real+offset,v0_r);
 	_mm256_store_pd(x->real+offset+128,v128_r);

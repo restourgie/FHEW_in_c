@@ -61,6 +61,8 @@ void inverse_phi(cplx_ptr *x,int n,int lo,int level)
 	    __m256d real_x,imag_x,real_y,imag_y,imag_twid,real_twid,temp_real,temp_imag;
     	real_twid = _mm256_set1_pd(wortel[0][level][lo/n]);
     	imag_twid = _mm256_set1_pd(wortel[2][level][lo/n]);
+    	print256_num(real_twid);
+    	print256_num(imag_twid);
 		for(int i=lo;i<m+lo;i+=4)
 		{	
 			real_x = _mm256_load_pd(x->real+i);

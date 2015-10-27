@@ -6,7 +6,7 @@
 #include "fftw.h"
 
 #define NTESTS 1000
-#define NALGO 4
+#define NALGO 2
 #define THRESHOLD 2
 
 cplx_ptr vector_x;
