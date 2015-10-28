@@ -3,6 +3,7 @@
 #include "../mul.h"
 #include <stdbool.h>
 
+
 #define NTESTS 1000
 #define NALGO 6
 #define THRESHOLD 2
@@ -157,17 +158,17 @@ void cycle_meassure(){
     }
     qsort(cycles,sizeof(cycles)/sizeof(*cycles),sizeof(*cycles),compare);
     if(j == 0)
-      printf("Naive real mul: %llu\n",cycles[NTESTS/2-1]);
+      printf("Naive real mul                     : %llu\n",cycles[NTESTS/2-1]);
     else if(j == 1)
-      printf("Median Vectorized normal FFT: %llu\n",cycles[NTESTS/2-1]);
+      printf("Median Vectorized normal FFT       : %llu\n",cycles[NTESTS/2-1]);
     else if(j == 2)
-      printf("Median Vectorized SplitRadix: %llu\n",cycles[NTESTS/2-1]);
+      printf("Median Vectorized SplitRadix       : %llu\n",cycles[NTESTS/2-1]);
     else if(j == 3)
-      printf("Median Vectorized Non recursive SR: %llu\n",cycles[NTESTS/2-1]);
+      printf("Median Vectorized Non recursive SR : %llu\n",cycles[NTESTS/2-1]);
     else if(j == 4)
-      printf("Median FFTW: %llu\n",cycles[NTESTS/2-1]);
+      printf("Median FFTW                        : %llu\n",cycles[NTESTS/2-1]);
     else if(j == 5)
-      printf("Median FFTW Dan's trick: %llu\n",cycles[NTESTS/2-1]);
+      printf("Median FFTW Dan's trick            : %llu\n",cycles[NTESTS/2-1]);
   }
 
   fclose(urandom); 

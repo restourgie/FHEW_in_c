@@ -6,7 +6,7 @@
 #include "fftw.h"
 
 #define NTESTS 1000
-#define NALGO 2
+#define NALGO 3
 #define THRESHOLD 2
 
 cplx_ptr vector_x;
@@ -68,6 +68,14 @@ void cycle_meassure(){
         FFTWbackward(&x,res);
         end_2 = rdtsc();
       }
+      else if(j == 2){
+        start = rdtsc();
+        FFTWforward_original(res,&x);
+        end = rdtsc();
+        start_2 = rdtsc();
+        FFTWbackward_original(&x,res);
+        end_2 = rdtsc();
+      }
       cycles[n] = end - start;
       cycles_2[n] = end_2 - start_2;
     }
@@ -80,6 +88,10 @@ void cycle_meassure(){
     else if(j == 1){
       printf("FFTW Forward: %llu\n",cycles[NTESTS/2-1]);
       printf("FFTW Backward: %llu\n",cycles_2[NTESTS/2-1]);
+    }
+    else if(j == 2){
+      printf("FFTW Forward org: %llu\n",cycles[NTESTS/2-1]);
+      printf("FFTW Backward org: %llu\n",cycles_2[NTESTS/2-1]);
     }
 
   }

@@ -782,11 +782,11 @@ void iterative_phi(cplx_ptr *x)
 	sub_real = _mm256_add_pd(sub_real,temp_real);
 
 	// //NEEDED TO COMPLETE LAYER 4
-	// v0_r = _mm256_permute2f128_pd(sub_imag,sub_real,0x02);
+	// v0_r   = _mm256_permute2f128_pd(sub_imag,sub_real,0x02);
 	// v256_r = _mm256_permute2f128_pd(sub_imag,sub_real,0x13);
 	//PREPARE REALS FOR LAYER 2
 	//STORE ALL FACTORS THAT NEED TO BE MULT WITH ROOTS OF UNITY IN v0_r
-	v0_r = _mm256_unpackhi_pd(sub_real,sub_imag);
+	v0_r   = _mm256_unpackhi_pd(sub_real,sub_imag);
 	v256_r = _mm256_unpacklo_pd(sub_real,sub_imag);
 
 
@@ -801,12 +801,12 @@ void iterative_phi(cplx_ptr *x)
 	sub_real = _mm256_add_pd(sub_real,temp_imag);
 
 	//NEEDED TO COMPLETE LAYER 4
-	// v0_i = _mm256_permute2f128_pd(sub_imag,sub_real,0x02);
+	// v0_i   = _mm256_permute2f128_pd(sub_imag,sub_real,0x02);
 	// v256_i = _mm256_permute2f128_pd(sub_imag,sub_real,0x13);
 	//PREPARE IMAGS FOR LAYER 2
 	//STORE ALL FACTORS THAT NEED TO BE MULT WITH ROOTS OF UNITY IN v0_i
 	//STORE ALL NON TWIDLE IMAGS IN v256_i 
-	v0_i = _mm256_unpackhi_pd(sub_real,sub_imag);
+	v0_i   = _mm256_unpackhi_pd(sub_real,sub_imag);
 	v256_i = _mm256_unpacklo_pd(sub_real,sub_imag);
 
 	// // //START LAYER 2!!
@@ -827,7 +827,7 @@ void iterative_phi(cplx_ptr *x)
 	temp_real = _mm256_unpacklo_pd(sub_imag,sub_real);
 	sub_real  = _mm256_unpackhi_pd(sub_imag,sub_real);
 
-	v0_r = _mm256_permute2f128_pd(temp_real,sub_real,0x20);
+	v0_r   = _mm256_permute2f128_pd(temp_real,sub_real,0x20);
 	v256_r = _mm256_permute2f128_pd(temp_real,sub_real,0x31);
 
 	sub_real = _mm256_sub_pd(v256_i,temp_imag);
@@ -836,7 +836,7 @@ void iterative_phi(cplx_ptr *x)
 	temp_real = _mm256_unpacklo_pd(sub_imag,sub_real);
 	sub_real  = _mm256_unpackhi_pd(sub_imag,sub_real);
 
-	v0_i = _mm256_permute2f128_pd(temp_real,sub_real,0x20);
+	v0_i   = _mm256_permute2f128_pd(temp_real,sub_real,0x20);
 	v256_i = _mm256_permute2f128_pd(temp_real,sub_real,0x31);
 
 	_mm256_store_pd(x->real+lo,v0_r);
