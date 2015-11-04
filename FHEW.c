@@ -11,6 +11,7 @@ typedef Ring_FFT  dct_FFT[K2][K2];  // Decomposed Ciphertext in FFT form. dct_FF
 Ring_FFT t_TestMSB;
 
 void Setup(){
+  FFTsetup();
 	Ring_ModQ tmsb;
   tmsb[0]=-1;
 	for (int i = 1; i < N; ++i)
@@ -162,15 +163,18 @@ CipherTextQN* MemberTest(Ring_FFT t, ct_FFT C) {
     for (int i = 0; i < N; ++i) 
       ct->a[i] = temp_ModQ[i];
   	
-    for (int i = 0; i < N2; ++i)
+    for (int i = 0; i < N2; ++i){
   		temp[i] = C[1][1][i] * t[i];//temp will be THE COMPLEX MULTIPLICATION OF C[i][l][k] and t[l][j][k]
+      // printf("C[1][1][%d] = %f + i %f\n",i,creal(C[1][1][i]),cimag(C[1][1][i]));
+    }
   	
     FFTbackward(temp_ModQ, temp);
     ct->b = v+temp_ModQ[0];	
     return ct; 
 }
 
-void HomNAND(CipherText* res, EvalKey* EK, CipherText* ct1, CipherText* ct2) {
+void HomNAND(CipherText* res, EvalKey* EK, CipherText* ct1, CipherText* ct2) 
+{
 	  CipherText e12;
     
     for (int i = 0; i < n; ++i)

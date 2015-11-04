@@ -10,7 +10,7 @@ all: cmd
 cmd: cmd/gen cmd/enc cmd/nand cmd/dec
 
 FFT.o: FFT.h FFT.c params.h FHEW.h
-	$(CC) $(CFLAGS) -c FFT.c $(LIBS)
+	$(CC) $(CFLAGS) -c FFT.c $(LIBS) -mavx2 -march=native
 
 LWE.o: LWE.h LWE.c FFT.h params.h distrib.h
 	$(CC) $(CFLAGS) -c LWE.c $(LIBS)
@@ -40,6 +40,7 @@ cmd/dec: cmd/dec.c common.o LWE.o distrib.o params.o
 	$(CC) $(CFLAGS) -o cmd/dec cmd/dec.c LWE.o common.o distrib.o params.o $(LIBS)
 
 clean:
-	rm *.o cmd/*.o cmd/gen cmd/enc cmd/dec cmd/nand
+	rm *.o cmd/*.o cmd/gen cmd/enc cmd/dec cmd/nand benchmark/fft/test_mul benchmark/lut/test/test_mul benchmark/schoolbook/test/test_mul benchmark/trick/test/test_mul benchmark/vector/test/test_mul; rm -r cmd/*.dSYM
+	
 
 	

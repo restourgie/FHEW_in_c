@@ -7,4 +7,10 @@ void FFTsetup();
 void FFTforward(Ring_FFT res, Ring_ModQ val);
 void FFTbackward(Ring_ModQ res, Ring_FFT val);
 
+typedef struct
+{	
+	double *real;
+	double *imag;
+}cplx_ptr;
+
 #endif

@@ -8,7 +8,7 @@
 #define n 500
 
 #define N 1024
-#define N2 (N/2+1)
+#define N2 (N/2)
 
 #define K 3
 #define K2 6
