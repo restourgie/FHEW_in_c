@@ -57,7 +57,7 @@ void FHEWencrypt(ct_FFT ct, Ring_FFT sk_FFT, int m) {
     for (int i = 0; i < K2; ++i) 
     {
       for (int k = 0; k < N; ++k) 
-        res[i][0][k] = random_int(); // % Q //
+        res[i][0][k] = rand(); // % Q //
       
       FFTforward(ai, res[i][0]);
       
@@ -67,7 +67,7 @@ void FHEWencrypt(ct_FFT ct, Ring_FFT sk_FFT, int m) {
       FFTbackward(res[i][1], ai);
       
       for (int k = 0; k < N; ++k) 
-        res[i][1][k] += Sample_1(Chi1); // Add error [a,as+e]
+        res[i][1][k] += Sample(Chi1); // Add error [a,as+e]
     }
     
     for (int i = 0; i < K; ++i) 
@@ -105,13 +105,14 @@ void FHEWKeyGen(EvalKey* EK, SecretKey LWEsk){
   printf("finished GENERATION of BSkey\n");
 }
 
-void AddToACC(ct_FFT ACC, ct_FFT C) {
+void AddToACC(ct_FFT ACC,const ct_FFT C) {
 	ct_ModQ ct;		//int32_t[6][2][1024]
   dct_ModQ dct;	//int32_t[6][6][1024]
-  dct_FFT dctFFT;	//Complex double[6][6][513]
+  dct_FFT dctFFT;	//Complex double[6][6][512]
   for (int i = 0; i < K2; ++i)
     for (int j = 0; j < 2; ++j)
 	     FFTbackward(ct[i][j], ACC[i][j]);
+
   for (int i = 0; i < K2; ++i)
     for (int j = 0; j < 2; ++j)
 	     for (int k = 0; k < N; ++k) 
@@ -134,6 +135,7 @@ void AddToACC(ct_FFT ACC, ct_FFT C) {
   for (int i = 0; i < K2; ++i)
     for (int j = 0; j < K2; ++j)
        FFTforward(dctFFT[i][j], dct[i][j]);
+
 
   //   end = rdtsc();
   //   cycles[count] = end - start;
@@ -185,22 +187,26 @@ CipherTextQN* MemberTest(Ring_FFT t, ct_FFT C) {
     Ring_ModQ temp_ModQ;
     
     CipherTextQN* ct = malloc(sizeof(CipherTextQN));
+
     for (int i = 0; i < N2; ++i)
 	  	temp[i] = conj(C[1][0][i] * t[i]);  // Compute t*a //temp will be THE COMPLEX MULTIPLICATION OF C[i][l][k] and t[l][j][k]
-  
+
     FFTbackward(temp_ModQ, temp);
 
     for (int i = 0; i < N; ++i) 
       ct->a[i] = temp_ModQ[i];
-  	
+
+
     for (int i = 0; i < N2; ++i){
   		temp[i] = C[1][1][i] * t[i];//temp will be THE COMPLEX MULTIPLICATION OF C[i][l][k] and t[l][j][k]
       // printf("C[1][1][%d] = %f + i %f\n",i,creal(C[1][1][i]),cimag(C[1][1][i]));
     }
-  	
+
     FFTbackward(temp_ModQ, temp);
     ct->b = v+temp_ModQ[0];	
-    return ct; 
+  
+    return ct;
+
 }
 
 void HomNAND(CipherText* res, EvalKey* EK, CipherText* ct1, CipherText* ct2) 
@@ -225,11 +231,12 @@ void HomNAND(CipherText* res, EvalKey* EK, CipherText* ct1, CipherText* ct2)
 			   AddToACC(ACC, ((*EK->BSkey)[i][a0][k]));	
       }
     }
-    CipherTextQN* eQN = MemberTest(t_TestMSB,ACC);
-    CipherTextQ *eQ = malloc(sizeof(CipherTextQ));
-    KeySwitch(eQ, *(EK->KSkey), eQN);
+    CipherTextQN *eQN = MemberTest(t_TestMSB,ACC);
+    // CipherTextQ *eQ = malloc(sizeof(CipherTextQ));
+    CipherTextQ eQ;
+    KeySwitch(&eQ, *(EK->KSkey), eQN);
     free(eQN);
-    ModSwitch(res, eQ);
-    free(eQ);
+    ModSwitch(res, &eQ);
+    // free(eQ);
 }
 

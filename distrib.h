@@ -11,10 +11,7 @@ typedef struct {
 } Distrib;
 
 
-int Sample_1(const Distrib Chi);
-int Sample_3(const Distrib Chi);
-int random_int();
-int Sample_2(const Distrib Chi);
+int Sample(const Distrib Chi);
 
 // Distribution of std dev 1.2
 extern const float Chi1_Table[23];

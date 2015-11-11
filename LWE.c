@@ -14,7 +14,7 @@ void LWEKeyGen(SecretKey sk) {
   int s=0, ss=0;
   printf("Restart\n");
   for (int i = 0; i < n; ++i) {
-    sk[i] = Sample_1(Chi_Binary);
+    sk[i] = Sample(Chi_Binary);
     s+= sk[i];
     ss+= abs(sk[i]);
   }
@@ -27,8 +27,10 @@ void LWEKeyGen(SecretKey sk) {
 
 void KeyGenN(SecretKeyN FHEWsk) {
 	printf("\n*****Starting KeygenN*****\n");
-  for(int i =0;i < N; ++i)
-    FHEWsk[i] = Sample_1(Chi1);
+  for(int i =0;i < N; ++i){
+    FHEWsk[i] = Sample(Chi1);
+    printf("FHEWsk[%d] = %d\n",i,FHEWsk[i]);
+  }
   
   printf("\n*****Finished KeygenN*****\n");
 
@@ -42,10 +44,10 @@ void SwitchingKeyGen(SwitchingKey res,SecretKey new_sk,SecretKeyN old_sk) {
       for (int k = 0; k < KS_exp; ++k) 
       {
         CipherTextQ ct;    
-        ct.b = -old_sk[i]*j*KS_table[k] + Sample_3(Chi2);
+        ct.b = -old_sk[i]*j*KS_table[k] + Sample(Chi2);
         for (int l = 0; l < n; ++l) 
         {
-          ct.a[l] = random_int(); //I need to get this positive
+          ct.a[l] = rand(); //I need to get this positive
           ct.b += ct.a[l] * new_sk[l];
         }
         res[i][j][k] = ct;
@@ -64,10 +66,10 @@ void SwitchingKeyGen(SwitchingKey res,SecretKey new_sk,SecretKeyN old_sk) {
 
 void Encrypt(CipherText* ct, SecretKey sk, int m) {
     ct->b = (m % 4) * q / 4;//can you just do m * q / 4 because m is 0 or 1 this is always the same mod 4
-    ct->b += Sample_2(Chi3);
+    ct->b += Sample(Chi3);
     for (int i = 0; i < n; ++i)	
     {
-      ct->a[i] = random_int() % q;
+      ct->a[i] = rand() % q;
       ct->b = (ct->b + ct->a[i] * sk[i]) % q;
     }
 }

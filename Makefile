@@ -5,7 +5,7 @@ CFLAGS= -Wall -std=c11 -g -O3
 LIBS= -lm
 
 
-all: cmd
+all: cmd fhewtest
 
 cmd: cmd/gen cmd/enc cmd/nand cmd/dec
 
@@ -27,6 +27,9 @@ distrib.o: distrib.c distrib.h
 params.o: params.c params.h
 	$(CC) $(CFLAGS) -c params.c $(LIBS)
 
+fhewtest: fhewTest.c LWE.o FHEW.o distrib.o params.o FFT.o
+	$(CC) $(CFLAGS) -o fhewtest fhewtest.c LWE.o FHEW.o common.o FFT.o distrib.o params.o $(LIBS)
+
 cmd/gen: cmd/gen.c common.o LWE.o FHEW.o distrib.o params.o FFT.o
 	$(CC) $(CFLAGS) -o cmd/gen cmd/gen.c LWE.o FHEW.o common.o FFT.o distrib.o params.o $(LIBS)
 
@@ -40,7 +43,7 @@ cmd/dec: cmd/dec.c common.o LWE.o distrib.o params.o
 	$(CC) $(CFLAGS) -o cmd/dec cmd/dec.c LWE.o common.o distrib.o params.o $(LIBS)
 
 clean:
-	rm *.o cmd/*.o cmd/gen cmd/enc cmd/dec cmd/nand benchmark/fft/test_mul benchmark/lut/test/test_mul benchmark/schoolbook/test/test_mul benchmark/trick/test/test_mul benchmark/vector/test/test_mul; rm -r cmd/*.dSYM
+	rm *.o fhewtest cmd/*.o cmd/gen cmd/enc cmd/dec cmd/nand benchmark/fft/test_mul benchmark/lut/test/test_mul benchmark/schoolbook/test/test_mul benchmark/trick/test/test_mul benchmark/vector/test/test_mul; rm -r cmd/*.dSYM
 	
 
 	
