@@ -4,24 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// int compare(const void * elem1, const void * elem2)
-// { 
-//   uint64_t x = *((uint64_t*)elem1);
-//   uint64_t y = *((uint64_t*)elem2);
-//   if(x > y) 
-//     return 1;
-//   else if(x < y) 
-//     return -1;
-//   return 0;
-// }
-
-// uint64_t rdtsc()
-// {
-//     unsigned int lo,hi;
-//     __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
-//     return ((uint64_t)hi << 32) | lo;
-// }
-
 typedef Ring_ModQ ct_ModQ[K2][2];   // Ciphertext in coefficient form. ct_ModQ => Ring_ModQ[6][2] => Ring_ModQ[6][2] =>  ZmodQ[6][2][1024] => int32_t[6][2][1024]
 typedef Ring_ModQ dct_ModQ[K2][K2]; // Decomposed Ciphertext in coeff form. dct_ModQ => Ring_ModQ[6][6] => ZmodQ[6][6][1024] => int32_t[6][6][1024]
 typedef Ring_FFT  dct_FFT[K2][K2];  // Decomposed Ciphertext in FFT form. dct_FFT => Ring_FFT[6][6] => complex double[6][6][513]
@@ -125,23 +107,11 @@ void AddToACC(ct_FFT ACC,const ct_FFT C) {
       		    dct[i][j+2*l][k] = r;
         		}
       	}
-  // uint64_t start,end; 
-  // uint64_t cycles[1000];    
-  // for (int count = 0; count < 1000; ++count)
-  // { 
-  //   // printf("count = %d\n",count );
-  //   start = rdtsc();  
+ 
 
   for (int i = 0; i < K2; ++i)
     for (int j = 0; j < K2; ++j)
        FFTforward(dctFFT[i][j], dct[i][j]);
-
-
-  //   end = rdtsc();
-  //   cycles[count] = end - start;
-  // }
-  // qsort(cycles,sizeof(cycles)/sizeof(*cycles),sizeof(*cycles),compare);
-  // printf("Median: %llu\n",cycles[499]);
 
   for (int i = 0; i < K2; ++i)     
     for (int j = 0; j < 2; ++j)
