@@ -110,13 +110,13 @@ void cycle_meassure(){
     }
     qsort(cycles,sizeof(cycles)/sizeof(*cycles),sizeof(*cycles),compare);
     if(j == 0)
-      printf("Naive real mul: %llu\n",cycles[NTESTS/2-1]);
+      printf("Naive real mul:%llu %llu %llu\n",cycles[249],cycles[499],cycles[749]);
     else if(j == 1)
-      printf("Median Normal LUT FFT: %llu\n",cycles[NTESTS/2-1]);
+      printf("Median Normal LUT FFT:%llu %llu %llu\n",cycles[249],cycles[499],cycles[749]);
     else if(j == 2)
-      printf("Median Split Radix LUT FFT: %llu\n",cycles[NTESTS/2-1]);
+      printf("Median Split Radix LUT FFT:%llu %llu %llu\n",cycles[249],cycles[499],cycles[749]);
     else if(j == 3)
-      printf("Median Tangent LUT FFT: %llu\n",cycles[NTESTS/2-1]);
+      printf("Median Tangent LUT FFT:%llu %llu %llu\n",cycles[249],cycles[499],cycles[749]);
   }
 
   fclose(urandom); 
