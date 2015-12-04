@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
     cycles[count] = end - start;
   }
   qsort(cycles,sizeof(cycles)/sizeof(*cycles),sizeof(*cycles),compare);
-  printf("Median: %llu\n",cycles[499]);
+  printf("Median: %llu %llu %llu\n",cycles[249],cycles[499],cycles[749]);
 
   SaveCipherText(ct3,oct_fn);
   free(EK->BSkey);
