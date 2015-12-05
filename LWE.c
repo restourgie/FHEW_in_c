@@ -29,7 +29,7 @@ void KeyGenN(SecretKeyN FHEWsk) {
 	printf("\n*****Starting KeygenN*****\n");
   for(int i =0;i < N; ++i){
     FHEWsk[i] = Sample(Chi1);
-    printf("FHEWsk[%d] = %d\n",i,FHEWsk[i]);
+    // printf("FHEWsk[%d] = %d\n",i,FHEWsk[i]);
   }
   
   printf("\n*****Finished KeygenN*****\n");
