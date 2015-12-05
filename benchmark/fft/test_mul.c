@@ -83,15 +83,15 @@ void cycle_meassure(){
     qsort(cycles_2,sizeof(cycles_2)/sizeof(*cycles_2),sizeof(*cycles_2),compare);
     if(j == 0){
       printf("FFT Forward:%llu %llu %llu\n",cycles[249],cycles[499],cycles[749]);
-      printf("FFT Backward:%llu %llu %llu\n",cycles[249],cycles[499],cycles[749]);
+      printf("FFT Backward:%llu %llu %llu\n",cycles_2[249],cycles_2[499],cycles_2[749]);
     }
     else if(j == 1){
       printf("FFTW Forward:%llu %llu %llu\n",cycles[249],cycles[499],cycles[749]);
-      printf("FFTW Backward:%llu %llu %llu\n",cycles[249],cycles[499],cycles[749]);
+      printf("FFTW Backward:%llu %llu %llu\n",cycles_2[249],cycles_2[499],cycles_2[749]);
     }
     else if(j == 2){
       printf("FFTW Forward org:%llu %llu %llu\n",cycles[249],cycles[499],cycles[749]);
-      printf("FFTW Backward org:%llu %llu %llu\n",cycles[249],cycles[499],cycles[749]);
+      printf("FFTW Backward org:%llu %llu %llu\n",cycles_2[249],cycles_2[499],cycles_2[749]);
     }
 
   }
